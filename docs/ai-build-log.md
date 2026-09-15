@@ -254,3 +254,49 @@ $ npm run test:e2e
 
 **Commit**
 - `add sybil cluster key derivation`
+
+---
+
+## 2026-09-15 — T-11 Remediation: MSISDN Trust-Boundary Correction
+
+**Prompt(s) given to the agent**
+1. "T-11 REMEDIATION — MSISDN TRUST-BOUNDARY CORRECTION: src/domain/sybil.ts exposes normalizeMsisdnPrefix and accepts full MSISDN formats. Established T-11 trust boundary says domain must never receive full phone numbers. Place transformation at correct application/ingress boundary."
+
+**What I specified (human)**
+- Canonical specs: `07-trust-and-security.md §5` ("The domain core never receives a raw MSISDN — enforce with a type (PhoneHash) that has no constructor from a plain string outside infra"), `03-data-model.md §4` (`msisdn_prefix text NOT NULL -- first 6 digits ONLY`), `02-architecture.md`, `10-skills.md` (S-04), `09-agent.md §9`.
+- The domain module `src/domain/sybil.ts` must receive only the pre-truncated 6-digit `msisdnPrefixBucket`. It must not normalize or accept full phone numbers.
+- Full MSISDN normalization belongs at the channel/ingress boundary (`src/lib/msisdn.ts`), well outside the domain core.
+
+**What the agent produced**
+- `src/lib/msisdn.ts` — Ingress boundary phone normalization: `extractMsisdnPrefix(input, defaultCountryCode)` converting E.164, local `07...`, and international digits into the 6-digit prefix bucket.
+- `src/domain/sybil.ts` — Pure derivation module strictly enforcing the trust boundary:
+  - Replaced `normalizeMsisdnPrefix` with `validateMsisdnPrefixBucket(bucket)`.
+  - `validateMsisdnPrefixBucket` asserts `/^\d{6}$/` and rejects full phone numbers (>6 digits) loudly.
+  - `ClusterKeyParams` accepts only `msisdnPrefixBucket: string`.
+- `tests/unit/sybil.test.ts` — Updated 20 unit test cases passing only 6-digit prefix buckets, plus negative test asserting that full MSISDN formats (`+254712345678`, `254712345678`, `0712345678`) throw immediately when passed to the domain.
+- `tests/unit/msisdn.test.ts` — 6 unit tests verifying ingress extraction behavior.
+
+**What I rejected and why**
+- Rejected allowing optional `msisdn` in `ClusterKeyParams` with auto-truncation: that would silently erode the domain privacy boundary and make leaking raw PII into domain logs or memory trivial.
+
+**Verification (actual output)**
+```
+$ npx vitest run tests/unit/sybil.test.ts
+  ✓ tests/unit/sybil.test.ts (20 tests) 14ms
+$ npx vitest run tests/unit/architecture.test.ts
+  ✓ tests/unit/architecture.test.ts (1 test) 71ms
+$ npm run test:unit
+  10 passed (140 passed | 7 skipped)
+$ npm run typecheck
+  tsc --noEmit (exit 0)
+$ npm run lint
+  eslint . (exit 0)
+$ npm run test:e2e
+  1 passed (10.4s)
+```
+
+**Remaining unverified items**
+- Live PostgreSQL/Supabase RLS behavioral verification from T-06 remains unverified due to Docker engine being offline in local environment.
+
+**Commit**
+- `tighten sybil phone trust boundary`

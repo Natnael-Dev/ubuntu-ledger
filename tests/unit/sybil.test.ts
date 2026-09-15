@@ -2,11 +2,12 @@ import { describe, it, expect } from 'vitest';
 import {
   deriveClusterKey,
   getRegistrationCohort,
-  normalizeMsisdnPrefix,
+  validateMsisdnPrefixBucket,
   resolveEffectiveGeoCell,
   DEFAULT_WARD_FALLBACK_TOKEN,
   type ClusterKeyParams,
 } from '@/domain/sybil';
+import { extractMsisdnPrefix } from '@/lib/msisdn';
 
 describe('T-11: Sybil Cluster Key Derivation (07-trust-and-security.md §3, 10-skills.md S-04)', () => {
   const FIXED_TASK_ID = 'task-uuid-kibera-borehole-01';
@@ -19,7 +20,7 @@ describe('T-11: Sybil Cluster Key Derivation (07-trust-and-security.md §3, 10-s
       const params: ClusterKeyParams = {
         taskId: FIXED_TASK_ID,
         geoCell: FIXED_CELL,
-        msisdnPrefix: FIXED_PREFIX,
+        msisdnPrefixBucket: FIXED_PREFIX,
         registeredAt: FIXED_DATE,
       };
 
@@ -33,7 +34,7 @@ describe('T-11: Sybil Cluster Key Derivation (07-trust-and-security.md §3, 10-s
       const key = deriveClusterKey({
         taskId: FIXED_TASK_ID,
         geoCell: FIXED_CELL,
-        msisdnPrefix: FIXED_PREFIX,
+        msisdnPrefixBucket: FIXED_PREFIX,
         registeredAt: FIXED_DATE,
       });
 
@@ -51,7 +52,7 @@ describe('T-11: Sybil Cluster Key Derivation (07-trust-and-security.md §3, 10-s
       const key = deriveClusterKey({
         taskId: FIXED_TASK_ID,
         geoCell: FIXED_CELL,
-        msisdnPrefix: FIXED_PREFIX,
+        msisdnPrefixBucket: FIXED_PREFIX,
         registeredAt: FIXED_DATE,
       });
 
@@ -61,27 +62,30 @@ describe('T-11: Sybil Cluster Key Derivation (07-trust-and-security.md §3, 10-s
   });
 
   describe('2. Sybil Collusion Collision (Same Cluster -> Same Key)', () => {
-    it('collapses multiple submissions with same prefix, cell, and cohort into the identical cluster key', () => {
-      // 10 SIMs from the same shop (+254712...), registered the same week, in the same cell
+    it('collapses multiple submissions with same prefix bucket, cell, and cohort into the identical cluster key', () => {
+      const cohortDateMonday = new Date('2026-09-14T08:00:00Z');
+      const cohortDateThursday = new Date('2026-09-17T18:00:00Z');
+      const cohortDateSunday = new Date('2026-09-20T23:59:00Z');
+
       const sim1 = deriveClusterKey({
         taskId: FIXED_TASK_ID,
         geoCell: FIXED_CELL,
-        msisdn: '+254712000001',
-        registeredAt: new Date('2026-09-14T08:00:00Z'), // Monday
+        msisdnPrefixBucket: '254712',
+        registeredAt: cohortDateMonday,
       });
 
       const sim2 = deriveClusterKey({
         taskId: FIXED_TASK_ID,
         geoCell: FIXED_CELL,
-        msisdn: '+254712999999',
-        registeredAt: new Date('2026-09-17T18:00:00Z'), // Thursday same week
+        msisdnPrefixBucket: '254712',
+        registeredAt: cohortDateThursday,
       });
 
       const sim3 = deriveClusterKey({
         taskId: FIXED_TASK_ID,
         geoCell: FIXED_CELL,
-        msisdnPrefix: '254712',
-        registeredAt: new Date('2026-09-20T23:59:00Z'), // Sunday same week
+        msisdnPrefixBucket: '254712',
+        registeredAt: cohortDateSunday,
       });
 
       expect(sim1).toBe(sim2);
@@ -94,32 +98,32 @@ describe('T-11: Sybil Cluster Key Derivation (07-trust-and-security.md §3, 10-s
       const keyCellA = deriveClusterKey({
         taskId: FIXED_TASK_ID,
         geoCell: 'geo-cell-kbr-04',
-        msisdnPrefix: FIXED_PREFIX,
+        msisdnPrefixBucket: FIXED_PREFIX,
         registeredAt: FIXED_DATE,
       });
 
       const keyCellB = deriveClusterKey({
         taskId: FIXED_TASK_ID,
         geoCell: 'geo-cell-kbr-05',
-        msisdnPrefix: FIXED_PREFIX,
+        msisdnPrefixBucket: FIXED_PREFIX,
         registeredAt: FIXED_DATE,
       });
 
       expect(keyCellA).not.toBe(keyCellB);
     });
 
-    it('produces different cluster keys when MSISDN prefix differs (telecom cohort sensitivity)', () => {
+    it('produces different cluster keys when MSISDN prefix bucket differs (telecom cohort sensitivity)', () => {
       const keyPrefixA = deriveClusterKey({
         taskId: FIXED_TASK_ID,
         geoCell: FIXED_CELL,
-        msisdnPrefix: '254712',
+        msisdnPrefixBucket: '254712',
         registeredAt: FIXED_DATE,
       });
 
       const keyPrefixB = deriveClusterKey({
         taskId: FIXED_TASK_ID,
         geoCell: FIXED_CELL,
-        msisdnPrefix: '254722',
+        msisdnPrefixBucket: '254722',
         registeredAt: FIXED_DATE,
       });
 
@@ -131,14 +135,14 @@ describe('T-11: Sybil Cluster Key Derivation (07-trust-and-security.md §3, 10-s
       const keyWeek38 = deriveClusterKey({
         taskId: FIXED_TASK_ID,
         geoCell: FIXED_CELL,
-        msisdnPrefix: FIXED_PREFIX,
+        msisdnPrefixBucket: FIXED_PREFIX,
         registeredAt: new Date('2026-09-15T12:00:00Z'), // Week 38
       });
 
       const keyWeek39 = deriveClusterKey({
         taskId: FIXED_TASK_ID,
         geoCell: FIXED_CELL,
-        msisdnPrefix: FIXED_PREFIX,
+        msisdnPrefixBucket: FIXED_PREFIX,
         registeredAt: new Date('2026-09-22T12:00:00Z'), // Week 39
       });
 
@@ -149,14 +153,14 @@ describe('T-11: Sybil Cluster Key Derivation (07-trust-and-security.md §3, 10-s
       const keyTask1 = deriveClusterKey({
         taskId: 'task-001',
         geoCell: FIXED_CELL,
-        msisdnPrefix: FIXED_PREFIX,
+        msisdnPrefixBucket: FIXED_PREFIX,
         registeredAt: FIXED_DATE,
       });
 
       const keyTask2 = deriveClusterKey({
         taskId: 'task-002',
         geoCell: FIXED_CELL,
-        msisdnPrefix: FIXED_PREFIX,
+        msisdnPrefixBucket: FIXED_PREFIX,
         registeredAt: FIXED_DATE,
       });
 
@@ -178,14 +182,14 @@ describe('T-11: Sybil Cluster Key Derivation (07-trust-and-security.md §3, 10-s
         taskId: FIXED_TASK_ID,
         geoCell: null,
         wardId: 'ward-nairobi-south',
-        msisdnPrefix: FIXED_PREFIX,
+        msisdnPrefixBucket: FIXED_PREFIX,
         registeredAt: FIXED_DATE,
       });
 
       const keyWithExplicitWardCell = deriveClusterKey({
         taskId: FIXED_TASK_ID,
         geoCell: 'ward:ward-nairobi-south',
-        msisdnPrefix: FIXED_PREFIX,
+        msisdnPrefixBucket: FIXED_PREFIX,
         registeredAt: FIXED_DATE,
       });
 
@@ -199,14 +203,14 @@ describe('T-11: Sybil Cluster Key Derivation (07-trust-and-security.md §3, 10-s
         taskId: FIXED_TASK_ID,
         geoCell: undefined,
         wardId: undefined,
-        msisdnPrefix: FIXED_PREFIX,
+        msisdnPrefixBucket: FIXED_PREFIX,
         registeredAt: FIXED_DATE,
       });
 
       const keyExplicitUnspecified = deriveClusterKey({
         taskId: FIXED_TASK_ID,
         geoCell: 'ward:UNSPECIFIED',
-        msisdnPrefix: FIXED_PREFIX,
+        msisdnPrefixBucket: FIXED_PREFIX,
         registeredAt: FIXED_DATE,
       });
 
@@ -218,7 +222,7 @@ describe('T-11: Sybil Cluster Key Derivation (07-trust-and-security.md §3, 10-s
         taskId: FIXED_TASK_ID,
         geoCell: null,
         wardId: 'ward-01',
-        msisdnPrefix: FIXED_PREFIX,
+        msisdnPrefixBucket: FIXED_PREFIX,
         registeredAt: FIXED_DATE,
       });
 
@@ -226,7 +230,7 @@ describe('T-11: Sybil Cluster Key Derivation (07-trust-and-security.md §3, 10-s
         taskId: FIXED_TASK_ID,
         geoCell: null,
         wardId: 'ward-02',
-        msisdnPrefix: FIXED_PREFIX,
+        msisdnPrefixBucket: FIXED_PREFIX,
         registeredAt: FIXED_DATE,
       });
 
@@ -234,49 +238,43 @@ describe('T-11: Sybil Cluster Key Derivation (07-trust-and-security.md §3, 10-s
     });
   });
 
-  describe('5. MSISDN Prefix Normalization', () => {
-    it('normalizes international format with plus (+254712...) to 6 digits', () => {
-      expect(normalizeMsisdnPrefix('+254712345678')).toBe('254712');
+  describe('5. MSISDN Prefix Bucket Validation and Trust Boundary', () => {
+    it('accepts valid 6-digit prefix buckets', () => {
+      expect(validateMsisdnPrefixBucket('254712')).toBe('254712');
+      expect(validateMsisdnPrefixBucket('071234')).toBe('071234');
     });
 
-    it('normalizes international format without plus (254712...) to 6 digits', () => {
-      expect(normalizeMsisdnPrefix('254712345678')).toBe('254712');
-    });
-
-    it('normalizes raw 6-digit prefix directly', () => {
-      expect(normalizeMsisdnPrefix('254712')).toBe('254712');
-    });
-
-    it('normalizes local 10-digit format (0712345678) with defaultCountryCode', () => {
-      expect(normalizeMsisdnPrefix('0712345678', '254')).toBe('254712');
-    });
-
-    it('normalizes local format (0712345678) without defaultCountryCode to first 6 digits', () => {
-      expect(normalizeMsisdnPrefix('0712345678')).toBe('071234');
-    });
-
-    it('yields identical cluster key for +254712... and 254712...', () => {
-      const keyWithPlus = deriveClusterKey({
-        taskId: FIXED_TASK_ID,
-        geoCell: FIXED_CELL,
-        msisdn: '+254712345678',
-        registeredAt: FIXED_DATE,
-      });
-
-      const keyNoPlus = deriveClusterKey({
-        taskId: FIXED_TASK_ID,
-        geoCell: FIXED_CELL,
-        msisdn: '254712345678',
-        registeredAt: FIXED_DATE,
-      });
-
-      expect(keyWithPlus).toBe(keyNoPlus);
-    });
-
-    it('throws error if input has fewer than 6 digits', () => {
-      expect(() => normalizeMsisdnPrefix('12345')).toThrow(
-        /must contain at least 6 digits/
+    it('BLOCKER ENFORCEMENT: rejects full MSISDNs in the domain layer (07 §5)', () => {
+      expect(() => validateMsisdnPrefixBucket('+254712345678')).toThrow(
+        /Full MSISDN is strictly forbidden in the domain layer/
       );
+      expect(() => validateMsisdnPrefixBucket('254712345678')).toThrow(
+        /Full MSISDN is strictly forbidden in the domain layer/
+      );
+      expect(() => validateMsisdnPrefixBucket('0712345678')).toThrow(
+        /Full MSISDN is strictly forbidden in the domain layer/
+      );
+    });
+
+    it('rejects short prefixes (<6 digits) in the domain layer', () => {
+      expect(() => validateMsisdnPrefixBucket('12345')).toThrow(
+        /must be exactly 6 digits/
+      );
+    });
+
+    it('rejects non-numeric characters in the domain layer', () => {
+      expect(() => validateMsisdnPrefixBucket('25471A')).toThrow(
+        /must be exactly 6 digits/
+      );
+    });
+
+    it('proves ingress normalization helper (extractMsisdnPrefix) extracts prefix outside domain', () => {
+      expect(extractMsisdnPrefix('+254712345678')).toBe('254712');
+      expect(extractMsisdnPrefix('254712345678')).toBe('254712');
+      expect(extractMsisdnPrefix('0712345678', '254')).toBe('254712');
+      expect(extractMsisdnPrefix('0712345678')).toBe('071234');
+      expect(extractMsisdnPrefix('254712')).toBe('254712');
+      expect(() => extractMsisdnPrefix('123')).toThrow(/must contain at least 6 digits/);
     });
   });
 
@@ -309,7 +307,7 @@ describe('T-11: Sybil Cluster Key Derivation (07-trust-and-security.md §3, 10-s
         id: 'respondent-uuid-alice',
         taskId: FIXED_TASK_ID,
         geoCell: FIXED_CELL,
-        msisdnPrefix: FIXED_PREFIX,
+        msisdnPrefixBucket: FIXED_PREFIX,
         registeredAt: FIXED_DATE,
       };
 
@@ -317,7 +315,7 @@ describe('T-11: Sybil Cluster Key Derivation (07-trust-and-security.md §3, 10-s
         id: 'respondent-uuid-bob',
         taskId: FIXED_TASK_ID,
         geoCell: FIXED_CELL,
-        msisdnPrefix: FIXED_PREFIX,
+        msisdnPrefixBucket: FIXED_PREFIX,
         registeredAt: FIXED_DATE,
       };
 

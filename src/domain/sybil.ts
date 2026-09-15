@@ -2,6 +2,7 @@
 // Authoritative sources: docs/specs/07-trust-and-security.md §3, docs/specs/10-skills.md S-04,
 // docs/specs/03-data-model.md §4, docs/specs/04-state-machine.md §2 (INV-02), docs/specs/09-agent.md §9
 // Rule: Pure function. Zero external I/O, no DB imports, no Next.js imports, no real clock reads.
+// Trust boundary: Full phone numbers (MSISDN) are NEVER permitted in the domain layer (07 §5).
 
 import { createHash } from 'node:crypto';
 
@@ -15,44 +16,29 @@ export interface ClusterKeyParams {
   taskId: string;
   geoCell?: string | null;
   wardId?: string | null;
-  msisdnPrefix?: string | null;
-  msisdn?: string | null;
+  msisdnPrefixBucket: string;
   registeredAt: Date | string;
 }
 
 /**
- * Normalizes an MSISDN or prefix into a 6-digit bucket.
+ * Validates that the MSISDN prefix bucket is strictly a 6-digit string.
  * Authoritative: 07 §3 ("msisdn_prefix_bucket // first 6 digits -> bucket"), 03 §4 line 166.
  *
- * Supported formats:
- * - "+254712345678" -> "254712"
- * - "254712345678"  -> "254712"
- * - "0712345678"    -> "071234" (or "254712" if defaultCountryCode is "254")
- * - "254712"        -> "254712"
+ * Trust boundary: Full MSISDNs (>6 digits) are rejected loudly to prevent PII leakage into domain.
  */
-export function normalizeMsisdnPrefix(
-  input: string,
-  defaultCountryCode?: string
-): string {
-  if (!input) {
-    throw new Error('MSISDN or prefix must not be empty');
+export function validateMsisdnPrefixBucket(bucket: string): string {
+  if (!bucket || typeof bucket !== 'string') {
+    throw new Error('msisdnPrefixBucket must be a non-empty string');
   }
 
-  // Strip all non-digit characters (e.g. '+', spaces, dashes)
-  let digits = input.replace(/\D/g, '');
-
-  // Handle local leading '0' if default country code is supplied
-  if (defaultCountryCode && digits.startsWith('0') && digits.length > 6) {
-    digits = defaultCountryCode.replace(/\D/g, '') + digits.slice(1);
-  }
-
-  if (digits.length < 6) {
+  const trimmed = bucket.trim();
+  if (!/^\d{6}$/.test(trimmed)) {
     throw new Error(
-      `MSISDN or prefix must contain at least 6 digits; got '${input}' (${digits.length} digits)`
+      `msisdnPrefixBucket must be exactly 6 digits; got '${bucket}'. Full MSISDN is strictly forbidden in the domain layer (07 §5).`
     );
   }
 
-  return digits.slice(0, 6);
+  return trimmed;
 }
 
 /**
@@ -80,7 +66,7 @@ export function getRegistrationCohort(registeredAt: Date | string): string {
 
   target.setUTCMonth(0, 1);
   if (target.getUTCDay() !== 4) {
-    target.setUTCMonth(0, 1 + ((4 - target.getUTCDay() + 7) % 7));
+    target.setUTCMonth(0, 1 + ((4 - target.getUTCDay()) + 7) % 7);
   }
 
   const weekNumber =
@@ -126,7 +112,8 @@ export function resolveEffectiveGeoCell(
  * Security guarantees:
  * 1. Exactly 16 lowercase hex characters (/^[0-9a-f]{16}$/).
  * 2. CRITICAL: respondent.id is NEVER included. Confirmed by 13-ai-build-log-template.md.
- * 3. Deterministic across process restarts.
+ * 3. CRITICAL: Full phone numbers are NEVER accepted; only the 6-digit prefix bucket is allowed.
+ * 4. Deterministic across process restarts.
  */
 export function deriveClusterKey(params: ClusterKeyParams): string {
   const taskId = params.taskId ? params.taskId.trim() : '';
@@ -135,11 +122,7 @@ export function deriveClusterKey(params: ClusterKeyParams): string {
   }
 
   const effectiveGeoCell = resolveEffectiveGeoCell(params.geoCell, params.wardId);
-
-  // Extract prefix from msisdnPrefix or full msisdn
-  const rawPrefix = params.msisdnPrefix || params.msisdn || '';
-  const msisdnPrefixBucket = normalizeMsisdnPrefix(rawPrefix);
-
+  const msisdnPrefixBucket = validateMsisdnPrefixBucket(params.msisdnPrefixBucket);
   const registrationCohort = getRegistrationCohort(params.registeredAt);
 
   // Preimage concatenation: task_id + geo_cell + msisdn_prefix_bucket + registration_cohort

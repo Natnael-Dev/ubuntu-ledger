@@ -1,0 +1,67 @@
+// Core Domain Types
+// Authoritative sources: docs/specs/03-data-model.md §1, docs/specs/04-state-machine.md §8
+// Rule: Pure TypeScript definitions only. No framework, no I/O, no DB imports.
+
+export type FiscalState = 'PROMISED' | 'COMMITTED' | 'DISBURSED' | 'AUDITED';
+
+export type AuditState =
+  | 'NOT_DISPATCHED'
+  | 'TASK_DISPATCHED'
+  | 'AWAITING_THRESHOLD'
+  | 'PHYSICALLY_CONFIRMED'
+  | 'DISCREPANCY_FLAGGED';
+
+export type ProbationState =
+  | 'REPORTED_BROKEN'
+  | 'REPAIR_CLAIMED'
+  | 'PROBATION_DAY_0'
+  | 'PROBATION_ACTIVE'
+  | 'VERIFIED_SUSTAINED'
+  | 'PROBATION_FAILED';
+
+export type BulletinState =
+  | 'DRAFT'
+  | 'APPROVED_FOR_BROADCAST'
+  | 'REJECTED'
+  | 'BROADCAST_CONFIRMED';
+
+export type SourceConfidence =
+  | 'OFFICIAL_CITED'
+  | 'OFFICIAL_UNCITED'
+  | 'UNOFFICIAL_ESTIMATE';
+
+export type Channel = 'USSD' | 'SMS' | 'IVR' | 'PWA' | 'CONSOLE';
+
+export type ActorRole =
+  | 'CITIZEN'
+  | 'MONITOR'
+  | 'MODERATOR'
+  | 'INGEST_REVIEWER'
+  | 'ADMIN'
+  | 'SYSTEM';
+
+export type VoiceState =
+  | 'AUDIO_RECORDED'
+  | 'INTENT_STRUCTURED'
+  | 'HUMAN_AUDITED'
+  | 'PURGED'
+  | 'REJECTED';
+
+export type DomainErrorCode =
+  | 'E_ILLEGAL_TRANSITION'
+  | 'E_TERMINAL_STATE'
+  | 'E_UNINITIALIZED'
+  | 'E_ALREADY_INITIALIZED'
+  | 'E_UNOFFICIAL_ESTIMATE_CANNOT_COMMIT'
+  | 'E_MISSING_SOURCE_CITATION'
+  | 'E_MISSING_DISBURSEMENT_DOCUMENT'
+  | 'E_AUDIT_NOT_SETTLED'
+  | 'E_GUARD_FAILED';
+
+export type Effect =
+  | { kind: 'AUDIT'; action: string; payload: Record<string, unknown> }
+  | { kind: 'SET_CONFIDENCE'; confidence: SourceConfidence }
+  | { kind: 'MARK_BULLETIN_ELIGIBLE' }
+  | { kind: 'SCHEDULE_PING'; pingDay: 3 | 7; ticketId: string; respondentId: string }
+  | { kind: 'ENQUEUE_OUTBOX'; templateKey: string; recipientId: string }
+  | { kind: 'INCREMENT_FAILURE_COUNT'; claimingOrg: string };

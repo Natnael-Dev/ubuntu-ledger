@@ -21,3 +21,55 @@ every state machine transition are mine. The agent implemented, tested and attac
 | Adversarial attack scenarios | Agent generated, human curated and extended |
 | i18n plumbing and audio manifest | Agent |
 | Accessibility fixes | Agent, human-verified |
+
+---
+
+### T-07 — Fiscal state machine
+**Date:** 2026-09-15  ·  **Duration:** 0h 45m  ·  **Spec refs:** 04 §1, 04 §7 (INV-03, INV-05, INV-07), 03 §1, §3, 02 §4, 10 (S-03)
+
+**What I specified (human)**
+The fiscal state machine tracks public money claims only and is never influenced by citizen observations.
+Transitions: `uninitialized` → `PROMISED` → `COMMITTED` → `DISBURSED` → `AUDITED`.
+Enforce invariant INV-07: an unofficial estimate (or project lacking citation) must never reach `COMMITTED`.
+Enforce invariant INV-05: illegal transitions return typed domain errors and produce zero side-effects.
+Enforce invariant INV-03: every successful transition emits an audit descriptor.
+`AUDITED` is terminal. Reconciling requires settled community audit state (`PHYSICALLY_CONFIRMED` or `DISCREPANCY_FLAGGED`).
+
+**Prompt(s) used**
+1. "Begin T-07 investigation only. Read canonical specs and determine exact requirements for T-07."
+2. "Push existing accepted work, then implement T-07 Fiscal State Machine per 04-state-machine.md §1."
+
+**What the agent produced**
+- `src/domain/types.ts` — Common domain types (`FiscalState`, `AuditState`, `SourceConfidence`, `Effect`, `DomainErrorCode`).
+- `src/domain/fiscal-lifecycle.ts` — Pure transition function `transition(snapshot, event)` with exhaustive `never` check.
+- `tests/unit/fiscal-lifecycle.test.ts` — 19 unit test cases covering all 4 transition rows, illegal transitions, regressions, terminal state, and invariants INV-03, INV-05, INV-07.
+
+**What I rejected and why**
+- Rejected an early proposal to invent an `'UNINITIALIZED'` enum value in domain types, because the Postgres `fiscal_state` enum defines only `'PROMISED' | 'COMMITTED' | 'DISBURSED' | 'AUDITED'`. Instead represented uninitialized state cleanly as `fiscal: FiscalState | null` (or `current: FiscalSnapshot | null`).
+- Rejected silent no-ops or default fallbacks on invalid transitions: every illegal transition strictly returns `{ ok: false, code, message, effects: [] }`.
+
+**What I wrote by hand**
+- Transition table guards and domain error codes mapping directly to `04 §1`.
+- Discrimination of required effect descriptors (`AUDIT`, `SET_CONFIDENCE`, `MARK_BULLETIN_ELIGIBLE`).
+
+**Verification (actual output)**
+```
+$ npx vitest run tests/unit/fiscal-lifecycle.test.ts
+  ✓ tests/unit/fiscal-lifecycle.test.ts (19 tests) 13ms
+$ npx vitest run tests/unit/architecture.test.ts
+  ✓ tests/unit/architecture.test.ts (1 test) 39ms
+$ npm run test:unit
+  5 passed (38 passed | 7 skipped)
+$ npm run typecheck
+  tsc --noEmit (exit 0)
+$ npm run lint
+  eslint . (exit 0)
+$ npm run test:e2e
+  1 passed (playwright test)
+```
+
+**Remaining unverified items**
+- Live PostgreSQL/Supabase RLS behavioral verification from T-06 remains unverified due to Docker engine being offline in local environment.
+
+**Commit**
+- `add fiscal lifecycle state machine`

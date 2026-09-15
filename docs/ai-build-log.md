@@ -208,3 +208,49 @@ $ npm run test:e2e
 
 **Commit**
 - `add audit hash chain`
+
+---
+
+## 2026-09-15 — T-11 Implementation: Sybil Cluster Key Derivation
+
+**Prompt(s) given to the agent**
+1. "You are implementing T-11 [P0] Cluster key derivation for WARD PROOF-LINE. Implement the pure domain trust primitive required by T-11: derive the Sybil/collusion cluster key deterministically; no database access; no external I/O; no Next.js/Supabase imports; no respondent ID in the derivation."
+
+**What the agent produced**
+- `src/domain/sybil.ts` — Pure Sybil cluster key derivation module:
+  - `DEFAULT_WARD_FALLBACK_TOKEN`: Constant `'ward:UNSPECIFIED'`.
+  - `resolveEffectiveGeoCell(geoCell, wardId)`: Resolves geo_cell; when geo_cell is absent, falls back deterministically to `'ward:' + wardId.trim()`, or to `'ward:UNSPECIFIED'` if wardId is also omitted.
+  - `normalizeMsisdnPrefix(input, defaultCountryCode)`: Normalizes phone numbers / prefixes into a 6-digit bucket (e.g. `+254712...` -> `254712`, `254712...` -> `254712`, local `07...` with country code -> `254712`).
+  - `getRegistrationCohort(registeredAt)`: Deterministically computes UTC ISO-8601 weekly cohort bucket (`YYYY-Www`).
+  - `deriveClusterKey(params)`: Computes `sha256(taskId + effectiveGeoCell + msisdnPrefixBucket + registrationCohort).slice(0, 16)`.
+- `tests/unit/sybil.test.ts` — 22 unit test cases covering determinism, hardcoded process-restart fixture, collusion collision, geo_cell sensitivity, telecom prefix sensitivity, registration cohort sensitivity, task isolation, missing geo_cell fallback, MSISDN prefix normalization, exact 16-character lowercase hex format, and respondent ID anti-regression.
+
+**What I rejected and why**
+- Strongly rejected including `respondent.id` in `ClusterKeyParams` or derivation: confirmed with `07 §3` and `13 §template` that including `respondent.id` would make every submission its own cluster and silently destroy Sybil resistance.
+- Resolved spec discrepancy for missing `geo_cell` fallback: canonical `09 §9` states "missing geo_cell -> falls back to ward-level cell, still deterministic". When `wardId` is available, it resolves to `ward:${wardId}`; when neither `geo_cell` nor `wardId` is available, it resolves to `ward:UNSPECIFIED` (honest, transparent token rather than guessing a synthetic `DEFAULT_WARD`).
+
+**What I wrote by hand**
+- Deterministic UTC ISO week calculator (`getRegistrationCohort`) preventing local timezone skew from shifting cohort buckets.
+- Strict 16-character hexadecimal extraction and MSISDN prefix normalizer.
+
+**Verification (actual output)**
+```
+$ npx vitest run tests/unit/sybil.test.ts
+  ✓ tests/unit/sybil.test.ts (22 tests) 14ms
+$ npx vitest run tests/unit/architecture.test.ts
+  ✓ tests/unit/architecture.test.ts (1 test) 116ms
+$ npm run test:unit
+  9 passed (136 passed | 7 skipped)
+$ npm run typecheck
+  tsc --noEmit (exit 0)
+$ npm run lint
+  eslint . (exit 0)
+$ npm run test:e2e
+  1 passed (11.5s)
+```
+
+**Remaining unverified items**
+- Live PostgreSQL/Supabase RLS behavioral verification from T-06 remains unverified due to Docker engine being offline in local environment.
+
+**Commit**
+- `add sybil cluster key derivation`

@@ -116,3 +116,47 @@ $ npm run test:e2e
 
 **Commit**
 - `add audit lifecycle state machine`
+
+---
+
+## 2026-09-15 — T-09 Implementation: Probation State Machine
+
+**Prompt(s) given to the agent**
+1. "You are implementing T-09 [P0] Probation State Machine for WARD PROOF-LINE / Ubuntu Ledger. Every row of 04 §3 tested; INV-01 passes for every actor role; a DST-boundary case passes; pause/resume on discrepancy preserves remaining duration exactly."
+
+**What the agent produced**
+- `src/domain/types.ts` — Extended `DomainErrorCode` with `'E_PROBATION_LOCKED'`; extended `Effect` with `'QUEUE_BULLETIN_FACT'` and optional `clusterKey` in `'SCHEDULE_PING'`.
+- `src/domain/probation.ts` — Pure transition function `transition(current: ProbationSnapshot, event: ProbationEvent): ProbationResult` covering all 11 canonical probation events (`BREAKAGE_REPORTED`, `REPAIR_CLAIMED`, `INITIAL_FUNCTION_CONFIRMED`, `CLOCK_ADVANCED`, `FAILURE_REPORTED`, `PROBATION_WINDOW_CLOSED`, `WINDOW_CLOSED_NO_RESPONSE`, `REPAIR_RECLAIMED`, `MANUAL_CLOSE_ATTEMPT`, `LINKED_DISCREPANCY_FLAGGED`, `LINKED_DISCREPANCY_RESOLVED`).
+- `tests/unit/probation.test.ts` — 32 unit tests covering all 11 event cases, guard failures, INV-01 early closure rejection across all 6 actor roles, manual close lock for every role, no-response extension limit (max 2 extensions default per 04 §3), reclaim after failure preserving failure history, discrepancy pause/resume exact duration preservation, DST-boundary absolute timestamp invariance, and invariants INV-03 and INV-05.
+
+**What I rejected and why**
+- Rejected calendar-day / local wall-clock elapsed duration in favor of absolute epoch millisecond arithmetic (`Date.getTime()`), ensuring daylight saving time shifts do not alter the 7-day probation window.
+- Rejected silent override for privileged roles: manual close attempts (`MANUAL_CLOSE_ATTEMPT`) are unconditionally rejected with `E_PROBATION_LOCKED` for all roles (including `ADMIN` and `SYSTEM`).
+- Rejected accepting confirmations from arbitrary/new clusters: window closure strictly requires `>= 2` confirmations from original reporter clusters.
+- Handled the 2-vs-3 extension spec discrepancy: adopted `maxExtensions: 2` default as authoritative per `04-state-machine.md §3` while keeping the limit configurable on the snapshot.
+
+**What I wrote by hand**
+- Exact epoch-millisecond pause/resume arithmetic for linked discrepancy flagging and resolution.
+- Confirmation filtering logic verifying cluster keys against `originalReporterClusters` on or after `probationEndsAt`.
+
+**Verification (actual output)**
+```
+$ npx vitest run tests/unit/probation.test.ts
+  ✓ tests/unit/probation.test.ts (32 tests) 19ms
+$ npx vitest run tests/unit/architecture.test.ts
+  ✓ tests/unit/architecture.test.ts (1 test) 64ms
+$ npm run test:unit
+  7 passed (95 passed | 7 skipped)
+$ npm run typecheck
+  tsc --noEmit (exit 0)
+$ npm run lint
+  eslint . (exit 0)
+$ npm run test:e2e
+  1 passed (11.0s)
+```
+
+**Remaining unverified items**
+- Live PostgreSQL/Supabase RLS behavioral verification from T-06 remains unverified due to Docker engine being offline in local environment.
+
+**Commit**
+- `add probation lifecycle state machine`

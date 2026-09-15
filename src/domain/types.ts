@@ -56,7 +56,8 @@ export type DomainErrorCode =
   | 'E_MISSING_SOURCE_CITATION'
   | 'E_MISSING_DISBURSEMENT_DOCUMENT'
   | 'E_AUDIT_NOT_SETTLED'
-  | 'E_GUARD_FAILED';
+  | 'E_GUARD_FAILED'
+  | 'E_PROBATION_LOCKED';
 
 export type Effect =
   | { kind: 'AUDIT'; action: string; payload: Record<string, unknown> }
@@ -70,6 +71,7 @@ export type Effect =
   | { kind: 'OPEN_RESPONSE_WINDOW'; durationHours: number }
   | { kind: 'QUEUE_BULLETIN_CORRECTION' }
   | { kind: 'CLOSE_TASK' }
-  | { kind: 'SCHEDULE_PING'; pingDay: 3 | 7; ticketId: string; respondentId: string }
+  | { kind: 'SCHEDULE_PING'; pingDay: 3 | 7; ticketId: string; respondentId?: string; clusterKey?: string }
   | { kind: 'ENQUEUE_OUTBOX'; templateKey: string; recipientId: string }
-  | { kind: 'INCREMENT_FAILURE_COUNT'; claimingOrg: string };
+  | { kind: 'INCREMENT_FAILURE_COUNT'; claimingOrg: string }
+  | { kind: 'QUEUE_BULLETIN_FACT'; reason: string; assetId?: string; ticketId?: string };

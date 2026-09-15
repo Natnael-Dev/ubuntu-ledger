@@ -1,0 +1,27 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Ink on paper — the receipt metaphor (08-ui-ux-design.md §2) */
+  --paper: #FBFAF7;
+  --ink: #14150F;
+  --ink-soft: #55564C;
+  --rule: #D9D7CC;
+
+  /* Meaning colours. Used ONLY for state, never for decoration. */
+  --state-open: #1F5C3D;
+  --state-hold: #8A5A00;
+  --state-break: #8C2F22;
+  --state-none: #6B6C61;
+
+  /* Feature phone */
+  --lcd-bg: #C3CBB4;
+  --lcd-ink: #1B2016;
+  --shell: #2A2A28;
+}
+
+body {
+  color: var(--ink);
+  background: var(--paper);
+}

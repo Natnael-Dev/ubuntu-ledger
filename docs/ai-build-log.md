@@ -160,3 +160,51 @@ $ npm run test:e2e
 
 **Commit**
 - `add probation lifecycle state machine`
+
+---
+
+## 2026-09-15 — T-10 Implementation: Hash Chain
+
+**Prompt(s) given to the agent**
+1. "You are implementing T-10 [P0] Hash Chain for WARD PROOF-LINE / Ubuntu Ledger. Implement the pure audit hash-chain engine required by 03 §10, 04 §7 (INV-03/INV-04), 07 §8, 10 §S-14, 11 §T-10, 14 (ADV-26/ADV-27)."
+
+**What the agent produced**
+- `src/domain/audit-chain.ts` — Pure append-only audit hash chain engine:
+  - `GENESIS_PREV_HASH`: 64 hexadecimal zeros constant.
+  - `canonicalJson(value)`: RFC 8785-compliant deterministic JSON serializer sorting object keys lexicographically at all levels without unnecessary whitespace.
+  - `computePayloadHash(payload)`: Computes `sha256(canonical_json(payload))` returning 64-character lowercase hex.
+  - `computeEventHash(params)`: Computes `sha256(seq || prev_hash || payload_hash || occurred_at)` with canonical ISO 8601 UTC timestamp normalization.
+  - `createAuditEventRecord(...)`: Helper to build cryptographically chained audit event records.
+  - `verifyAuditChain(events)`: Pure chain verifier validating empty chains, genesis link, sequence monotonicity, predecessor link continuity, payload hashes, and block hashes, returning exact `firstBreakSeq` on failure (satisfying INV-04, ADV-26).
+- `tests/unit/audit-chain.test.ts` — 19 unit test cases covering canonical JSON key ordering, array order preservation, primitive serialization, deterministic hashing, genesis verification, valid chain verification, tampered payload detection (ADV-26 / INV-04), broken prev_hash linkage, altered timestamps, sequence gaps, duplicate sequence numbers, corrupted payload_hash/event_hash, and genesis corruption.
+
+**What I rejected and why**
+- Rejected external npm packages for canonical JSON: wrote a clean recursive key-sorted serializer with zero external dependencies, protecting domain isolation.
+- Rejected locale-dependent timestamp stringification: normalized all dates strictly to UTC ISO 8601 (`YYYY-MM-DDTHH:mm:ss.sssZ`).
+- Rejected building HTTP endpoint `/api/audit/verify` in T-10: per `11-tasks.md` Checkpoint 1 ("the rules core is green with no UI and no API"), T-10 is purely the domain verification engine. The HTTP endpoint will be mounted in Day 2/3.
+
+**What I wrote by hand**
+- Chain verification loop with early-exit reporting exact `firstBreakSeq`, `expectedHash`, and `foundHash`.
+- Deterministic canonical JSON serializer and SHA-256 pre-image concatenation.
+
+**Verification (actual output)**
+```
+$ npx vitest run tests/unit/audit-chain.test.ts
+  ✓ tests/unit/audit-chain.test.ts (19 tests) 14ms
+$ npx vitest run tests/unit/architecture.test.ts
+  ✓ tests/unit/architecture.test.ts (1 test) 77ms
+$ npm run test:unit
+  8 passed (114 passed | 7 skipped)
+$ npm run typecheck
+  tsc --noEmit (exit 0)
+$ npm run lint
+  eslint . (exit 0)
+$ npm run test:e2e
+  1 passed (9.9s)
+```
+
+**Remaining unverified items**
+- Live PostgreSQL/Supabase RLS behavioral verification from T-06 remains unverified due to Docker engine being offline in local environment.
+
+**Commit**
+- `add audit hash chain`

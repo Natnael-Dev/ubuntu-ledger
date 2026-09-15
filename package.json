@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "test": "vitest run",
+    "test:unit": "vitest run tests/unit"
   },
   "dependencies": {
     "clsx": "^2.1.1",
@@ -18,7 +20,7 @@
     "tailwind-merge": "^2.5.5"
   },
   "devDependencies": {
-    "@types/node": "^20.11.0",
+    "@types/node": "^22.20.2",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "autoprefixer": "^10.4.20",
@@ -26,6 +28,7 @@
     "eslint-config-next": "^16.3.5",
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.17",
-    "typescript": "^5.6.3"
+    "typescript": "^5.6.3",
+    "vitest": "^5.0.1"
   }
 }

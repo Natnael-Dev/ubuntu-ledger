@@ -62,6 +62,14 @@ export type Effect =
   | { kind: 'AUDIT'; action: string; payload: Record<string, unknown> }
   | { kind: 'SET_CONFIDENCE'; confidence: SourceConfidence }
   | { kind: 'MARK_BULLETIN_ELIGIBLE' }
+  | { kind: 'CREATE_TASK'; taskId: string; assetId: string; expiresAt: string }
+  | { kind: 'RECOMPUTE_WITNESS_COUNT'; witnessCount: number; clusterKey: string }
+  | { kind: 'NOTIFY_MODERATOR'; action: string }
+  | { kind: 'ENQUEUE_MODERATOR'; queue: string }
+  | { kind: 'PAUSE_PROBATION_CLOCK' }
+  | { kind: 'OPEN_RESPONSE_WINDOW'; durationHours: number }
+  | { kind: 'QUEUE_BULLETIN_CORRECTION' }
+  | { kind: 'CLOSE_TASK' }
   | { kind: 'SCHEDULE_PING'; pingDay: 3 | 7; ticketId: string; respondentId: string }
   | { kind: 'ENQUEUE_OUTBOX'; templateKey: string; recipientId: string }
   | { kind: 'INCREMENT_FAILURE_COUNT'; claimingOrg: string };

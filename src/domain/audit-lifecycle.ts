@@ -7,11 +7,17 @@ import type {
   DomainErrorCode,
   Effect,
 } from './types';
+import {
+  calculateAgreement,
+  type ClusterAnswer,
+  type AgreementResult,
+} from './triangulation';
 
-export interface ClusterAnswer {
-  clusterKey: string;
-  answers: Record<string, boolean>;
-}
+export {
+  calculateAgreement,
+  type ClusterAnswer,
+  type AgreementResult,
+};
 
 export interface AuditSnapshot {
   audit: AuditState;
@@ -82,100 +88,6 @@ export type AuditResult =
       effects: never[];
     };
 
-/**
- * Computes the multi-witness agreement ratio across distinct clusters.
- *
- * Per 04-state-machine.md §2 (line 51):
- * "for each question, compute the majority answer across distinct clusters.
- * Agreement = (clusters agreeing with majority) / (clusters answering).
- * If any question falls below 2/3, the result is DISCREPANCY_FLAGGED, not PHYSICALLY_CONFIRMED."
- */
-export function calculateAgreement(clusterAnswers: ClusterAnswer[]): {
-  isConsistent: boolean;
-  minAgreement: number;
-  distinctClusterCount: number;
-  perQuestion: Record<string, number>;
-} {
-  // Deduplicate by clusterKey to enforce INV-02
-  const uniqueByCluster = new Map<string, Record<string, boolean>>();
-  for (const item of clusterAnswers) {
-    if (!uniqueByCluster.has(item.clusterKey)) {
-      uniqueByCluster.set(item.clusterKey, item.answers);
-    }
-  }
-
-  const distinctClusterCount = uniqueByCluster.size;
-  if (distinctClusterCount === 0) {
-    return {
-      isConsistent: false,
-      minAgreement: 0,
-      distinctClusterCount: 0,
-      perQuestion: {},
-    };
-  }
-
-  // Collect all distinct question IDs
-  const allQuestionIds = new Set<string>();
-  for (const answers of uniqueByCluster.values()) {
-    for (const qId of Object.keys(answers)) {
-      allQuestionIds.add(qId);
-    }
-  }
-
-  if (allQuestionIds.size === 0) {
-    return {
-      isConsistent: false,
-      minAgreement: 0,
-      distinctClusterCount,
-      perQuestion: {},
-    };
-  }
-
-  let minAgreement = 1.0;
-  let isConsistent = true;
-  const perQuestion: Record<string, number> = {};
-
-  for (const qId of allQuestionIds) {
-    let trueVotes = 0;
-    let falseVotes = 0;
-
-    for (const answers of uniqueByCluster.values()) {
-      if (qId in answers) {
-        if (answers[qId] === true) {
-          trueVotes++;
-        } else {
-          falseVotes++;
-        }
-      }
-    }
-
-    const totalVotes = trueVotes + falseVotes;
-    if (totalVotes === 0) {
-      continue;
-    }
-
-    const majorityVotes = Math.max(trueVotes, falseVotes);
-    const agreement = majorityVotes / totalVotes;
-    perQuestion[qId] = agreement;
-
-    if (agreement < minAgreement) {
-      minAgreement = agreement;
-    }
-
-    // Strict 2/3 threshold (majorityVotes / totalVotes >= 2/3)
-    // Using integer arithmetic majorityVotes * 3 >= totalVotes * 2 to avoid float inaccuracies
-    if (majorityVotes * 3 < totalVotes * 2) {
-      isConsistent = false;
-    }
-  }
-
-  return {
-    isConsistent,
-    minAgreement,
-    distinctClusterCount,
-    perQuestion,
-  };
-}
 
 /**
  * Pure transition function for the Project Audit Lifecycle.

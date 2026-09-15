@@ -300,3 +300,57 @@ $ npm run test:e2e
 
 **Commit**
 - `tighten sybil phone trust boundary`
+
+---
+
+## 2026-09-15 — T-12 Implementation: Triangulation and Agreement
+
+**Prompt(s) given to the agent**
+1. "T-12 [P0] IMPLEMENTATION — TRIANGULATION AND AGREEMENT. Implement the pure domain triangulation/trust engine defined by the canonical specs: assignObservationWeight, countWitnesses, calculateAgreement, checkOfficialClaimContradiction, evaluateTriangulation."
+
+**What I specified (human)**
+- Canonical specs: `04 §2`, `04 §7` (INV-02, INV-08), `07 §3`, `07 §4`, `10` (S-05), `02 §2, §5`, `03 §4`, `05 §5`, `14 §2` (ADV-01..ADV-05).
+- Pure domain implementation in `src/domain/triangulation.ts` with zero database or external I/O imports.
+- Invariant INV-02: `witness_count = count(distinct cluster_key) where weight = 1`. Suppressed duplicates (`weight = 0`) never count.
+- Multi-witness agreement rule: each question evaluated independently across distinct clusters; agreement passes only when `majorityVotes * 3 >= totalVotes * 2` (strict integer arithmetic); if any question falls below 2/3, overall consensus is inconsistent (`DISCREPANCY_FLAGGED`).
+- Official claim contradiction: ≥2 distinct clusters answering `false` to an official claim flags discrepancy immediately (`CONTRADICTS_OFFICIAL_CLAIM`).
+- INV-08 domain boundary: pure domain guards prevent duplicate threshold transitions or duplicate audit effects once a task is settled. Physical cross-process serialization with `SELECT ... FOR UPDATE` is explicitly deferred to T-13.
+- Backwards compatibility: move `calculateAgreement` and `ClusterAnswer` to `src/domain/triangulation.ts` and re-export from `src/domain/audit-lifecycle.ts` without duplicating logic.
+
+**What the agent produced**
+- `src/domain/triangulation.ts` — Pure domain triangulation engine:
+  - `assignObservationWeight(existingClusterKeys, incomingClusterKey)`: returns `{ weight: 1, isDuplicate: false }` for new clusters, or `{ weight: 0, isDuplicate: true, reasonKey: 'observation.cluster_already_counted' }` for duplicates.
+  - `countWitnesses(observations)`: counts distinct cluster keys with `weight = 1`.
+  - `calculateAgreement(clusterAnswers)`: computes per-question majority ratio using integer arithmetic (`majorityVotes * 3 >= totalVotes * 2`).
+  - `checkOfficialClaimContradiction(clusterAnswers, officialClaims)`: detects if ≥2 distinct clusters contradict an official assertion.
+  - `evaluateTriangulation(params)`: evaluates threshold and maps to canonical `AuditEvent` recommendations (`THRESHOLD_MET_CONSISTENT`, `THRESHOLD_MET_CONFLICTING`, `CONTRADICTS_OFFICIAL_CLAIM`, or awaiting).
+- `src/domain/audit-lifecycle.ts` — Updated to import and re-export `calculateAgreement`, `ClusterAnswer`, and `AgreementResult` from `./triangulation`.
+- `tests/unit/triangulation.test.ts` — 26 unit test cases covering weighting, duplicate suppression (ADV-01), INV-02, agreement thresholds (ADV-04, ADV-05), integer precision boundaries, official contradictions, evaluator mappings, and domain settled-state guards.
+
+**What I rejected and why**
+- Rejected implementing an in-memory lock in the domain: concurrency locks belong to PostgreSQL transactions (`SELECT ... FOR UPDATE`) in T-13.
+- Rejected duplicating `calculateAgreement` across domain files.
+
+**Verification (actual output)**
+```
+$ npx vitest run tests/unit/triangulation.test.ts
+  ✓ tests/unit/triangulation.test.ts (26 tests) 20ms
+$ npx vitest run tests/unit/audit-lifecycle.test.ts
+  ✓ tests/unit/audit-lifecycle.test.ts (25 tests) 18ms
+$ npx vitest run tests/unit/architecture.test.ts
+  ✓ tests/unit/architecture.test.ts (1 test) 75ms
+$ npm run test:unit
+  11 passed (166 passed | 7 skipped)
+$ npm run typecheck
+  tsc --noEmit (exit 0)
+$ npm run lint
+  eslint . (exit 0)
+$ npm run test:e2e
+  1 passed (9.5s)
+```
+
+**Remaining unverified items**
+- Live PostgreSQL/Supabase RLS behavioral verification from T-06 remains unverified due to Docker engine being offline in local environment.
+
+**Commit**
+- `add triangulation and agreement`

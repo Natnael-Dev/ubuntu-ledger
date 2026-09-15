@@ -58,5 +58,25 @@ export default tseslint.config(
         },
       ],
     },
+  },
+  {
+    files: ["src/**/*.{ts,tsx,js,jsx}"],
+    ignores: ["src/infra/clock/**"],
+    rules: {
+      "no-restricted-syntax": [
+        "error",
+        {
+          selector:
+            "CallExpression[callee.object.name='Date'][callee.property.name='now']",
+          message:
+            "Date.now() is forbidden outside infra/clock. Use infra/clock instead (02-architecture.md §4).",
+        },
+        {
+          selector: "NewExpression[callee.name='Date'][arguments.length=0]",
+          message:
+            "new Date() without arguments is forbidden outside infra/clock. Use infra/clock instead (02-architecture.md §4).",
+        },
+      ],
+    },
   }
 );

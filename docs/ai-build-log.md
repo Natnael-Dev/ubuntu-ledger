@@ -354,3 +354,101 @@ $ npm run test:e2e
 
 **Commit**
 - `add triangulation and agreement`
+
+---
+
+## 2026-09-16 — T-13 Implementation: Repositories and Application Services
+
+**Prompt(s) given to the agent**
+1. "T-13 IMPLEMENTATION — REPOSITORIES + APP-SERVICES. Implement the repository and application-service layer required to safely execute observation mutations against the existing PostgreSQL schema while preserving aggregate boundaries, domain purity, PostgreSQL transaction atomicity, row-lock concurrency, global idempotency, audit hash-chain serialization, triangulation rules, and exactly-once threshold transition behavior."
+
+**What I specified (human)**
+- Canonical specs: `02 §2, §4, §5 (Path B)`, `03 §4, §10, §11`, `04 §2, §7 (INV-02, INV-03, INV-08)`, `05 §5`, `07 §3, §4, §5, §8`, `11` (T-13), `14 §2` (ADV-01, ADV-07).
+- Strict 16-step transaction contract executing within a single atomic PostgreSQL transaction with full rollback on any failure (INV-05).
+- Idempotency contract: `SELECT pg_advisory_xact_lock(hashtext('idempotency:' || :key))` at transaction start followed by in-transaction re-check against `idempotency_record`. Same key + same hash returns cached response; same key + different hash returns `409 idempotency_key_reused`; same key + different task is globally serialized without mutating the second task.
+- Audit hash-chain serialization: `SELECT pg_advisory_xact_lock(hashtext('audit_event_chain'))` serializing global sequence numbering and SHA-256 predecessor hash linking without table lock contention.
+- Ingress privacy boundary: raw MSISDN is normalized to prefix bucket outside the domain; domain code receives only opaque `cluster_key` and boolean answers.
+- Clear separation: static and unit service tests are verified; physical multi-connection database concurrency (INV-08/ADV-07) and live RLS remain documented as environment-blocked verification debt due to offline Docker engine.
+
+**What the agent produced**
+- `src/infra/db/types.ts`: Infrastructure database entity types (`ProjectRecord`, `InspectionTaskRecord`, `ObservationRecord`, `IdempotencyRecord`).
+- `src/infra/db/repositories/project.repository.ts`: Project aggregate repository providing `getProjectForUpdate` and `updateAuditState`.
+- `src/infra/db/repositories/task.repository.ts`: InspectionTask and Observation persistence provider with `getTaskForUpdate`, `updateWitnessCount`, `insertObservation`, `getObservationsForTask`.
+- `src/infra/db/services/audit-log.service.ts`: Append-only audit log service maintaining the tamper-evident cryptographic hash chain.
+- `src/infra/db/services/idempotency.store.ts`: Transport idempotency store for caching mutating endpoint responses.
+- `src/infra/db/transaction.ts`: TransactionContext and transactional rollback runner.
+- `src/app-services/errors.ts`: Typed `ServiceError` class.
+- `src/app-services/observation.service.ts`: Full observation mutation orchestrator implementing the 16-step transaction pipeline.
+- `src/app-services/index.ts`: Application service barrel export.
+- `tests/unit/app-services/observation-service.test.ts`: 11 focused unit tests verifying weighting, duplicate cluster suppression, threshold state transitions, idempotency replays and conflicts, atomicity rollback, and ingress privacy normalization.
+
+**What I rejected and why**
+- Rejected "one repository per table": observations are treated as child entities within the task/project aggregate boundary.
+- Rejected in-memory locks or pending status rows for idempotency: advisory locks + DB unique constraints cleanly prevent race conditions without schema changes.
+
+**Verification (actual output)**
+```
+$ npx vitest run tests/unit/app-services/observation-service.test.ts
+  ✓ tests/unit/app-services/observation-service.test.ts (11 tests) 21ms
+$ npx vitest run tests/unit/architecture.test.ts
+  ✓ tests/unit/architecture.test.ts (1 test) 93ms
+$ npm run test:unit
+  12 passed (177 passed | 7 skipped)
+$ npm run typecheck
+  tsc --noEmit (exit 0)
+$ npm run lint
+  eslint . (exit 0)
+$ npm run build
+  next build (exit 0, compiled successfully)
+$ npm run test:e2e
+  1 passed (10.7s)
+```
+
+### T-13 Remediation: Real PostgreSQL Adapters & Concurrency Verification
+- **Task:** T-13 Remediation — Real Postgres Adapter / Verify Actual Implementation
+- **Why:** Architect audit flagged that in-memory implementations (`InMemoryTransactionRunner`, `InMemoryProjectRepository`, etc.) were acting as the sole infrastructure without real PostgreSQL adapters. Implemented real PostgreSQL adapters with `pg` driver using parameterized SQL, real advisory locking (`pg_advisory_xact_lock`), real row locks (`SELECT ... FOR UPDATE`), transaction boundaries (`BEGIN`/`COMMIT`/`ROLLBACK`), and live multi-connection integration harness.
+
+**What I changed**
+- Added `pg` and `@types/pg` dependencies.
+- `src/infra/db/postgres/pool.ts`: Connection pool manager (`getPostgresPool`, `closePostgresPool`).
+- `src/infra/db/postgres/transaction.ts`: `PostgresTransactionRunner` running real single-transaction client checkouts with `BEGIN`, `COMMIT`, `ROLLBACK`, and `pg_advisory_xact_lock`.
+- `src/infra/db/postgres/project.repository.ts`: `PostgresProjectRepository` executing `SELECT ... FROM project WHERE id = $1 FOR UPDATE` and `UPDATE project SET audit = $2`.
+- `src/infra/db/postgres/task.repository.ts`: `PostgresTaskRepository` executing `SELECT ... FROM inspection_task WHERE id = $1 FOR UPDATE`, `INSERT INTO observation`, and witness count updates.
+- `src/infra/db/postgres/audit-log.service.ts`: `PostgresAuditLogService` executing `SELECT pg_advisory_xact_lock(hashtext('audit_event_chain'))`, reading latest sequence, and appending audit events.
+- `src/infra/db/postgres/idempotency.store.ts`: `PostgresIdempotencyStore` executing queries against `idempotency_record`.
+- `src/infra/db/index.ts`: Exporting both the real PostgreSQL implementations and the unit test doubles.
+- `tests/integration/postgres-observation.test.ts`: Integration test verifying real PostgreSQL adapter behavior and wiring, with live multi-connection concurrency test harness when live PostgreSQL is attached.
+- `vitest.config.mts`: Updated test include to cover `tests/integration/**/*.test.ts`.
+
+**Verification (actual output)**
+```
+$ npm test
+  ✓ tests/unit/rls.test.ts (20 tests | 7 skipped)
+  ✓ tests/unit/smoke.test.ts (1 test)
+  ✓ tests/unit/probation.test.ts (32 tests)
+  ✓ tests/unit/triangulation.test.ts (26 tests)
+  ✓ tests/unit/audit-chain.test.ts (19 tests)
+  ✓ tests/unit/audit-lifecycle.test.ts (25 tests)
+  ✓ tests/unit/msisdn.test.ts (6 tests)
+  ✓ tests/unit/fiscal-lifecycle.test.ts (19 tests)
+  ✓ tests/unit/clock.test.ts (4 tests)
+  ✓ tests/unit/sybil.test.ts (20 tests)
+  ✓ tests/unit/app-services/observation-service.test.ts (11 tests)
+  ✓ tests/integration/postgres-observation.test.ts (4 tests | 1 skipped)
+  ✓ tests/unit/architecture.test.ts (1 test)
+  Test Files 13 passed (13), Tests 180 passed | 8 skipped
+$ npm run typecheck
+  tsc --noEmit (exit 0)
+$ npm run lint
+  eslint . (exit 0)
+$ npm run build
+  next build (exit 0, compiled successfully)
+$ npm run test:e2e
+  1 passed (11.5s)
+```
+
+**Remaining unverified items**
+- Live multi-connection physical PostgreSQL execution (INV-08 live race with 2 simultaneous TCP database client connections crossing the threshold simultaneously) and live database RLS enforcement remain unverified because local Docker/PostgreSQL is offline (connection to localhost:5432 / localhost:54321 failed). Adapters and transaction wiring are verified via automated integration tests with mock pool clients and test doubles.
+
+**Commit**
+- `add repositories and observation application service` (amended with real PostgreSQL adapters)

@@ -452,3 +452,41 @@ $ npm run test:e2e
 
 **Commit**
 - `add repositories and observation application service` (amended with real PostgreSQL adapters)
+
+---
+
+## 2026-09-16 — Batch 4A (T-14)
+
+### T-14: Pure USSD Session Reducer & Content Core
+- **Task:** T-14 [P0] USSD session reducer
+- **Why:** Enable stateless replay of keypress sequences into USSD menu screens without telecom I/O or server-side session persistence.
+
+**What I changed**
+- `src/domain/content.ts`: Pure domain message catalog and template interpolation engine for `en`, `am`, and `om`. Enforces absence of banned terms (CH-08), strict length budgets (CH-02), and canonical Provenance Sentence composition.
+- `src/domain/ussd/types.ts`: Domain types for USSD responses, lookups, observations, faults, and session contexts.
+- `src/domain/ussd/session.ts`: Pure deterministic USSD session reducer. Statelessly replays keypress sequences (`1*4412*1...`), implements universal navigation (`0` back, `00` main menu, invalid input re-prompts with inline hints), canonical menu tree (check project, service fees, report fault, language), and formats non-terminal nodes as `CON <prompt>` and terminal nodes as `END <message>`.
+- `src/domain/ussd/index.ts`: Module barrel exports.
+- `tests/unit/ussd-session.test.ts`: 20 focused unit tests validating CH-05 (CON/END framing), CH-07 (pure replay determinism), CH-02 (<=182 character limit across en/am/om for all screens), full tree navigation, error resilience, and content integrity.
+
+**Verification (actual output)**
+```
+$ npx vitest run tests/unit/ussd-session.test.ts
+  ✓ tests/unit/ussd-session.test.ts (20 tests) 44ms
+$ npx vitest run tests/unit/architecture.test.ts
+  ✓ tests/unit/architecture.test.ts (1 test) 84ms
+$ npm test
+  14 test files passed (200 passed | 8 skipped)
+$ npm run test:unit
+  13 test files passed (197 passed | 7 skipped)
+$ npm run typecheck
+  tsc --noEmit (exit 0)
+$ npm run lint
+  eslint . (exit 0)
+$ npm run build
+  next build (exit 0, compiled successfully)
+$ npm run test:e2e
+  1 passed (12.0s)
+```
+
+**Commit**
+- `implement pure ussd session reducer`

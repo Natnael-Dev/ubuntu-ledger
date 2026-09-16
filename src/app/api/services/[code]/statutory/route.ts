@@ -5,7 +5,7 @@
 // - docs/specs/07-trust-and-security.md §7
 // - docs/specs/11-tasks.md T-25
 
-import { StatutoryService } from '@/app-services/statutory.service';
+import { getStatutoryService } from '@/app-services/statutory.service';
 import { ServiceError } from '@/app-services/errors';
 
 export interface RouteContext {
@@ -61,7 +61,7 @@ export async function GET(
   }
 
   const code = rawCode.trim();
-  const service = new StatutoryService();
+  const service = getStatutoryService();
 
   try {
     const card = await service.getStatutoryCard(code);

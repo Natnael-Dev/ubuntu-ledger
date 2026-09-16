@@ -227,3 +227,16 @@ export class StatutoryService {
     return card.observed;
   }
 }
+
+let _statutoryServiceSingleton: StatutoryService | null = null;
+
+/**
+ * Returns a shared singleton StatutoryService instance.
+ * Matches the factory pattern used by cron route handlers.
+ */
+export function getStatutoryService(): StatutoryService {
+  if (!_statutoryServiceSingleton) {
+    _statutoryServiceSingleton = new StatutoryService();
+  }
+  return _statutoryServiceSingleton;
+}

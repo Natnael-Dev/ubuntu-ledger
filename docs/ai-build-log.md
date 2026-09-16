@@ -490,3 +490,146 @@ $ npm run test:e2e
 
 **Commit**
 - `implement pure ussd session reducer`
+
+---
+
+## 2026-09-16 — Batch 4B (T-15)
+
+### T-15: USSD HTTP Transport Route Adapter
+- **Task:** T-15 [P0] USSD transport adapter
+- **Why:** Expose Africa's Talking compatible HTTP gateway (`POST /api/ussd`) supporting both URL-encoded and JSON payloads, strictly guarding the phone number trust boundary at ingress.
+
+**What I changed**
+- `src/app/api/ussd/route.ts`: Webhook handler parsing `sessionId`, `phoneNumber`, and `text`. Validates MSISDN format and 6-digit prefix bucket, invokes `reduceUssdSession`, and returns plain text responses framed with `CON` or `END`. Implements 405 Method Not Allowed for GET/PUT/DELETE/PATCH.
+- `tests/unit/api/ussd-route.test.ts`: 18 focused unit tests asserting payload handling, framing invariants, MSISDN boundary security, and error responses.
+
+**What I rejected and why**
+- Rejected passing raw caller phone numbers into the session reducer or downstream domain functions: MSISDN is stripped of whitespace/formatting and hashed before any trust evaluation.
+- Rejected custom JSON envelope on the HTTP response: Africa's Talking requires raw `text/plain` responses prefixed with `CON ` or `END `.
+
+**Verification (actual output)**
+```
+$ npx vitest run tests/unit/api/ussd-route.test.ts
+  ✓ tests/unit/api/ussd-route.test.ts (18 tests) 82ms
+```
+
+**Commit**
+- `add ussd http transport route`
+
+---
+
+## 2026-09-16 — Batch 4C (T-16)
+
+### T-16: Observations Ingress API & Idempotency
+- **Task:** T-16 [P0] Observations API
+- **Why:** Allow offline-capable monitor PWAs and authenticated channels to submit physical asset verification observations with UUID idempotency keys.
+
+**What I changed**
+- `src/app/api/observations/route.ts`: RFC 7807 problem-json compliant ingress route validating UUID `Idempotency-Key` headers, request schemas, resolving respondent identities via `phoneHash`, and delegating to `ObservationService`.
+- `tests/unit/api/observations-route.test.ts`: 19 tests verifying header validation, UUID format enforcement, schema validation, 404 respondent handling, and idempotency replay.
+
+**What I rejected and why**
+- Rejected returning internal PostgreSQL stack traces or 500 error messages on unhandled database exceptions.
+- Rejected accepting `Idempotency-Key` headers that deviate from the canonical UUID specification.
+
+**Verification (actual output)**
+```
+$ npx vitest run tests/unit/api/observations-route.test.ts
+  ✓ tests/unit/api/observations-route.test.ts (19 tests) 78ms
+```
+
+**Commit**
+- `add observations api and idempotency`
+
+---
+
+## 2026-09-16 — Batch 4D (T-18 Fixtures)
+
+### T-18 (Part 1): Canonical Demo Scenario Fixtures & Invariant Verification
+- **Task:** T-18 [P0] Demo scenario dataset
+- **Why:** Provide single-source-of-truth declarative test data for 6 projects, 12 respondents, pre-seeded observations, repair tickets, and statutory rules.
+
+**What I changed**
+- `src/fixtures/demo-scenario.ts`: 1,251-line canonical scenario fixture defining synthetic non-routable personas (+251999000001 through +251999000012), timeline anchors, and pre-seeded observations for Project 4412 (2 of 3 witnesses).
+- `tests/unit/fixtures/demo-scenario.test.ts`: 25 unit tests verifying data consistency, Sybil cluster collision for Amina/Girma, SHA-256 digests, and probation duration.
+
+**Commit**
+- `add canonical demo scenario fixture and trust invariant tests`
+
+---
+
+## 2026-09-16 — Batch 4E (T-17)
+
+### T-17: Feature Phone Web Simulator
+- **Task:** T-17 [P0] Feature phone simulator
+- **Why:** Provide an interactive browser-based Nokia 3310-style hardware simulator for manual testing and demonstration of USSD menus.
+
+**What I changed**
+- `src/app/simulator/page.tsx` & `src/app/simulator/SimulatorShell.tsx`: Client-side simulator rendering 4x20 LCD display, physical keypad, persona selector, session accumulator, and live transcript panel. Interacts exclusively with `/api/ussd` over HTTP.
+- `tests/e2e/simulator.spec.ts`: Playwright automated tests verifying phone rendering, persona selection, keypad clicks, and backend HTTP integration.
+
+**Commit**
+- `add feature phone simulator`
+
+---
+
+## 2026-09-17 — Batch 5A (Build & Tooling)
+
+### Next.js Windows Build Fix
+- **Task:** Build configuration fix for Windows file tracing
+- **Why:** On Windows environments, `@vercel/nft` threw `ENOENT: route.js.nft.json` when attempting to trace native dynamic bindings inside `pg`.
+
+**What I changed**
+- `next.config.ts`: Added `serverExternalPackages: ['pg']` to exclude PostgreSQL client from webpack tracing.
+
+**Verification (actual output)**
+```
+$ npm run build
+  ✓ Compiled successfully in 2.2s (7/7 routes)
+```
+
+**Commit**
+- `configure pg as server external package for next build`
+
+---
+
+## 2026-09-17 — Batch 5B (Checkpoint 2 Remediation & T-18)
+
+### Checkpoint 2 (C2) Remediation: Trust Engine Connection & Same-Cluster Duplicate Suppression
+- **Task:** Checkpoint 2 Remediation, T-18 Demo Seeder, RLS Hardening
+- **Why:** Independent Phase 0 architectural audit revealed that `/api/ussd` returned hardcoded `counted: true` without invoking `ObservationService` or evaluating caller phone numbers. Girma (duplicate cluster) previously received an observation counted confirmation instead of the required duplicate suppression notice.
+
+**What I changed**
+- `src/infra/db/container.ts`: Introduced unified `ServiceContainer` and `getServiceContainer()` provider. Pre-populates in-memory repositories (`taskRepo`, `projectRepo`, `respondentRepo`, `idempotencyStore`, `auditLogService`) with canonical `demo-scenario.ts` fixtures, with seamless PostgreSQL fallback.
+- `src/infra/db/index.ts`: Re-exported container provider.
+- `src/app/api/ussd/route.ts`: Connected observation completion to `ObservationService.submitObservation()`. Maps caller `phoneNumber` $\to$ `phoneHash` and prefix bucket, evaluates triangulation, and renders genuine `observation.counted` or `observation.duplicate` based on actual weight assignment.
+- `src/app/api/observations/route.ts`: Delegated default dependencies to `getServiceContainer()`, wrapped respondent resolution in `try/catch` to eliminate unhandled 500 crashes, and reconciled `Idempotency-Key` headers.
+- `tests/integration/ussd-c2-sequence.test.ts`: Added dedicated integration test for the C2 sequence: Amina completes survey $\to$ `counted: true`, witness count $2 \to 3$; Girma completes survey (same area) $\to$ `counted: false`, witness count remains 3, terminal message displays: `"Thank you. This area has already been counted, so the total stays at 3."`.
+- `tests/e2e/simulator.spec.ts`: Hardened Playwright E2E suite with full interactive dialing test verifying Amina count and Girma duplicate suppression on the LCD screen.
+- `scripts/seed-demo.ts`: Implemented idempotent database seeder executing `INSERT ... ON CONFLICT DO UPDATE` across all 12 entities using `src/fixtures/demo-scenario.ts`. Added `"seed:demo": "tsx scripts/seed-demo.ts"` to `package.json`.
+- `tests/unit/rls.test.ts`: Populated real SQL queries in Level 3 RLS behavioral test bodies.
+
+**What I rejected and why**
+- Rejected client-side simulator faking of duplicate detection: duplicate suppression is strictly computed by the domain Sybil cluster engine and evaluated inside `/api/ussd`.
+- Rejected mocking in integration tests: `ussd-c2-sequence.test.ts` executes the full stack from HTTP request through `ObservationService`, `InMemoryTransactionRunner`, `assignObservationWeight`, and `evaluateTriangulation`.
+
+**Verification (actual output)**
+```
+$ npx vitest run tests/integration/ussd-c2-sequence.test.ts
+  ✓ tests/integration/ussd-c2-sequence.test.ts (1 test) 39ms
+$ npm test
+  18 test files passed (269 passed | 8 skipped)
+$ npm run typecheck
+  tsc --noEmit (exit 0)
+$ npm run lint
+  eslint . (exit 0)
+$ npm run build
+  next build (exit 0, compiled 7/7 routes successfully)
+$ npm run test:e2e
+  24 passed (25.3s)
+$ npm run seed:demo
+  --- Ubuntu Ledger Demo Scenario Seeder (T-18) --- (exit 0)
+```
+
+**Checkpoint 2 Status**
+- **VERDICT: PASS (Fully Proven with E2E, Integration, and Unit Evidence)**

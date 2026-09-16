@@ -193,7 +193,7 @@ export function reduceUssdSession(
     }
 
     // 3. State-specific transition handling
-    const nextState = evaluateTransition(state, token, getProject);
+    const nextState = evaluateTransition(state, token, getProject, getService);
 
     if (nextState.invalidHint) {
       // Retain state, show hint
@@ -236,7 +236,8 @@ function isTerminalNode(nodeId: string): boolean {
 function evaluateTransition(
   current: SessionState,
   token: string,
-  getProject: (code: string) => ProjectLookup | null
+  getProject: (code: string) => ProjectLookup | null,
+  getService?: (code: string) => ServiceLookup | null
 ): SessionState {
   switch (current.nodeId) {
     case 'ROOT': {
@@ -331,6 +332,10 @@ function evaluateTransition(
       }
       if (token === '2') {
         return { nodeId: 'SERVICE_CARD', serviceCode: 'ET-CLINIC-INTAKE', answers: {} };
+      }
+      const svc = getService ? (getService(token) || getService(token.trim().toUpperCase())) : null;
+      if (svc) {
+        return { nodeId: 'SERVICE_CARD', serviceCode: svc.serviceCode, answers: {} };
       }
       return { ...current, invalidHint: true };
     }

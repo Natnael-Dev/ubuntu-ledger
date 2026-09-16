@@ -633,3 +633,62 @@ $ npm run seed:demo
 
 **Checkpoint 2 Status**
 - **VERDICT: PASS (Fully Proven with E2E, Integration, and Unit Evidence)**
+
+---
+
+## 2026-09-17 — Batch 6: Day 3 Swarm Execution (T-24, T-19, T-20 & Checkpoint 3)
+
+### T-24 [P0] Structured Logging & Adversarial PII Redaction Engine
+- **Task:** T-24 / S-15 / 07 §5 / 10 §15 / 11 §DAY 3
+- **Why:** To satisfy INV-03 and 07 §5, raw MSISDNs, citizen actor references, database passwords, and Bearer/JWT tokens must be deterministically redacted prior to reaching any log sink or console output.
+- **What I produced:**
+  - `src/lib/redact.ts`: High-performance PII redaction engine scrubbing E.164 and African mobile numbers (+251..., +254..., 09..., 07...), Bearer tokens, JWTs, and database URIs. Deeply scrubs structured objects up to depth 10.
+  - `src/lib/logger.ts`: `StructuredLogger` middleware intercepting all log levels (`debug`, `info`, `warn`, `error`) and enforcing mandatory PII scrubbing before emitting to sinks. Utilizes `systemClock.now()` for deterministic timestamps.
+  - `tests/adversarial/log-redaction.test.ts`: Adversarial test suite validating scrubbing of raw numbers, passwords, JWTs, and structured JSON payloads.
+  - `vitest.config.mts`: Added `tests/adversarial/**/*.test.ts` to test include paths.
+- **Verification:**
+  - `npx vitest run tests/adversarial`: 4 passed (15ms).
+
+### T-19 [P0] Receipt API & Public Spending Receipt Page
+- **Task:** T-19 / 05 §4 / 08 §5 / 11 §DAY 3
+- **Why:** Required citizen-facing accountability surface allowing residents and journalists to inspect official budget commitments, source document citations, and 3-witness triangulation evidence.
+- **What I produced:**
+  - `src/app/api/wards/[wardCode]/receipts/route.ts`: Endpoint returning 200 with ward metadata and array of project receipts. Includes full source citations for cited projects (`4412`) and `confidence: 'UNOFFICIAL_ESTIMATE'` with `source: null` for uncited projects (`4414`).
+  - `src/app/api/projects/[code]/route.ts`: Endpoint returning 200 with single project receipt and ward metadata, or 404 Problem JSON (`E_NOT_FOUND`). Reusable formatting helpers for currency, dates, truncated SHA-256 (`6...4`), and narrative resolution.
+  - `src/app/receipt/[code]/page.tsx`: Server Component rendering the receipt column layout, hairline rules, perforation fold motif, `SourceBlock` (or full-width `NO SOURCE DOCUMENT` band), `STATUS` narrative indicator, and `CHECKED` provenance section with mono witness count. Includes `@media print` clean stylesheet.
+  - `src/app/receipt/[code]/ReceiptAudioButton.tsx`: Client subcomponent with `[ ▶ hear this ]` audio control reading provenance sentences via browser speech synthesis.
+  - `tests/unit/api/receipt-route.test.ts`: 16 comprehensive unit tests covering schema contracts, case-insensitive lookups, 404/405 guards, and live container state reactivity.
+- **Verification:**
+  - `npx vitest run tests/unit/api/receipt-route.test.ts`: 16 passed (135ms).
+
+### T-20 [P0] Probation Endpoints and Governance Refusal
+- **Task:** T-20 / 04 §3, §7 / 05 §8 / 11 §DAY 3 / 14 ADV-08
+- **Why:** Core democratic invariant INV-01: No project reaches `VERIFIED_SUSTAINED` before `probation_ends_at`, regardless of administrative role or premature claims.
+- **What I produced:**
+  - `src/infra/db/repositories/repair-ticket.repository.ts`: `RepairTicketRepository` interface and `InMemoryRepairTicketRepository` primed with canonical `demo-scenario.ts` tickets.
+  - `src/app-services/probation.service.ts`: `ProbationService` coordinating repair claims and early close attempts. Uses domain `transition` from `@/domain/probation` and logs all attempts (including failed closures) to `AuditLogService`.
+  - `src/app/api/repairs/[id]/claim/route.ts`: Endpoint returning HTTP 200 `{ state: "REPAIR_CLAIMED", closureAvailable: false, reasonKey: "probation.claim_does_not_close", probationDays: 7 }`.
+  - `src/app/api/repairs/[id]/close/route.ts`: Endpoint rejecting early closures before `probation_ends_at` with HTTP 409 `E_PROBATION_LOCKED` Problem JSON across all roles (including ADMIN), appending `MANUAL_CLOSE_ATTEMPT` to the cryptographic audit hash chain.
+  - `tests/unit/api/probation-routes.test.ts`: 13 unit tests verifying claim response schema, refusal flags, 409 locked status, and cryptographic audit chain linkage.
+- **Verification:**
+  - `npx vitest run tests/unit/api/probation-routes.test.ts`: 13 passed (46ms).
+
+### Checkpoint 3 (End of Day 3 Hard Gate) Verification
+1. **Suppressed Duplicate:** Proven live via Playwright E2E and `tests/integration/ussd-c2-sequence.test.ts`. Dialing as Amina increases count $2 \to 3$; dialing same cell as Girma produces `counted: false` and terminal duplicate text; witness count remains at 3.
+2. **Refused Early Close:** Proven live via `tests/unit/api/probation-routes.test.ts`. Admin attempting `POST /api/repairs/:ticketId/close` on Day 3 receives HTTP 409 `E_PROBATION_LOCKED` and generates audit event.
+- **VERDICT: CHECKPOINT 3 PASS**
+
+### Overall Suite Verification
+```
+$ npm run typecheck
+  tsc --noEmit (exit 0)
+$ npm run lint
+  eslint . (exit 0)
+$ npx vitest run
+  21 test files passed (302 passed | 8 skipped)
+$ npx playwright test
+  24 passed (41.3s)
+$ npm run build
+  next build (exit 0, compiled 10/10 routes successfully)
+```
+

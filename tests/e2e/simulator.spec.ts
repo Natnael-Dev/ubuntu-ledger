@@ -364,4 +364,83 @@ test.describe('Checkpoint 2 — duplicate cluster demo flow', () => {
     const girmaCard = page.getByRole('button', { name: /Girma/i });
     await expect(girmaCard.getByText('DUPLICATE CLUSTER')).toBeVisible();
   });
+
+  test('Amina completes observation 3/3, then Girma dials and receives duplicate suppression', async ({ page }) => {
+    await page.goto('/simulator');
+
+    // Helper to send a keypress and wait for backend reply
+    async function sendKey(key: string) {
+      const prevCount = await page.locator('[data-direction="received"]').count();
+      await page.getByTestId(`key-${key}`).click();
+      await page.waitForFunction(
+        (target) => document.querySelectorAll('[data-direction="received"]').length > target,
+        prevCount,
+        { timeout: 10000 }
+      );
+    }
+
+    // 1. Dial as Amina
+    await page.getByRole('button', { name: /Amina/i }).click();
+    await page.getByTestId('btn-dial').click();
+    await page.waitForSelector('[data-direction="received"]', { timeout: 10000 });
+
+    // Step: Select Check Project (1)
+    await sendKey('1');
+    // Step: Enter project code 4412 via text input
+    await page.getByTestId('text-input').fill('4412');
+    const countBefore4412 = await page.locator('[data-direction="received"]').count();
+    await page.getByTestId('text-input').press('Enter');
+    await page.waitForFunction(
+      (target) => document.querySelectorAll('[data-direction="received"]').length > target,
+      countBefore4412,
+      { timeout: 10000 }
+    );
+
+    // Step: Check this project (1)
+    await sendKey('1');
+    // Step: Q1 runs_on_outage -> Yes (1)
+    await sendKey('1');
+    // Step: Q2 fridge_green -> Yes (1)
+    await sendKey('1');
+    // Step: Q3 board_posted -> Yes (1)
+    await sendKey('1');
+
+    // Amina terminal response should be counted
+    await expect(page.getByTestId('raw-response')).toContainText('Thank you. 3 of 3 neighbours have checked.');
+
+    // 2. Switch to Girma (same cluster duplicate)
+    await page.getByRole('button', { name: /Girma/i }).click();
+    await page.getByTestId('btn-dial').click();
+    await page.waitForFunction(
+      () => {
+        const lines = Array.from(document.querySelectorAll('[data-direction="received"]'));
+        return lines.length > 0 && lines[lines.length - 1].textContent?.includes('CON');
+      },
+      { timeout: 10000 }
+    );
+
+    // Step: Select Check Project (1)
+    await sendKey('1');
+    // Step: Enter project code 4412
+    await page.getByTestId('text-input').fill('4412');
+    const countBeforeGirma4412 = await page.locator('[data-direction="received"]').count();
+    await page.getByTestId('text-input').press('Enter');
+    await page.waitForFunction(
+      (target) => document.querySelectorAll('[data-direction="received"]').length > target,
+      countBeforeGirma4412,
+      { timeout: 10000 }
+    );
+
+    // Step: Check this project (1)
+    await sendKey('1');
+    // Step: Q1 -> Yes (1)
+    await sendKey('1');
+    // Step: Q2 -> Yes (1)
+    await sendKey('1');
+    // Step: Q3 -> Yes (1)
+    await sendKey('1');
+
+    // Girma terminal response MUST be duplicate suppression!
+    await expect(page.getByTestId('raw-response')).toContainText('This area has already been counted, so the total stays at 3.');
+  });
 });

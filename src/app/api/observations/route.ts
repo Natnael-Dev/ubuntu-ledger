@@ -9,12 +9,8 @@
 import { ObservationService } from '@/app-services/observation.service';
 import { ServiceError } from '@/app-services/errors';
 import type { RespondentRepository } from '@/infra/db/repositories/respondent.repository';
-import { PostgresRespondentRepository } from '@/infra/db/postgres/respondent.repository';
-import { getPostgresPool } from '@/infra/db/postgres/pool';
-import { PostgresTransactionRunner } from '@/infra/db/postgres/transaction';
-import type { IdempotencyStore } from '@/infra/db/services/idempotency.store';
-import type { IdempotencyRecord, NewIdempotencyRecord } from '@/infra/db/types';
 import type { Channel } from '@/domain/types';
+import { getServiceContainer } from '@/infra/db/container';
 
 const UUID_REGEX =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -28,39 +24,11 @@ function getDefaultDeps(): {
   respondentRepo: RespondentRepository;
   observationService: ObservationService;
 } {
-  const pool = getPostgresPool();
-  const respondentRepo = new PostgresRespondentRepository(pool);
-  const txRunner = new PostgresTransactionRunner(pool);
-  const idempotencyStore: IdempotencyStore = {
-    async findByKey(key: string): Promise<IdempotencyRecord | null> {
-      const res = await pool.query(
-        `SELECT key, endpoint, request_hash, response, created_at
-         FROM idempotency_record
-         WHERE key = $1`,
-        [key]
-      );
-      if (res.rows.length === 0) {
-        return null;
-      }
-      const row = res.rows[0];
-      return {
-        key: row.key,
-        endpoint: row.endpoint,
-        requestHash: row.request_hash,
-        response: typeof row.response === 'string' ? JSON.parse(row.response) : row.response,
-        createdAt: new Date(row.created_at),
-      };
-    },
-    async save(record: NewIdempotencyRecord): Promise<void> {
-      await pool.query(
-        `INSERT INTO idempotency_record (key, endpoint, request_hash, response, created_at)
-         VALUES ($1, $2, $3, $4, COALESCE($5, now()))`,
-        [record.key, record.endpoint, record.requestHash, JSON.stringify(record.response), record.createdAt]
-      );
-    },
+  const container = getServiceContainer();
+  return {
+    respondentRepo: container.respondentRepo,
+    observationService: container.observationService,
   };
-  const observationService = new ObservationService(txRunner, idempotencyStore);
-  return { respondentRepo, observationService };
 }
 
 function problemResponse(
@@ -211,26 +179,27 @@ export async function POST(req: Request): Promise<Response> {
   const respondentRepo = deps?.respondentRepo || getDefaultDeps().respondentRepo;
   const observationService = deps?.observationService || getDefaultDeps().observationService;
 
-  // 4. Server-side identity resolution: phoneHash -> respondent
-  const respondent = await respondentRepo.findByPhoneHash(body.phoneHash);
-  if (!respondent) {
-    return problemResponse(
-      404,
-      'E_UNKNOWN_CODE',
-      'Unknown Respondent',
-      'Respondent not found for provided phoneHash'
-    );
-  }
-
-  // 5. Delegate to Observation Application Service
+  // 4. Server-side identity resolution & submission
   try {
+    const respondent = await respondentRepo.findByPhoneHash(body.phoneHash);
+    if (!respondent) {
+      return problemResponse(
+        404,
+        'E_UNKNOWN_CODE',
+        'Unknown Respondent',
+        'Respondent not found for provided phoneHash'
+      );
+    }
+
+    // 5. Delegate to Observation Application Service
+    const effectiveKey = body.clientIdempotencyKey || trimmedHeaderKey;
     const result = await observationService.submitObservation({
       taskId: body.taskId,
       respondentId: respondent.id,
       respondentWardId: respondent.wardId,
       channel: (body.channel as Channel) || 'PWA',
       answers: body.answers,
-      clientIdempotencyKey: body.clientIdempotencyKey,
+      clientIdempotencyKey: effectiveKey,
       geoCell: body.geoCell ?? null,
       submittedAt: body.submittedAt,
     });
@@ -255,9 +224,9 @@ export async function POST(req: Request): Promise<Response> {
     // Generic safe 500 error without exposing stack traces or database errors
     return problemResponse(
       500,
-      'E_INTERNAL_ERROR',
+      'E_INTERNAL',
       'Internal Server Error',
-      'An unexpected error occurred processing the observation'
+      'An error occurred while processing the observation submission'
     );
   }
 }

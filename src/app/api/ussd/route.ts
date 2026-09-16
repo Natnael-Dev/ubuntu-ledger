@@ -6,7 +6,11 @@
 // - docs/specs/11-tasks.md T-15
 
 import { reduceUssdSession } from '@/domain/ussd/session';
-import { extractMsisdnPrefix } from '@/lib/msisdn';
+import { extractMsisdnPrefix, computePhoneHash } from '@/lib/msisdn';
+import { getServiceContainer } from '@/infra/db/container';
+import { DEMO_PEPPER, DEMO_IDS } from '@/fixtures/demo-scenario';
+import { formatMessage } from '@/domain/content';
+import { systemClock } from '@/infra/clock';
 
 interface ParsedUssdPayload {
   sessionId: string;
@@ -99,8 +103,9 @@ export async function POST(req: Request): Promise<Response> {
     // MSISDN Trust Boundary Check:
     // Validate phone number format and extract 6-digit prefix bucket.
     // Raw MSISDN is NOT passed into the domain core or logged.
+    let prefix: string;
     try {
-      extractMsisdnPrefix(payload.phoneNumber, '251');
+      prefix = extractMsisdnPrefix(payload.phoneNumber, '251');
     } catch {
       return new Response('Invalid phone number format', {
         status: 400,
@@ -113,6 +118,72 @@ export async function POST(req: Request): Promise<Response> {
     // Pure deterministic replay via T-14 reducer.
     // Reducer output already includes the exact 'CON ' or 'END ' framing.
     const ussdResponse = reduceUssdSession(payload.text);
+
+    // If session reaches an observation completion, delegate to genuine ObservationService
+    if (ussdResponse.nodeId === 'OBSERVATION_COMPLETED' && ussdResponse.completedObservation) {
+      const container = getServiceContainer();
+      const pepper = process.env.PHONE_HASH_PEPPER || process.env.PEPPER || DEMO_PEPPER;
+      const phoneHash = computePhoneHash(payload.phoneNumber, pepper);
+
+      let respondent = await container.respondentRepo.findByPhoneHash(phoneHash);
+      if (!respondent) {
+        respondent = {
+          id: `resp-auto-${phoneHash.slice(0, 8)}`,
+          wardId: DEMO_IDS.WARD_W09,
+          phoneHash,
+          phoneEnc: null,
+          msisdnPrefix: prefix,
+          registeredAt: systemClock.now(),
+          locale: ussdResponse.locale || 'am',
+        };
+      }
+
+      const completedObs = ussdResponse.completedObservation;
+      const taskId = completedObs.projectCode === '4412' ? DEMO_IDS.TASK_4412 : (completedObs.taskId || DEMO_IDS.TASK_4412);
+
+      const answers: Record<string, boolean> = { ...completedObs.answers };
+      // Map Q1, Q2, Q3 to semantic names for Task 4412 (generator)
+      if (answers.q1 !== undefined) answers.runs_on_outage = answers.q1;
+      if (answers.q2 !== undefined) answers.fridge_green = answers.q2;
+      if (answers.q3 !== undefined) answers.board_posted = answers.q3;
+
+      const geoCell = (respondent as { geoCell?: string }).geoCell || 'et-aa-0919';
+
+      const obsResult = await container.observationService.submitObservation({
+        taskId,
+        respondentId: respondent.id,
+        respondentWardId: respondent.wardId,
+        channel: 'USSD',
+        answers,
+        clientIdempotencyKey: `ussd-${payload.sessionId}-${completedObs.projectCode}`,
+        msisdnPrefixBucket: prefix,
+        geoCell,
+        submittedAt: systemClock.now().toISOString(),
+      });
+
+      const locale = ussdResponse.locale || 'en';
+      let terminalMsg: string;
+      if (obsResult.counted) {
+        terminalMsg = formatMessage('observation.counted', locale, {
+          count: obsResult.witnessCount,
+          target: obsResult.witnessTarget,
+        });
+        if (obsResult.resultingNarrative === 'FIELD_DISCREPANCY') {
+          terminalMsg = `${terminalMsg} ${formatMessage('narrative.reports_disagree', locale)}`;
+        }
+      } else {
+        terminalMsg = formatMessage('observation.duplicate', locale, {
+          count: obsResult.witnessCount,
+        });
+      }
+
+      return new Response(`END ${terminalMsg}`, {
+        status: 200,
+        headers: {
+          'Content-Type': 'text/plain; charset=utf-8',
+        },
+      });
+    }
 
     return new Response(ussdResponse.text, {
       status: 200,

@@ -17,3 +17,4 @@ export * from './postgres/respondent.repository';
 export * from './postgres/audit-log.service';
 export * from './postgres/idempotency.store';
 export * from './postgres/transaction';
+export * from './container';

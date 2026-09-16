@@ -201,33 +201,101 @@ describe("T-06: RLS Security Invariant Verification", () => {
     "Level 3: Behavioral Database RLS Tests (Requires Live PostgreSQL/Supabase)",
     () => {
       it("asserts every table has rowsecurity = true via pg_tables query", async () => {
-        // When live DB is connected, execute:
-        // SELECT tablename, rowsecurity FROM pg_tables WHERE schemaname = 'public';
-        // Assert zero tables have rowsecurity = false
+        const { getPostgresPool } = await import("@/infra/db/postgres/pool");
+        const pool = getPostgresPool();
+        const res = await pool.query(
+          `SELECT tablename, rowsecurity FROM pg_tables WHERE schemaname = 'public'`
+        );
+        expect(res.rows.length).toBeGreaterThan(0);
+        for (const expectedTable of ALL_EXPECTED_TABLES) {
+          const row = res.rows.find((r: { tablename: string }) => r.tablename === expectedTable);
+          expect(row, `Table ${expectedTable} must exist`).toBeDefined();
+          expect(row.rowsecurity, `Table ${expectedTable} must have rowsecurity = true`).toBe(true);
+        }
       });
 
       it("anon client returns zero rows from respondent", async () => {
-        // Anon SELECT * FROM respondent -> 0 rows
+        const { getPostgresPool } = await import("@/infra/db/postgres/pool");
+        const pool = getPostgresPool();
+        const client = await pool.connect();
+        try {
+          await client.query("SET ROLE anon");
+          const res = await client.query("SELECT * FROM respondent");
+          expect(res.rows.length).toBe(0);
+        } finally {
+          await client.query("RESET ROLE");
+          client.release();
+        }
       });
 
       it("anon client returns zero rows from voice_note", async () => {
-        // Anon SELECT * FROM voice_note -> 0 rows
+        const { getPostgresPool } = await import("@/infra/db/postgres/pool");
+        const pool = getPostgresPool();
+        const client = await pool.connect();
+        try {
+          await client.query("SET ROLE anon");
+          const res = await client.query("SELECT * FROM voice_note");
+          expect(res.rows.length).toBe(0);
+        } finally {
+          await client.query("RESET ROLE");
+          client.release();
+        }
       });
 
       it("anon client returns zero rows from observation", async () => {
-        // Anon SELECT * FROM observation -> 0 rows
+        const { getPostgresPool } = await import("@/infra/db/postgres/pool");
+        const pool = getPostgresPool();
+        const client = await pool.connect();
+        try {
+          await client.query("SET ROLE anon");
+          const res = await client.query("SELECT * FROM observation");
+          expect(res.rows.length).toBe(0);
+        } finally {
+          await client.query("RESET ROLE");
+          client.release();
+        }
       });
 
       it("anon client returns zero rows from audit_event", async () => {
-        // Anon SELECT * FROM audit_event -> 0 rows
+        const { getPostgresPool } = await import("@/infra/db/postgres/pool");
+        const pool = getPostgresPool();
+        const client = await pool.connect();
+        try {
+          await client.query("SET ROLE anon");
+          const res = await client.query("SELECT * FROM audit_event");
+          expect(res.rows.length).toBe(0);
+        } finally {
+          await client.query("RESET ROLE");
+          client.release();
+        }
       });
 
       it("anon client returns zero rows from divergence_aggregate while k_satisfied = false", async () => {
-        // Anon SELECT * FROM divergence_aggregate WHERE k_satisfied = false -> 0 rows
+        const { getPostgresPool } = await import("@/infra/db/postgres/pool");
+        const pool = getPostgresPool();
+        const client = await pool.connect();
+        try {
+          await client.query("SET ROLE anon");
+          const res = await client.query("SELECT * FROM divergence_aggregate WHERE k_satisfied = false");
+          expect(res.rows.length).toBe(0);
+        } finally {
+          await client.query("RESET ROLE");
+          client.release();
+        }
       });
 
       it("anon client can read project rows (public read permitted)", async () => {
-        // Anon SELECT * FROM project -> returns public rows
+        const { getPostgresPool } = await import("@/infra/db/postgres/pool");
+        const pool = getPostgresPool();
+        const client = await pool.connect();
+        try {
+          await client.query("SET ROLE anon");
+          const res = await client.query("SELECT * FROM project");
+          expect(Array.isArray(res.rows)).toBe(true);
+        } finally {
+          await client.query("RESET ROLE");
+          client.release();
+        }
       });
     }
   );

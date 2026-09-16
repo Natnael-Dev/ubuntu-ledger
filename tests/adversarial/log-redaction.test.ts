@@ -66,6 +66,7 @@ describe('T-24: Adversarial Log Redaction & PII Scrubbing (Release Blocker)', ()
     expect(cleaned.phoneNumber).toBe('[REDACTED]');
     expect(cleaned.msisdn).toBe('[REDACTED]');
     expect(cleaned.phone_enc).toBe('[REDACTED]');
+    expect(cleaned.user.actor_ref).toBe('[REDACTED]');
     expect(cleaned.user.contact.token).toBe('[REDACTED]');
 
     // Serialize to inspect final string output
@@ -77,6 +78,176 @@ describe('T-24: Adversarial Log Redaction & PII Scrubbing (Release Blocker)', ()
     expect(serialized).not.toContain(SYNTHETIC_PHONE_ENC);
     expect(serialized).not.toContain('SuperSecretPassword123');
     expect(serialized).not.toContain('top-secret-token');
+    expect(serialized).not.toContain('citizen-secret-ref-999');
+    expect(serialized).not.toContain(SYNTHETIC_STORAGE_PATH);
+  });
+
+  it('handles circular references via WeakSet cycle tracking without crashing JSON.stringify in logger', () => {
+    // Reproduction test for Checkpoint 3 defect 3:
+    // Circular structures previously crashed JSON.stringify in the logger with:
+    // "TypeError: Converting circular structure to JSON"
+    const circularObj: Record<string, unknown> = {
+      name: 'CircularAuditRecord',
+      token: SYNTHETIC_TOKEN,
+    };
+    circularObj.self = circularObj;
+
+    const circularArray: unknown[] = ['initial-item'];
+    circularArray.push(circularArray);
+    circularObj.nestedArray = circularArray;
+
+    // Must not throw or recurse infinitely
+    const redacted = redactPii(circularObj);
+
+    expect((redacted as Record<string, unknown>).token).toBe('[REDACTED]');
+    expect((redacted as Record<string, unknown>).self).toBe('[CIRCULAR]');
+    expect(((redacted as Record<string, unknown>).nestedArray as unknown[])[1]).toBe('[CIRCULAR]');
+
+    // Must serialize safely through JSON.stringify without throwing
+    expect(() => JSON.stringify(redacted)).not.toThrow();
+
+    // Verify StructuredLogger sink handles it safely
+    const emittedLines: string[] = [];
+    const testLogger = new StructuredLogger((record: StructuredLogRecord) => {
+      emittedLines.push(JSON.stringify(record));
+    });
+
+    expect(() => {
+      testLogger.warn('Testing circular object logging', { payload: circularObj });
+    }).not.toThrow();
+
+    expect(emittedLines.length).toBe(1);
+    expect(emittedLines[0]).toContain('[CIRCULAR]');
+    expect(emittedLines[0]).not.toContain(SYNTHETIC_TOKEN);
+  });
+
+  it('scrubs citizen references and actor_ref from object keys and free text strings', () => {
+    // Reproduction test for Checkpoint 3 defect 4:
+    // actor_ref and citizen identifiers leaked in logs and objects
+    const citizenPayload = {
+      actor_ref: 'citizen-secret-ref-001',
+      actorRef: 'citizen-secret-ref-002',
+      citizen_id: 'cit-998877',
+      citizenId: 'cit-112233',
+      citizenRef: 'ref-445566',
+      message: 'Citizen citizen-secret-ref-999 reported outage with actor_ref=cit-12345',
+    };
+
+    const redacted = redactPii(citizenPayload);
+
+    expect(redacted.actor_ref).toBe('[REDACTED]');
+    expect(redacted.actorRef).toBe('[REDACTED]');
+    expect(redacted.citizen_id).toBe('[REDACTED]');
+    expect(redacted.citizenId).toBe('[REDACTED]');
+    expect(redacted.citizenRef).toBe('[REDACTED]');
+    expect(redacted.message).not.toContain('citizen-secret-ref-999');
+    expect(redacted.message).toContain('[REDACTED_CITIZEN_REF]');
+
+    const serialized = JSON.stringify(redacted);
+    expect(serialized).not.toContain('citizen-secret-ref-001');
+    expect(serialized).not.toContain('citizen-secret-ref-002');
+    expect(serialized).not.toContain('cit-998877');
+    expect(serialized).not.toContain('citizen-secret-ref-999');
+  });
+
+  it('scrubs compound sensitive keys in camelCase and snake_case without impacting non-sensitive keys', () => {
+    // Reproduction test for Checkpoint 3 defect 5:
+    // Compound keys like accessToken, clientSecret, dbPassword, rawPhone bypassed SENSITIVE_KEY_REGEX
+    const compoundPayload = {
+      // Compound sensitive keys (camelCase)
+      accessToken: 'token-val-123',
+      refreshToken: 'refresh-val-456',
+      clientSecret: 'secret-val-789',
+      dbPassword: 'password-val-abc',
+      rawPhone: '+251911998877',
+      clientApiKey: 'key-val-xyz',
+      // Compound sensitive keys (snake_case)
+      access_token: 'token-val-123-snake',
+      refresh_token: 'refresh-val-456-snake',
+      client_secret: 'secret-val-789-snake',
+      db_password: 'password-val-abc-snake',
+      raw_phone: '+251911998878',
+      api_key: 'key-val-xyz-snake',
+      // Legitimate non-sensitive keys that must NOT be redacted
+      authority: 'Water Authority of Addis Ababa',
+      author: 'Amina Mengistu',
+      action: 'REPAIR_VERIFIED',
+      state: 'VERIFIED_SUSTAINED',
+      status: 'CONFIRMED',
+      ticketId: '00000000-0000-4000-a000-000000000001',
+    };
+
+    const redacted = redactPii(compoundPayload);
+
+    // Verify all compound sensitive keys were redacted
+    expect(redacted.accessToken).toBe('[REDACTED]');
+    expect(redacted.refreshToken).toBe('[REDACTED]');
+    expect(redacted.clientSecret).toBe('[REDACTED]');
+    expect(redacted.dbPassword).toBe('[REDACTED]');
+    expect(redacted.rawPhone).toBe('[REDACTED]');
+    expect(redacted.clientApiKey).toBe('[REDACTED]');
+
+    expect(redacted.access_token).toBe('[REDACTED]');
+    expect(redacted.refresh_token).toBe('[REDACTED]');
+    expect(redacted.client_secret).toBe('[REDACTED]');
+    expect(redacted.db_password).toBe('[REDACTED]');
+    expect(redacted.raw_phone).toBe('[REDACTED]');
+    expect(redacted.api_key).toBe('[REDACTED]');
+
+    // Verify legitimate non-sensitive keys were preserved
+    expect(redacted.authority).toBe('Water Authority of Addis Ababa');
+    expect(redacted.author).toBe('Amina Mengistu');
+    expect(redacted.action).toBe('REPAIR_VERIFIED');
+    expect(redacted.state).toBe('VERIFIED_SUSTAINED');
+    expect(redacted.status).toBe('CONFIRMED');
+    expect(redacted.ticketId).toBe('00000000-0000-4000-a000-000000000001');
+  });
+
+  it('sanitizes deep nesting (> 10 levels) rather than returning raw data', () => {
+    // Reproduction test for Checkpoint 3 defect 6:
+    // When depth > 10, previous code returned data raw without sanitizing sensitive keys or PII
+    const deepObject: Record<string, unknown> = {
+      level1: {
+        level2: {
+          level3: {
+            level4: {
+              level5: {
+                level6: {
+                  level7: {
+                    level8: {
+                      level9: {
+                        level10: {
+                          level11: {
+                            password: 'deepSecretPassword123',
+                            rawPhone: '+251911223344',
+                            deepMessage: 'Call citizen-secret-ref-999 at +251911223344',
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    };
+
+    const redacted = redactPii(deepObject);
+    const serialized = JSON.stringify(redacted);
+
+    // Assert that sensitive keys at level 11 (> 10 levels) are NOT leaked raw
+    expect(serialized).not.toContain('deepSecretPassword123');
+    expect(serialized).not.toContain('+251911223344');
+    expect(serialized).not.toContain('citizen-secret-ref-999');
+
+    // Assert that the deep structure was sanitized
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const lvl11 = (redacted as any).level1.level2.level3.level4.level5.level6.level7.level8.level9.level10.level11;
+    expect(lvl11.password).toBe('[REDACTED]');
+    expect(lvl11.rawPhone).toBe('[REDACTED]');
+    expect(lvl11.deepMessage).toContain('[REDACTED_PHONE]');
   });
 
   it('StructuredLogger intercepts all log calls and prevents PII leakage to sinks', () => {

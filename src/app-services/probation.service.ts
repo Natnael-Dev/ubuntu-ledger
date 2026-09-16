@@ -28,6 +28,8 @@ export interface ClaimRepairInput {
   claimedBy: string;
   claimedAt?: Date | string;
   evidenceNote?: string;
+  actorRole?: ActorRole;
+  actorRef?: string | null;
 }
 
 export interface ClaimRepairResponseDto {
@@ -52,7 +54,9 @@ export class ProbationService {
     ticketIdOrInput: string | ClaimRepairInput,
     claimedByArg?: string,
     claimedAtArg?: Date | string,
-    evidenceNoteArg?: string
+    evidenceNoteArg?: string,
+    actorRoleArg?: ActorRole,
+    actorRefArg?: string | null
   ): Promise<ClaimRepairResponseDto> {
     const input: ClaimRepairInput =
       typeof ticketIdOrInput === 'string'
@@ -61,6 +65,8 @@ export class ProbationService {
             claimedBy: claimedByArg || '',
             claimedAt: claimedAtArg,
             evidenceNote: evidenceNoteArg,
+            actorRole: actorRoleArg,
+            actorRef: actorRefArg,
           }
         : ticketIdOrInput;
 
@@ -152,7 +158,8 @@ export class ProbationService {
           action: eff.action,
           entityType: 'repair_ticket',
           entityId: ticket.id,
-          actorRole: 'INGEST_REVIEWER',
+          actorRole: input.actorRole || 'INGEST_REVIEWER',
+          actorRef: input.actorRef ?? null,
           payload: input.evidenceNote
             ? { ...eff.payload, evidenceNote: input.evidenceNote }
             : eff.payload,

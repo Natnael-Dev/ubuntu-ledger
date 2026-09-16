@@ -8,6 +8,9 @@
 import { describe, it, expect, vi } from 'vitest';
 import { POST, GET, PUT, DELETE, PATCH } from '@/app/api/ussd/route';
 import * as ussdSessionModule from '@/domain/ussd/session';
+import { getServiceContainer } from '@/infra/db/container';
+import { computePhoneHash } from '@/lib/msisdn';
+import { DEMO_PEPPER } from '@/fixtures/demo-scenario';
 
 describe('POST /api/ussd — HTTP Transport Adapter', () => {
   const defaultSessionId = 'ATUid_9f1a2b3c4d5e';
@@ -368,6 +371,45 @@ describe('POST /api/ussd — HTTP Transport Adapter', () => {
           `HTTP response for text "${text}" exceeded 182 chars (${body.length}): "${body}"`
         ).toBeLessThanOrEqual(182);
       }
+    });
+  });
+
+  describe('6. Respondent UUID Generation and Persistence (Checkpoint 3 Fix)', () => {
+    it('creates and persists new respondents with valid RFC 4122 UUID instead of resp-auto-* synthetic IDs', async () => {
+      const container = getServiceContainer();
+      const newPhone = '+251977665544';
+      const pepper = process.env.PHONE_HASH_PEPPER || process.env.PEPPER || DEMO_PEPPER;
+      const phoneHash = computePhoneHash(newPhone, pepper);
+
+      // Verify respondent does not exist before observation submission
+      const existing = await container.respondentRepo.findByPhoneHash(phoneHash);
+      expect(existing).toBeNull();
+
+      // Submit terminal observation sequence
+      const req = createFormRequest({
+        sessionId: 'ATUid_new_session_999',
+        phoneNumber: newPhone,
+        text: '1*4412*1*1*2*1',
+      });
+
+      const res = await POST(req);
+      expect(res.status).toBe(200);
+      const text = await res.text();
+      expect(text.startsWith('END ')).toBe(true);
+
+      // Verify respondent was persisted and can be looked up by phoneHash
+      const created = await container.respondentRepo.findByPhoneHash(phoneHash);
+      expect(created).not.toBeNull();
+
+      // Assert UUID validity (RFC 4122) and absence of synthetic non-UUID prefix
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      expect(created!.id).toMatch(uuidRegex);
+      expect(created!.id.startsWith('resp-auto-')).toBe(false);
+
+      // Verify respondent can also be retrieved by its primary key UUID
+      const byId = await container.respondentRepo.findById(created!.id);
+      expect(byId).not.toBeNull();
+      expect(byId!.id).toBe(created!.id);
     });
   });
 });

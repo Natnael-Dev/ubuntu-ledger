@@ -11,6 +11,8 @@ import { getServiceContainer } from '@/infra/db/container';
 import { DEMO_PEPPER, DEMO_IDS } from '@/fixtures/demo-scenario';
 import { formatMessage } from '@/domain/content';
 import { systemClock } from '@/infra/clock';
+import { randomUUID } from 'node:crypto';
+import type { RespondentRecord } from '@/infra/db/types';
 
 interface ParsedUssdPayload {
   sessionId: string;
@@ -128,7 +130,7 @@ export async function POST(req: Request): Promise<Response> {
       let respondent = await container.respondentRepo.findByPhoneHash(phoneHash);
       if (!respondent) {
         respondent = {
-          id: `resp-auto-${phoneHash.slice(0, 8)}`,
+          id: randomUUID(),
           wardId: DEMO_IDS.WARD_W09,
           phoneHash,
           phoneEnc: null,
@@ -136,6 +138,42 @@ export async function POST(req: Request): Promise<Response> {
           registeredAt: systemClock.now(),
           locale: ussdResponse.locale || 'am',
         };
+
+        // Persist / upsert respondent into repository to respect FK constraints
+        const repo = container.respondentRepo as unknown as {
+          seed?: (r: RespondentRecord) => void;
+          save?: (r: RespondentRecord) => Promise<void>;
+          upsert?: (r: RespondentRecord) => Promise<void>;
+          clientOrPool?: { query: (sql: string, params: unknown[]) => Promise<unknown> };
+          respondents?: Map<string, unknown>;
+        };
+
+        if (typeof repo.upsert === 'function') {
+          await repo.upsert(respondent);
+        } else if (typeof repo.save === 'function') {
+          await repo.save(respondent);
+        } else if (repo.clientOrPool) {
+          await repo.clientOrPool.query(
+            `INSERT INTO respondent (id, ward_id, phone_hash, phone_enc, msisdn_prefix, registered_at, locale)
+             VALUES ($1, $2, $3, $4, $5, $6, $7)
+             ON CONFLICT (phone_hash) DO UPDATE SET locale = EXCLUDED.locale`,
+            [
+              respondent.id,
+              respondent.wardId,
+              respondent.phoneHash,
+              respondent.phoneEnc,
+              respondent.msisdnPrefix,
+              respondent.registeredAt,
+              respondent.locale,
+            ]
+          );
+        }
+
+        if (typeof repo.seed === 'function') {
+          repo.seed(respondent);
+        } else if (repo.respondents instanceof Map) {
+          repo.respondents.set(respondent.id, respondent);
+        }
       }
 
       const completedObs = ussdResponse.completedObservation;

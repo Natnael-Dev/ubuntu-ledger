@@ -9,9 +9,12 @@ import {
   getProbationService,
 } from '@/app-services/probation.service';
 import { ServiceError } from '@/app-services/errors';
+import type { ActorRole } from '@/domain/types';
 import type { RepairTicketRepository } from '@/infra/db/repositories/repair-ticket.repository';
 import type { AuditLogService } from '@/infra/db/services/audit-log.service';
 import type { Clock } from '@/infra/clock';
+
+const ALLOWED_CLAIM_ROLES: ActorRole[] = ['INGEST_REVIEWER', 'ADMIN'];
 
 export interface ClaimRouteDeps {
   probationService?: ProbationService;
@@ -99,6 +102,42 @@ export async function POST(
     }
 
     const body = rawBody as Record<string, unknown>;
+
+    // 1. Authenticate actor role (must be provided via x-actor-role header, body.actorRole, or body.actor)
+    let actorRole: ActorRole | null = null;
+    const headerRole = req.headers.get('x-actor-role');
+    if (headerRole && headerRole.trim()) {
+      actorRole = headerRole.trim() as ActorRole;
+    } else if (typeof body.actorRole === 'string' && body.actorRole.trim()) {
+      actorRole = body.actorRole.trim() as ActorRole;
+    } else if (typeof body.actor === 'string' && body.actor.trim()) {
+      actorRole = body.actor.trim() as ActorRole;
+    }
+
+    if (!actorRole) {
+      return problemResponse(
+        401,
+        'E_UNAUTHORIZED',
+        'Unauthorized',
+        'Authentication required to claim repair ticket'
+      );
+    }
+
+    // 2. Authorize role (INGEST_REVIEWER or ADMIN per specification)
+    if (!ALLOWED_CLAIM_ROLES.includes(actorRole)) {
+      return problemResponse(
+        403,
+        'E_FORBIDDEN_ROLE',
+        'Forbidden',
+        `Role '${actorRole}' is not authorized to claim repair tickets. Required role: INGEST_REVIEWER or ADMIN`
+      );
+    }
+
+    const actorRef =
+      req.headers.get('x-actor-ref') ||
+      (typeof body.actorRef === 'string' ? body.actorRef.trim() : undefined) ||
+      (typeof body.actor_ref === 'string' ? body.actor_ref.trim() : undefined);
+
     const claimedBy =
       typeof body.claimedBy === 'string' ? body.claimedBy.trim() : '';
 
@@ -121,12 +160,14 @@ export async function POST(
     const probationService =
       deps?.probationService || getProbationService(deps);
 
-    const result = await probationService.claimRepair(
-      id,
+    const result = await probationService.claimRepair({
+      ticketId: id,
       claimedBy,
       claimedAt,
-      evidenceNote
-    );
+      evidenceNote,
+      actorRole,
+      actorRef,
+    });
 
     return new Response(JSON.stringify(result), {
       status: 200,

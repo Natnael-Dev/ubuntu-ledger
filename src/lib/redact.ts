@@ -5,8 +5,8 @@
 // - docs/specs/11-tasks.md T-24
 // - docs/specs/17-scope-control.md
 
-const SENSITIVE_KEY_REGEX =
-  /^(phone_?number|msisdn|phone_?enc|password|secret|pepper|token|bearer|auth|authorization|cookie|api_?key)$/i;
+export const SENSITIVE_KEY_REGEX =
+  /(?:token|secret|pass(?:word|wd)|pwd|phone|msisdn|pepper|bearer|cookie|api_?key|actor_?ref|citizen|credential|(?:^|[_\-])auth(?:entication|orization|Header|Code|Token|Secret|Key|Context|Credentials)?(?:[_\-]|$)|[a-z0-9]auth(?:entication|orization)?$)/i;
 
 // Matches E.164 numbers, common African mobile numbers (+251..., +254..., 09..., 07...), and formatted numbers
 const PHONE_NUMBER_REGEX =
@@ -18,6 +18,12 @@ const JWT_REGEX = /\beyJ[A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+(?:\.[A-Za-z0-9-_.+/=]*)
 
 // Matches connection URIs with credentials
 const DB_CREDENTIAL_URI_REGEX = /postgres(?:ql)?:\/\/[^:]+:[^@]+@[^\s/'"]+/gi;
+
+// Matches citizen references and actor references in string logs
+const CITIZEN_IDENTIFIER_REGEX = /\b(?:citizen[-_][a-z0-9_-]+|actor_ref[:=\s]+[^\s,;]+)\b/gi;
+
+// Matches sensitive storage paths (gazettes, voice recordings)
+const STORAGE_PATH_REGEX = /\b(?:gazettes|voice|recordings)\/[^\s'",;]+\b/gi;
 
 /**
  * Redacts phone numbers, secrets, tokens, and storage paths from a string.
@@ -39,14 +45,26 @@ export function redactString(str: string): string {
   // 3. Redact phone numbers / MSISDNs
   result = result.replace(PHONE_NUMBER_REGEX, '[REDACTED_PHONE]');
 
+  // 4. Redact citizen references and actor_ref in strings
+  result = result.replace(CITIZEN_IDENTIFIER_REGEX, '[REDACTED_CITIZEN_REF]');
+
+  // 5. Redact storage paths in strings
+  result = result.replace(STORAGE_PATH_REGEX, '[REDACTED_PATH]');
+
   return result;
 }
 
 /**
  * Deeply redacts an object, array, or primitive structure.
+ * Tracks visited objects via WeakSet to prevent circular reference crashes in JSON serialization.
+ * Deep nesting is sanitized rather than returned raw.
  */
-export function redactPii<T>(data: T, depth = 0): T {
-  if (depth > 10 || data === null || data === undefined) {
+export function redactPii<T>(
+  data: T,
+  depth = 0,
+  seen: WeakSet<object> = new WeakSet<object>()
+): T {
+  if (data === null || data === undefined) {
     return data;
   }
 
@@ -58,20 +76,33 @@ export function redactPii<T>(data: T, depth = 0): T {
     return data;
   }
 
-  if (Array.isArray(data)) {
-    return data.map((item) => redactPii(item, depth + 1)) as unknown as T;
-  }
-
-  if (data instanceof Error) {
-    const redactedError = new Error(redactString(data.message));
-    redactedError.name = data.name;
-    if (data.stack) {
-      redactedError.stack = redactString(data.stack);
+  // Guard against pathological call stack depth while never returning raw unsanitized objects
+  if (depth > 20) {
+    if (typeof data === 'object') {
+      return '[TRUNCATED]' as unknown as T;
     }
-    return redactedError as unknown as T;
+    return data;
   }
 
   if (typeof data === 'object') {
+    if (seen.has(data as object)) {
+      return '[CIRCULAR]' as unknown as T;
+    }
+    seen.add(data as object);
+
+    if (Array.isArray(data)) {
+      return data.map((item) => redactPii(item, depth + 1, seen)) as unknown as T;
+    }
+
+    if (data instanceof Error) {
+      const redactedError = new Error(redactString(data.message));
+      redactedError.name = data.name;
+      if (data.stack) {
+        redactedError.stack = redactString(data.stack);
+      }
+      return redactedError as unknown as T;
+    }
+
     const result: Record<string, unknown> = {};
     for (const [key, value] of Object.entries(data)) {
       if (SENSITIVE_KEY_REGEX.test(key)) {
@@ -79,7 +110,7 @@ export function redactPii<T>(data: T, depth = 0): T {
       } else if (typeof value === 'string') {
         result[key] = redactString(value);
       } else {
-        result[key] = redactPii(value, depth + 1);
+        result[key] = redactPii(value, depth + 1, seen);
       }
     }
     return result as T;

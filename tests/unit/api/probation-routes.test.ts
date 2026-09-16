@@ -63,6 +63,7 @@ describe('T-20: Probation Endpoints and the Refusal (05-api-contracts.md §8, AD
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            'x-actor-role': 'INGEST_REVIEWER',
           },
           body: JSON.stringify({
             claimedBy: 'AfroTech Infra',
@@ -98,10 +99,11 @@ describe('T-20: Probation Endpoints and the Refusal (05-api-contracts.md §8, AD
       expect(updated?.state).toBe('REPAIR_CLAIMED');
       expect(updated?.claimedBy).toBe('AfroTech Infra');
 
-      // Assert audit log recorded state transition
+      // Assert audit log recorded state transition with proper actorRole
       const events = auditLogService.getEvents();
       expect(events.length).toBe(1);
       expect(events[0].action).toBe('AUDIT_STATE_CHANGED');
+      expect(events[0].actor_role).toBe('INGEST_REVIEWER');
       expect(events[0].entity_type).toBe('repair_ticket');
       expect(events[0].entity_id).toBe(ticketId);
       expect(events[0].payload).toMatchObject({
@@ -120,6 +122,7 @@ describe('T-20: Probation Endpoints and the Refusal (05-api-contracts.md §8, AD
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            'x-actor-role': 'INGEST_REVIEWER',
           },
           body: JSON.stringify({
             claimedBy: 'AfroTech Infra',
@@ -148,6 +151,122 @@ describe('T-20: Probation Endpoints and the Refusal (05-api-contracts.md §8, AD
       });
     });
 
+    it('rejects unauthenticated claim requests with 401 E_UNAUTHORIZED', async () => {
+      const ticketId = DEMO_IDS.TICKET_4412;
+      const req = new Request(
+        `http://localhost/api/repairs/${ticketId}/claim`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            claimedBy: 'AfroTech Infra',
+          }),
+        }
+      );
+      (req as unknown as { deps: unknown }).deps = {
+        probationService,
+        repairTicketRepo,
+        auditLogService,
+        clock,
+      };
+
+      const response = await claimRoute(req, {
+        params: Promise.resolve({ id: ticketId }),
+      });
+
+      expect(response.status).toBe(401);
+      const body = await response.json();
+      expect(body.code).toBe('E_UNAUTHORIZED');
+      expect(body.title).toBe('Unauthorized');
+    });
+
+    it('rejects claim requests with unauthorized role (e.g. CITIZEN) with 403 E_FORBIDDEN_ROLE', async () => {
+      const ticketId = DEMO_IDS.TICKET_4412;
+      const req = new Request(
+        `http://localhost/api/repairs/${ticketId}/claim`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-actor-role': 'CITIZEN',
+          },
+          body: JSON.stringify({
+            claimedBy: 'AfroTech Infra',
+          }),
+        }
+      );
+      (req as unknown as { deps: unknown }).deps = {
+        probationService,
+        repairTicketRepo,
+        auditLogService,
+        clock,
+      };
+
+      const response = await claimRoute(req, {
+        params: Promise.resolve({ id: ticketId }),
+      });
+
+      expect(response.status).toBe(403);
+      const body = await response.json();
+      expect(body.code).toBe('E_FORBIDDEN_ROLE');
+    });
+
+    it('records actual claiming actor role in audit event chain instead of hardcoding false audit actor', async () => {
+      const ticketId = '00000000-0000-4000-a000-000000000998';
+      const brokenTicket: RepairTicketRecord = {
+        id: ticketId,
+        assetId: '00000000-0000-4000-a000-000000000888',
+        projectId: '00000000-0000-4000-a000-000000000777',
+        state: 'REPORTED_BROKEN',
+        reportedBrokenAt: new Date('2026-09-10T10:00:00.000Z'),
+        repairClaimedAt: null,
+        claimedBy: null,
+        probationStartedAt: null,
+        probationEndsAt: null,
+        probationDays: 7,
+        resolvedAt: null,
+        failureReasonKey: null,
+      };
+      repairTicketRepo.seed(brokenTicket);
+
+      const req = new Request(
+        `http://localhost/api/repairs/${ticketId}/claim`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-actor-role': 'ADMIN',
+            'x-actor-ref': 'admin-usr-123',
+          },
+          body: JSON.stringify({
+            claimedBy: 'City Administration Direct Works',
+            claimedAt: '2026-09-15T08:00:00.000Z',
+            evidenceNote: 'Inspected and certified by municipal engineering directorate',
+          }),
+        }
+      );
+      (req as unknown as { deps: unknown }).deps = {
+        probationService,
+        repairTicketRepo,
+        auditLogService,
+        clock,
+      };
+
+      const response = await claimRoute(req, {
+        params: Promise.resolve({ id: ticketId }),
+      });
+
+      expect(response.status).toBe(200);
+
+      const events = auditLogService.getEvents();
+      expect(events.length).toBe(1);
+      // Confirms audit record has genuine ADMIN actor instead of hardcoded INGEST_REVIEWER
+      expect(events[0].actor_role).toBe('ADMIN');
+      expect(events[0].actor_ref).toBe('admin-usr-123');
+    });
+
     it('rejects claim with empty organisation name (422 E_VALIDATION)', async () => {
       const ticketId = DEMO_IDS.TICKET_4412;
       const req = new Request(
@@ -156,6 +275,7 @@ describe('T-20: Probation Endpoints and the Refusal (05-api-contracts.md §8, AD
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            'x-actor-role': 'INGEST_REVIEWER',
           },
           body: JSON.stringify({
             claimedBy: '   ',
@@ -185,6 +305,7 @@ describe('T-20: Probation Endpoints and the Refusal (05-api-contracts.md §8, AD
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            'x-actor-role': 'INGEST_REVIEWER',
           },
           body: JSON.stringify({
             claimedBy: 'AfroTech Infra',

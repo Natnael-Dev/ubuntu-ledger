@@ -20,7 +20,17 @@ export interface StructuredLogRecord {
 export class StructuredLogger {
   constructor(
     private readonly sink: (record: StructuredLogRecord) => void = (rec) => {
-      const line = JSON.stringify(rec);
+      let line: string;
+      try {
+        line = JSON.stringify(rec);
+      } catch {
+        line = JSON.stringify({
+          level: rec.level,
+          message: rec.message,
+          timestamp: rec.timestamp,
+          error: '[Serialization Error]',
+        });
+      }
       if (rec.level === 'error') {
         console.error(line);
       } else if (rec.level === 'warn') {

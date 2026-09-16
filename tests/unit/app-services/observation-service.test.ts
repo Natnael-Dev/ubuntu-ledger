@@ -50,6 +50,7 @@ describe('T-13: Observation Application Service & Repositories', () => {
       const input: SubmitObservationInput = {
         taskId: TASK_ID,
         respondentId: 'resp-alice',
+        respondentWardId: WARD_ID,
         channel: 'PWA',
         answers: { q1_operational: true, q2_fuel_present: true },
         clientIdempotencyKey: 'idemp-001',
@@ -77,6 +78,7 @@ describe('T-13: Observation Application Service & Repositories', () => {
       await service.submitObservation({
         taskId: TASK_ID,
         respondentId: 'resp-alice',
+        respondentWardId: WARD_ID,
         channel: 'PWA',
         answers: { q1_operational: true },
         clientIdempotencyKey: 'idemp-001',
@@ -88,6 +90,7 @@ describe('T-13: Observation Application Service & Repositories', () => {
       const res2 = await service.submitObservation({
         taskId: TASK_ID,
         respondentId: 'resp-bob',
+        respondentWardId: WARD_ID,
         channel: 'PWA',
         answers: { q1_operational: true },
         clientIdempotencyKey: 'idemp-002',
@@ -116,6 +119,7 @@ describe('T-13: Observation Application Service & Repositories', () => {
       const input: SubmitObservationInput = {
         taskId: TASK_ID,
         respondentId: 'resp-alice',
+        respondentWardId: WARD_ID,
         channel: 'PWA',
         answers: { q1: true },
         clientIdempotencyKey: 'idemp-replay-01',
@@ -137,6 +141,7 @@ describe('T-13: Observation Application Service & Repositories', () => {
       const input1: SubmitObservationInput = {
         taskId: TASK_ID,
         respondentId: 'resp-alice',
+        respondentWardId: WARD_ID,
         channel: 'PWA',
         answers: { q1: true },
         clientIdempotencyKey: 'idemp-conflict-01',
@@ -168,6 +173,7 @@ describe('T-13: Observation Application Service & Repositories', () => {
       const inputTask1: SubmitObservationInput = {
         taskId: TASK_ID,
         respondentId: 'resp-alice',
+        respondentWardId: WARD_ID,
         channel: 'PWA',
         answers: { q1: true },
         clientIdempotencyKey: 'idemp-cross-task',
@@ -194,6 +200,7 @@ describe('T-13: Observation Application Service & Repositories', () => {
       await service.submitObservation({
         taskId: TASK_ID,
         respondentId: 'resp-01',
+        respondentWardId: WARD_ID,
         channel: 'PWA',
         answers: { q1: true, q2: true },
         clientIdempotencyKey: 'idemp-t1',
@@ -205,6 +212,7 @@ describe('T-13: Observation Application Service & Repositories', () => {
       await service.submitObservation({
         taskId: TASK_ID,
         respondentId: 'resp-02',
+        respondentWardId: WARD_ID,
         channel: 'PWA',
         answers: { q1: true, q2: true },
         clientIdempotencyKey: 'idemp-t2',
@@ -218,6 +226,7 @@ describe('T-13: Observation Application Service & Repositories', () => {
       const res3 = await service.submitObservation({
         taskId: TASK_ID,
         respondentId: 'resp-03',
+        respondentWardId: WARD_ID,
         channel: 'PWA',
         answers: { q1: true, q2: true },
         clientIdempotencyKey: 'idemp-t3',
@@ -249,6 +258,7 @@ describe('T-13: Observation Application Service & Repositories', () => {
       await service.submitObservation({
         taskId: TASK_ID,
         respondentId: 'resp-01',
+        respondentWardId: WARD_ID,
         channel: 'PWA',
         answers: { q1: true },
         clientIdempotencyKey: 'idemp-d1',
@@ -260,6 +270,7 @@ describe('T-13: Observation Application Service & Repositories', () => {
       const res2 = await service.submitObservation({
         taskId: TASK_ID,
         respondentId: 'resp-02',
+        respondentWardId: WARD_ID,
         channel: 'PWA',
         answers: { q1: false },
         clientIdempotencyKey: 'idemp-d2',
@@ -278,6 +289,7 @@ describe('T-13: Observation Application Service & Repositories', () => {
         await service.submitObservation({
           taskId: TASK_ID,
           respondentId: `resp-0${i}`,
+          respondentWardId: WARD_ID,
           channel: 'PWA',
           answers: { q1: true },
           clientIdempotencyKey: `idemp-seq-${i}`,
@@ -294,6 +306,7 @@ describe('T-13: Observation Application Service & Repositories', () => {
       const res4 = await service.submitObservation({
         taskId: TASK_ID,
         respondentId: 'resp-04',
+        respondentWardId: WARD_ID,
         channel: 'PWA',
         answers: { q1: true },
         clientIdempotencyKey: 'idemp-seq-4',
@@ -318,6 +331,7 @@ describe('T-13: Observation Application Service & Repositories', () => {
         service.submitObservation({
           taskId: 'non-existent-task',
           respondentId: 'resp-fail',
+          respondentWardId: WARD_ID,
           channel: 'PWA',
           answers: { q1: true },
           clientIdempotencyKey: 'idemp-fail-01',
@@ -345,6 +359,7 @@ describe('T-13: Observation Application Service & Repositories', () => {
         service.submitObservation({
           taskId: TASK_ID,
           respondentId: 'resp-retry',
+          respondentWardId: WARD_ID,
           channel: 'PWA',
           answers: { q1: true },
           clientIdempotencyKey: 'idemp-retry-01',
@@ -360,6 +375,7 @@ describe('T-13: Observation Application Service & Repositories', () => {
       const res = await service.submitObservation({
         taskId: TASK_ID,
         respondentId: 'resp-retry',
+        respondentWardId: WARD_ID,
         channel: 'PWA',
         answers: { q1: true },
         clientIdempotencyKey: 'idemp-retry-01',
@@ -377,6 +393,7 @@ describe('T-13: Observation Application Service & Repositories', () => {
       const res = await service.submitObservation({
         taskId: TASK_ID,
         respondentId: 'resp-phone',
+        respondentWardId: WARD_ID,
         channel: 'USSD',
         answers: { q1: true },
         clientIdempotencyKey: 'idemp-phone-01',
@@ -390,6 +407,32 @@ describe('T-13: Observation Application Service & Repositories', () => {
       // Assert observation stored prefix without raw phone
       const obs = (await txRunner.taskRepo.getObservationsForTask(TASK_ID))[0];
       expect(obs.clusterKey).toBe(res.clusterKey);
+    });
+  });
+
+  describe('6. Ward-Registration Invariant (14 §3)', () => {
+    it('rejects submission when respondent ward does not match project ward with E_UNKNOWN_CODE / 404', async () => {
+      const input: SubmitObservationInput = {
+        taskId: TASK_ID,
+        respondentId: 'resp-wrong-ward',
+        respondentWardId: 'ward-other-99',
+        channel: 'PWA',
+        answers: { q1_operational: true },
+        clientIdempotencyKey: 'idemp-wrong-ward-01',
+        geoCell: 'geo-cell-01',
+        msisdnPrefixBucket: '254711',
+      };
+
+      try {
+        await service.submitObservation(input);
+        expect.unreachable('Should have thrown ServiceError');
+      } catch (err: unknown) {
+        expect(err).toBeInstanceOf(ServiceError);
+        const serr = err as ServiceError;
+        expect(serr.code).toBe('E_UNKNOWN_CODE');
+        expect(serr.statusCode).toBe(404);
+        expect(serr.message).toContain('does not match project ward');
+      }
     });
   });
 });

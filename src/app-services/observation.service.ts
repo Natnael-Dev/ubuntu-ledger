@@ -39,6 +39,7 @@ export interface SubmitObservationInput {
   msisdn?: string; // If raw MSISDN passed at ingress, normalized before domain
   registeredAt?: Date | string;
   submittedAt?: Date | string;
+  respondentWardId?: string;
 }
 
 export interface ObservationResponseDto {
@@ -177,6 +178,15 @@ export class ObservationService {
           'E_NOT_FOUND',
           404,
           `Project '${task.projectId}' not found`
+        );
+      }
+
+      // Enforce respondent belongs to the task's project ward per 14 §3
+      if (input.respondentWardId !== undefined && input.respondentWardId !== project.wardId) {
+        throw new ServiceError(
+          'E_UNKNOWN_CODE',
+          404,
+          `Respondent ward '${input.respondentWardId}' does not match project ward '${project.wardId}'`
         );
       }
 

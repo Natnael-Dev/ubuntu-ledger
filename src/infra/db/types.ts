@@ -68,3 +68,13 @@ export interface NewIdempotencyRecord {
   response: Record<string, unknown>;
   createdAt?: Date;
 }
+
+export interface RespondentRecord {
+  id: string;
+  wardId: string;
+  phoneHash: string;
+  phoneEnc?: Buffer | Uint8Array | null;
+  msisdnPrefix?: string | null;
+  registeredAt: Date;
+  locale: string;
+}

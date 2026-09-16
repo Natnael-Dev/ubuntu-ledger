@@ -5,6 +5,7 @@ export * from './types';
 export * from './transaction';
 export * from './repositories/project.repository';
 export * from './repositories/task.repository';
+export * from './repositories/respondent.repository';
 export * from './services/audit-log.service';
 export * from './services/idempotency.store';
 
@@ -12,6 +13,7 @@ export * from './services/idempotency.store';
 export * from './postgres/pool';
 export * from './postgres/project.repository';
 export * from './postgres/task.repository';
+export * from './postgres/respondent.repository';
 export * from './postgres/audit-log.service';
 export * from './postgres/idempotency.store';
 export * from './postgres/transaction';

@@ -12,6 +12,7 @@ export interface RepairTicketRecord {
   id: string;
   assetId: string;
   projectId?: string | null;
+  wardId?: string | null;
   state: ProbationState;
   reportedBrokenAt: Date;
   repairClaimedAt?: Date | null;
@@ -21,7 +22,19 @@ export interface RepairTicketRecord {
   probationDays: number;
   resolvedAt?: Date | null;
   failureReasonKey?: string | null;
+  originalReporterClusters?: string[];
   createdAt?: Date;
+}
+
+export interface ProbationPingRecord {
+  id: string;
+  ticketId: string;
+  respondentId: string;
+  scheduledFor: Date;
+  sentAt?: Date | null;
+  respondedAt?: Date | null;
+  stillWorking?: boolean | null;
+  clusterKey?: string | null;
 }
 
 export interface UpdateTicketExtra {
@@ -32,6 +45,8 @@ export interface UpdateTicketExtra {
   probationDays?: number;
   resolvedAt?: Date | null;
   failureReasonKey?: string | null;
+  originalReporterClusters?: string[];
+  wardId?: string | null;
 }
 
 export interface RepairTicketRepository {
@@ -50,6 +65,47 @@ export interface RepairTicketRepository {
   ): Promise<void>;
 
   /**
+   * Finds all tickets currently in active probation (e.g. PROBATION_ACTIVE, PROBATION_DAY_0, or claimed with active window).
+   */
+  findActiveProbationTickets(): Promise<RepairTicketRecord[]>;
+
+  /**
+   * Finds all probation pings scheduled on or before `asOf` that have not yet been sent.
+   */
+  findPendingPings(asOf?: Date): Promise<ProbationPingRecord[]>;
+
+  /**
+   * Lists all repair tickets for a given ward (clean method for T-22 Console Board).
+   */
+  listTicketsByWard(wardId: string): Promise<RepairTicketRecord[]>;
+
+  /**
+   * Schedules a new probation ping. Idempotent on (ticketId, respondentId, scheduledFor).
+   */
+  schedulePing(
+    ping: Omit<ProbationPingRecord, 'id'> & { id?: string }
+  ): Promise<ProbationPingRecord>;
+
+  /**
+   * Marks a probation ping as sent.
+   */
+  markPingSent(pingId: string, sentAt?: Date): Promise<void>;
+
+  /**
+   * Gets all probation pings for a given repair ticket.
+   */
+  getPingsByTicketId(ticketId: string): Promise<ProbationPingRecord[]>;
+
+  /**
+   * Updates a ping's citizen verification response.
+   */
+  updatePingResponse?(
+    pingId: string,
+    stillWorking: boolean,
+    respondedAt?: Date
+  ): Promise<void>;
+
+  /**
    * Optional helper to seed a ticket record directly.
    */
   seed?(ticket: RepairTicketRecord): void;
@@ -60,9 +116,10 @@ export interface RepairTicketRepository {
  */
 export class InMemoryRepairTicketRepository implements RepairTicketRepository {
   private tickets: Map<string, RepairTicketRecord> = new Map();
+  private pings: Map<string, ProbationPingRecord> = new Map();
 
   constructor(initialTickets?: RepairTicketRecord[]) {
-    if (initialTickets && initialTickets.length > 0) {
+    if (initialTickets !== undefined) {
       for (const t of initialTickets) {
         this.seed(t);
       }
@@ -76,10 +133,21 @@ export class InMemoryRepairTicketRepository implements RepairTicketRepository {
    */
   seedDemo(): void {
     for (const t of DEMO_REPAIR_TICKETS) {
+      const wardId =
+        t.id === DEMO_IDS.TICKET_4412 || t.id === DEMO_IDS.TICKET_4413
+          ? DEMO_IDS.WARD_W09
+          : null;
+
+      const clusters =
+        t.id === DEMO_IDS.TICKET_4412
+          ? ['cluster-alpha', 'cluster-beta']
+          : ['cluster-gamma'];
+
       const record: RepairTicketRecord = {
         id: t.id,
         assetId: t.assetId,
         projectId: t.projectId ?? null,
+        wardId,
         state: t.state,
         reportedBrokenAt: new Date(t.reportedBrokenAt),
         repairClaimedAt: t.repairClaimedAt ? new Date(t.repairClaimedAt) : null,
@@ -93,6 +161,7 @@ export class InMemoryRepairTicketRepository implements RepairTicketRepository {
         probationDays: t.probationDays,
         resolvedAt: t.resolvedAt ? new Date(t.resolvedAt) : null,
         failureReasonKey: t.failureReasonKey ?? null,
+        originalReporterClusters: clusters,
       };
 
       this.seed(record);
@@ -155,6 +224,11 @@ export class InMemoryRepairTicketRepository implements RepairTicketRepository {
         extra?.failureReasonKey !== undefined
           ? extra.failureReasonKey
           : existing.failureReasonKey,
+      originalReporterClusters:
+        extra?.originalReporterClusters !== undefined
+          ? extra.originalReporterClusters
+          : existing.originalReporterClusters,
+      wardId: extra?.wardId !== undefined ? extra.wardId : existing.wardId,
     };
 
     this.tickets.set(id, updated);
@@ -179,8 +253,147 @@ export class InMemoryRepairTicketRepository implements RepairTicketRepository {
     }
   }
 
+  async findActiveProbationTickets(): Promise<RepairTicketRecord[]> {
+    const activeStates: ProbationState[] = [
+      'PROBATION_ACTIVE',
+      'PROBATION_DAY_0',
+      'REPAIR_CLAIMED',
+    ];
+    const results: RepairTicketRecord[] = [];
+    const seenIds = new Set<string>();
+
+    for (const ticket of this.tickets.values()) {
+      // Avoid duplicates from alias keys ('ticket-4412')
+      if (seenIds.has(ticket.id)) continue;
+      seenIds.add(ticket.id);
+
+      if (
+        ticket.state === 'PROBATION_ACTIVE' ||
+        ticket.state === 'PROBATION_DAY_0' ||
+        (ticket.state === 'REPAIR_CLAIMED' && ticket.probationStartedAt != null)
+      ) {
+        results.push({ ...ticket });
+      }
+    }
+    return results;
+  }
+
+  async findPendingPings(asOf?: Date): Promise<ProbationPingRecord[]> {
+    const threshold = asOf ? asOf.getTime() : Date.now();
+    const results: ProbationPingRecord[] = [];
+
+    for (const ping of this.pings.values()) {
+      if (
+        ping.scheduledFor.getTime() <= threshold &&
+        (ping.sentAt === null || ping.sentAt === undefined)
+      ) {
+        results.push({ ...ping });
+      }
+    }
+
+    return results.sort((a, b) => a.scheduledFor.getTime() - b.scheduledFor.getTime());
+  }
+
+  async listTicketsByWard(wardId: string): Promise<RepairTicketRecord[]> {
+    const results: RepairTicketRecord[] = [];
+    const seenIds = new Set<string>();
+
+    for (const ticket of this.tickets.values()) {
+      if (seenIds.has(ticket.id)) continue;
+
+      const isWardMatch =
+        ticket.wardId === wardId ||
+        ((ticket.id === DEMO_IDS.TICKET_4412 || ticket.id === DEMO_IDS.TICKET_4413) &&
+          wardId === DEMO_IDS.WARD_W09);
+
+      if (isWardMatch) {
+        seenIds.add(ticket.id);
+        results.push({ ...ticket });
+      }
+    }
+
+    return results.sort(
+      (a, b) => b.reportedBrokenAt.getTime() - a.reportedBrokenAt.getTime()
+    );
+  }
+
+  async schedulePing(
+    ping: Omit<ProbationPingRecord, 'id'> & { id?: string }
+  ): Promise<ProbationPingRecord> {
+    // Idempotency check: unique (ticket_id, respondent_id, scheduled_for)
+    for (const existing of this.pings.values()) {
+      if (
+        existing.ticketId === ping.ticketId &&
+        existing.respondentId === ping.respondentId &&
+        existing.scheduledFor.getTime() === ping.scheduledFor.getTime()
+      ) {
+        return { ...existing };
+      }
+    }
+
+    const id =
+      ping.id ||
+      (typeof crypto !== 'undefined' && crypto.randomUUID
+        ? crypto.randomUUID()
+        : `ping-${Date.now()}-${Math.floor(Math.random() * 100000)}`);
+
+    const record: ProbationPingRecord = {
+      id,
+      ticketId: ping.ticketId,
+      respondentId: ping.respondentId,
+      scheduledFor: ping.scheduledFor,
+      sentAt: ping.sentAt ?? null,
+      respondedAt: ping.respondedAt ?? null,
+      stillWorking: ping.stillWorking ?? null,
+      clusterKey: ping.clusterKey ?? null,
+    };
+
+    this.pings.set(id, record);
+    return { ...record };
+  }
+
+  async markPingSent(pingId: string, sentAt?: Date): Promise<void> {
+    const ping = this.pings.get(pingId);
+    if (!ping) {
+      throw new Error(`Probation ping '${pingId}' not found`);
+    }
+
+    this.pings.set(pingId, {
+      ...ping,
+      sentAt: sentAt ?? new Date(),
+    });
+  }
+
+  async getPingsByTicketId(ticketId: string): Promise<ProbationPingRecord[]> {
+    const results: ProbationPingRecord[] = [];
+    for (const ping of this.pings.values()) {
+      if (ping.ticketId === ticketId) {
+        results.push({ ...ping });
+      }
+    }
+    return results.sort((a, b) => a.scheduledFor.getTime() - b.scheduledFor.getTime());
+  }
+
+  async updatePingResponse(
+    pingId: string,
+    stillWorking: boolean,
+    respondedAt?: Date
+  ): Promise<void> {
+    const ping = this.pings.get(pingId);
+    if (!ping) {
+      throw new Error(`Probation ping '${pingId}' not found`);
+    }
+
+    this.pings.set(pingId, {
+      ...ping,
+      stillWorking,
+      respondedAt: respondedAt ?? new Date(),
+    });
+  }
+
   clear(): void {
     this.tickets.clear();
+    this.pings.clear();
   }
 }
 

@@ -122,7 +122,9 @@ export interface RecordVisitOutcomeInput {
   phoneHash: string;
   channel: Channel | string;
   idempotencyKey?: string;
-  clusterKey?: string;
+  geoCell?: string | null;
+  msisdnPrefixBucket?: string;
+  registeredAt?: Date | string | null;
 }
 
 export interface RecordVisitOutcomeResponseDto {

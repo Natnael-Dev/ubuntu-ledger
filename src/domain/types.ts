@@ -1,6 +1,6 @@
 // Core Domain Types
 // Authoritative sources: docs/specs/03-data-model.md §1, docs/specs/04-state-machine.md §8
-// Rule: Pure TypeScript definitions only. No framework, no I/O, no DB imports.
+export type { Locale } from './content';
 
 export type FiscalState = 'PROMISED' | 'COMMITTED' | 'DISBURSED' | 'AUDITED';
 

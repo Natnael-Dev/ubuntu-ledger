@@ -1,0 +1,22 @@
+{
+  "wardCode": "KE-NRB-ROY",
+  "name": "Roysambu Ward",
+  "countryCode": "KE",
+  "adminHierarchy": {
+    "national": "Kenya",
+    "county": "Nairobi County",
+    "subCounty": "Roysambu Sub-County",
+    "ward": "Roysambu Ward"
+  },
+  "defaultLocale": "sw",
+  "locales": ["sw", "en"],
+  "radioPartner": {
+    "name": "Ghetto Radio 89.5 FM",
+    "broadcastDay": "Wednesday",
+    "timeSlot": "20:00"
+  },
+  "monitorRoster": {
+    "targetActiveMonitors": 20,
+    "clusterThresholdK": 3
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "countryCode": "ET",
+  "name": "Ethiopia",
+  "dialCode": "251",
+  "currency": "ETB",
+  "defaultLocale": "am",
+  "locales": ["am", "om", "en"],
+  "adminTiers": [
+    { "level": 0, "name": "National", "label": "Federal" },
+    { "level": 1, "name": "Region", "label": "Charter City / Region" },
+    { "level": 2, "name": "Zone", "label": "Sub-city / Zone" },
+    { "level": 3, "name": "Woreda", "label": "Woreda" },
+    { "level": 4, "name": "Kebele", "label": "Kebele" }
+  ],
+  "appealBodies": {
+    "administrative": "Woreda Grievance Redress Committee",
+    "ombudsman": "Ethiopian Institution of the Ombudsman",
+    "anticorruption": "Federal Ethics and Anti-Corruption Commission"
+  },
+  "statutorySourceTypes": [
+    "DIRECTIVE",
+    "CIRCULAR",
+    "PROCLAMATION",
+    "REGULATION",
+    "CHARTER"
+  ]
+}

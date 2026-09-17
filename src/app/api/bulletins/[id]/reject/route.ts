@@ -6,14 +6,13 @@
 import { NextResponse } from 'next/server';
 import { getBulletinService } from '@/app-services/bulletin.service';
 import { ServiceError } from '@/app-services/errors';
+import { authorizeActor } from '@/infra/security/actor-auth';
 
 interface RouteContext {
   params: Promise<{ id: string }>;
 }
 
 export async function POST(request: Request, props: RouteContext): Promise<Response> {
-  const { id } = await props.params;
-
   let body: Record<string, unknown>;
   try {
     body = await request.json();
@@ -23,6 +22,13 @@ export async function POST(request: Request, props: RouteContext): Promise<Respo
       { status: 400 }
     );
   }
+
+  const auth = authorizeActor(request, ['MODERATOR', 'ADMIN'], body);
+  if (!auth.authorized) {
+    return auth.response;
+  }
+
+  const { id } = await props.params;
 
   const reason = typeof body.reason === 'string' ? body.reason.trim() : '';
 

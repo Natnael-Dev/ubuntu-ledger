@@ -15,7 +15,7 @@ test.describe('T-22: Operator Console — Project Board & Repair Claim', () => {
   test('loads console page with title, municipal header, and navigation', async ({ page }) => {
     await expect(page).toHaveTitle(/Operator Console/);
     await expect(page.getByText('Ward Proof-Line // Municipal Operator Interface')).toBeVisible();
-    await expect(page.getByText(/CONSOLE: WOREDA 09/i)).toBeVisible();
+    await expect(page.getByText(/CONSOLE: WOREDA 0?9/i)).toBeVisible();
     await expect(page.getByText('Role: ADMIN')).toBeVisible();
     await expect(page.getByText('Audit Chain: Genesis-linked')).toBeVisible();
   });

@@ -527,4 +527,45 @@ describe('T-25: Statutory Rule Card & Pure Divergence Domain Logic', () => {
       expect(resDivClinic.text).toContain('Not enough reports yet');
     });
   });
+
+  // ==========================================================================
+  // 6. SEC-04: CANONICAL CLUSTER DERIVATION (07 §3)
+  // ==========================================================================
+  describe('6. SEC-04: Canonical Server-Side Cluster Derivation', () => {
+    it('generates a strictly 16-hex clusterKey independent of raw respondent identity', async () => {
+      let savedOutcome: VisitOutcomeDomain | null = null;
+      const mockRepo: StatutoryRepository = {
+        getServiceByCode: async () => ({
+          id: '00000000-0000-0000-0000-000000000001',
+          wardId: '00000000-0000-0000-0000-000000000010',
+          code: 'ET-ID-REPLACE',
+          officeCode: 'ET-AA-W09-OFFICE',
+          labelKey: 'service.id_replace',
+        }),
+        getRulesForService: async () => [],
+        getSourceDocument: async () => null,
+        getDivergenceAggregate: async () => null,
+        getVisitOutcomes: async () => [],
+        saveVisitOutcome: async (outcome) => {
+          savedOutcome = outcome;
+        },
+        getVisitOutcomeByIdempotencyKey: async () => null,
+        countVisitOutcomesByReporterAndDay: async () => 0,
+      };
+
+      const service = new StatutoryService(mockRepo);
+      await service.recordVisitOutcome({
+        serviceCode: 'ET-ID-REPLACE',
+        outcomeCode: 1,
+        phoneHash: 'phone_hash_abc_123',
+        channel: 'USSD',
+        idempotencyKey: 'idemp_sec04_test_1',
+      });
+
+      expect(savedOutcome).not.toBeNull();
+      expect(savedOutcome!.clusterKey).toMatch(/^[0-9a-f]{16}$/);
+      expect(savedOutcome!.clusterKey).not.toContain('phone_hash');
+      expect(savedOutcome!.clusterKey).not.toContain('cluster_');
+    });
+  });
 });

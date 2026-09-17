@@ -10,7 +10,9 @@
     "lint": "eslint .",
     "test": "vitest run",
     "test:unit": "vitest run tests/unit",
+    "test:adversarial": "vitest run tests/adversarial",
     "test:e2e": "playwright test",
+    "dev:full": "next dev",
     "seed:demo": "tsx scripts/seed-demo.ts"
   },
   "dependencies": {

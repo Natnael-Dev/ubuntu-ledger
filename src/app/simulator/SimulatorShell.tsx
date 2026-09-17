@@ -89,6 +89,8 @@ interface SimulatorShellProps {
 
 export function SimulatorShell({ config }: SimulatorShellProps) {
   const [selectedPersona, setSelectedPersona] = useState<PersonaOption>(config.personas[0]);
+  const [channelMode, setChannelMode] = useState<'USSD' | 'IVR'>('USSD');
+  const [activeAudioKeys, setActiveAudioKeys] = useState<string[]>([]);
   const [session, setSession] = useState<UssdSession | null>(null);
   const [lcdLines, setLcdLines] = useState<string[]>(['Ward Proof-Line', 'Feature-Phone Sim', '', 'Select persona']);
   const [inputBuffer, setInputBuffer] = useState('');
@@ -114,7 +116,7 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
     []
   );
 
-  // ── Start a fresh USSD session (dial *890#) ──────────────────────────────
+  // ── Start a fresh session ──────────────────────────────────────────────────
 
   const startSession = useCallback(async () => {
     if (loading) return;
@@ -130,73 +132,24 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
     setInputBuffer('');
     setLoading(true);
     setLastRawResponse('');
+    setActiveAudioKeys([]);
 
     addTranscriptEntry(
       'info',
-      `[DIAL] *890# from ${selectedPersona.msisdn} (${selectedPersona.label})`
+      channelMode === 'USSD'
+        ? `[DIAL] *890# from ${selectedPersona.msisdn} (${selectedPersona.label})`
+        : `[CALL] Dialing IVR from ${selectedPersona.msisdn} (${selectedPersona.label})`
     );
 
     try {
-      const res = await fetch('/api/ussd', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          sessionId: newSession.sessionId,
-          phoneNumber: newSession.phoneNumber,
-          text: '',
-        }),
-      });
-
-      const rawText = await res.text();
-      setLastRawResponse(rawText);
-      addTranscriptEntry('received', rawText);
-
-      if (!res.ok) {
-        setLcdLines([`HTTP ${res.status}`, rawText.slice(0, 60)]);
-        setSession((s) => s ? { ...s, isAlive: false } : null);
-        return;
-      }
-
-      const isEnd = isEndResponse(rawText);
-      setLcdLines(toRows(stripPrefix(rawText)).slice(0, 4));
-      if (isEnd) {
-        setSession((s) => s ? { ...s, isAlive: false } : null);
-      } else {
-        setSession(newSession);
-      }
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : String(err);
-      setLcdLines(['Network error', msg.slice(0, 60)]);
-      setSession((s) => s ? { ...s, isAlive: false } : null);
-      addTranscriptEntry('info', `[ERROR] ${msg}`);
-    } finally {
-      setLoading(false);
-    }
-  }, [loading, selectedPersona, addTranscriptEntry]);
-
-  // ── Send a digit press ───────────────────────────────────────────────────
-
-  const sendInput = useCallback(
-    async (digit: string) => {
-      if (!session?.isAlive || loading) return;
-
-      const separator = session.textAccumulator ? '*' : '';
-      const newAccumulator = session.textAccumulator + separator + digit;
-      const updatedSession = { ...session, textAccumulator: newAccumulator };
-      setSession(updatedSession);
-      setInputBuffer('');
-      setLoading(true);
-
-      addTranscriptEntry('sent', `→ ${digit}`);
-
-      try {
+      if (channelMode === 'USSD') {
         const res = await fetch('/api/ussd', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            sessionId: updatedSession.sessionId,
-            phoneNumber: updatedSession.phoneNumber,
-            text: newAccumulator,
+            sessionId: newSession.sessionId,
+            phoneNumber: newSession.phoneNumber,
+            text: '',
           }),
         });
 
@@ -215,7 +168,143 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
         if (isEnd) {
           setSession((s) => s ? { ...s, isAlive: false } : null);
         } else {
-          setSession(updatedSession);
+          setSession(newSession);
+        }
+      } else {
+        // IVR Mode
+        const res = await fetch('/api/ivr', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            sessionId: newSession.sessionId,
+            phoneNumber: newSession.phoneNumber,
+            digits: '',
+            locale: 'en',
+          }),
+        });
+
+        const rawJson = await res.text();
+        setLastRawResponse(rawJson);
+
+        if (!res.ok) {
+          setLcdLines([`HTTP ${res.status}`, rawJson.slice(0, 60)]);
+          setSession((s) => s ? { ...s, isAlive: false } : null);
+          addTranscriptEntry('received', rawJson);
+          return;
+        }
+
+        const data = JSON.parse(rawJson);
+        const keys = Array.isArray(data.audioKeys) ? data.audioKeys : [];
+        setActiveAudioKeys(keys);
+        addTranscriptEntry('received', `[IVR ${data.action}] keys: [${keys.join(', ')}] slots: ${JSON.stringify(data.slots || {})}`);
+
+        setLcdLines([
+          `IVR: ${data.action}`,
+          `Audio: ${keys.length} clip(s)`,
+          keys[0] ? `> ${keys[0]}` : '',
+          data.action === 'END' ? 'Call Ended' : `Input digits:`,
+        ]);
+
+        if (data.action === 'END') {
+          setSession((s) => s ? { ...s, isAlive: false } : null);
+        } else {
+          setSession(newSession);
+        }
+      }
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      setLcdLines(['Network error', msg.slice(0, 60)]);
+      setSession((s) => s ? { ...s, isAlive: false } : null);
+      addTranscriptEntry('info', `[ERROR] ${msg}`);
+    } finally {
+      setLoading(false);
+    }
+  }, [loading, selectedPersona, channelMode, addTranscriptEntry]);
+
+  // ── Send a digit press ───────────────────────────────────────────────────
+
+  const sendInput = useCallback(
+    async (digit: string) => {
+      if (!session?.isAlive || loading) return;
+
+      const separator = session.textAccumulator ? '*' : '';
+      const newAccumulator = session.textAccumulator + separator + digit;
+      const updatedSession = { ...session, textAccumulator: newAccumulator };
+      setSession(updatedSession);
+      setInputBuffer('');
+      setLoading(true);
+
+      addTranscriptEntry('sent', `→ ${digit}`);
+
+      try {
+        if (channelMode === 'USSD') {
+          const res = await fetch('/api/ussd', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              sessionId: updatedSession.sessionId,
+              phoneNumber: updatedSession.phoneNumber,
+              text: newAccumulator,
+            }),
+          });
+
+          const rawText = await res.text();
+          setLastRawResponse(rawText);
+          addTranscriptEntry('received', rawText);
+
+          if (!res.ok) {
+            setLcdLines([`HTTP ${res.status}`, rawText.slice(0, 60)]);
+            setSession((s) => s ? { ...s, isAlive: false } : null);
+            return;
+          }
+
+          const isEnd = isEndResponse(rawText);
+          setLcdLines(toRows(stripPrefix(rawText)).slice(0, 4));
+          if (isEnd) {
+            setSession((s) => s ? { ...s, isAlive: false } : null);
+          } else {
+            setSession(updatedSession);
+          }
+        } else {
+          // IVR Mode
+          const res = await fetch('/api/ivr', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              sessionId: updatedSession.sessionId,
+              phoneNumber: updatedSession.phoneNumber,
+              digits: newAccumulator,
+              locale: 'en',
+            }),
+          });
+
+          const rawJson = await res.text();
+          setLastRawResponse(rawJson);
+
+          if (!res.ok) {
+            setLcdLines([`HTTP ${res.status}`, rawJson.slice(0, 60)]);
+            setSession((s) => s ? { ...s, isAlive: false } : null);
+            addTranscriptEntry('received', rawJson);
+            return;
+          }
+
+          const data = JSON.parse(rawJson);
+          const keys = Array.isArray(data.audioKeys) ? data.audioKeys : [];
+          setActiveAudioKeys(keys);
+          addTranscriptEntry('received', `[IVR ${data.action}] keys: [${keys.join(', ')}] slots: ${JSON.stringify(data.slots || {})}`);
+
+          setLcdLines([
+            `IVR: ${data.action}`,
+            `Audio: ${keys.length} clip(s)`,
+            keys[0] ? `> ${keys[0]}` : '',
+            data.action === 'END' ? 'Call Ended' : `Input digits:`,
+          ]);
+
+          if (data.action === 'END') {
+            setSession((s) => s ? { ...s, isAlive: false } : null);
+          } else {
+            setSession(updatedSession);
+          }
         }
       } catch (err) {
         const msg = err instanceof Error ? err.message : String(err);
@@ -226,7 +315,7 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
         setLoading(false);
       }
     },
-    [session, loading, addTranscriptEntry]
+    [session, loading, channelMode, addTranscriptEntry]
   );
 
   // ── Keyboard support ─────────────────────────────────────────────────────
@@ -287,6 +376,50 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
       <div className="flex flex-col lg:flex-row gap-6 items-start">
         {/* Left column: phone + persona */}
         <div className="flex flex-col gap-4 w-full lg:w-auto">
+
+          {/* ── Channel Mode Switch (USSD / IVR) ── */}
+          <div className="flex gap-2 p-1 bg-gray-100 rounded-lg border border-[var(--rule)] w-full lg:w-72">
+            <button
+              type="button"
+              data-testid="mode-ussd"
+              onClick={() => {
+                setChannelMode('USSD');
+                setSession(null);
+                setActiveAudioKeys([]);
+                setLcdLines(['Ward Proof-Line', 'Feature-Phone Sim', '', 'Select persona']);
+                setLastRawResponse('');
+                addTranscriptEntry('info', '[MODE] Switched to USSD text transport (*890#)');
+              }}
+              className={[
+                'flex-1 py-1.5 text-xs font-semibold rounded-md transition-colors',
+                channelMode === 'USSD'
+                  ? 'bg-white text-[var(--ink)] shadow-sm border border-gray-200'
+                  : 'text-gray-500 hover:text-gray-900',
+              ].join(' ')}
+            >
+              USSD (Text)
+            </button>
+            <button
+              type="button"
+              data-testid="mode-ivr"
+              onClick={() => {
+                setChannelMode('IVR');
+                setSession(null);
+                setActiveAudioKeys([]);
+                setLcdLines(['Ward Proof-Line', 'IVR Voice Engine', '', 'Press DIAL to call']);
+                setLastRawResponse('');
+                addTranscriptEntry('info', '[MODE] Switched to IVR voice audio transport (/api/ivr)');
+              }}
+              className={[
+                'flex-1 py-1.5 text-xs font-semibold rounded-md transition-colors',
+                channelMode === 'IVR'
+                  ? 'bg-white text-[var(--ink)] shadow-sm border border-gray-200'
+                  : 'text-gray-500 hover:text-gray-900',
+              ].join(' ')}
+            >
+              IVR (Voice)
+            </button>
+          </div>
 
           {/* ── Persona selector ── */}
           <section aria-label="Persona selector" className="rounded-xl border border-[var(--rule)] bg-white p-4 w-full lg:w-72">
@@ -395,7 +528,7 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
                     : 'bg-[var(--state-open)] text-white hover:opacity-90 active:opacity-75',
                 ].join(' ')}
               >
-                {session?.isAlive ? '↺ REDIAL' : 'DIAL *890#'}
+                {session?.isAlive ? '↺ REDIAL' : channelMode === 'USSD' ? 'DIAL *890#' : 'CALL IVR'}
               </button>
               {session && !session.isAlive && (
                 <button
@@ -483,6 +616,43 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
               </button>
             </div>
           </div>
+
+          {/* ── IVR Audio Queue Card (visible when in IVR mode) ── */}
+          {channelMode === 'IVR' && (
+            <div
+              data-testid="ivr-audio-panel"
+              className="rounded-xl border border-blue-200 bg-blue-50/70 p-4 w-full lg:w-72"
+            >
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-xs font-semibold uppercase tracking-wider text-blue-900 flex items-center gap-1.5">
+                  <span className={`w-2 h-2 rounded-full ${sessionActive ? 'bg-green-500 animate-ping' : 'bg-blue-400'}`} />
+                  IVR Audio Queue
+                </h3>
+                <span className="text-[10px] font-mono text-blue-700 bg-blue-100 px-1.5 py-0.5 rounded">
+                  {activeAudioKeys.length} clip{activeAudioKeys.length === 1 ? '' : 's'}
+                </span>
+              </div>
+              {activeAudioKeys.length === 0 ? (
+                <p className="text-xs text-blue-600 italic">Call IVR to trigger audio playback</p>
+              ) : (
+                <div className="flex flex-col gap-1.5 mt-2">
+                  {activeAudioKeys.map((key, idx) => (
+                    <div
+                      key={`${key}-${idx}`}
+                      data-testid="audio-key-badge"
+                      className="text-[11px] font-mono bg-white text-blue-900 border border-blue-200 px-2 py-1 rounded shadow-sm flex items-center justify-between"
+                    >
+                      <span className="flex items-center gap-1 truncate">
+                        <span>🔊</span>
+                        <span className="truncate">{key}</span>
+                      </span>
+                      <span className="text-[9px] text-blue-500 shrink-0">#{idx + 1}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Right column: transcript */}

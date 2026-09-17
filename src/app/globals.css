@@ -24,4 +24,10 @@
 body {
   color: var(--ink);
   background: var(--paper);
+  font-family: var(--font-sans), 'IBM Plex Sans', system-ui, sans-serif;
 }
+
+code, kbd, samp, .font-mono {
+  font-family: var(--font-mono), 'IBM Plex Mono', 'Courier New', monospace;
+}
+

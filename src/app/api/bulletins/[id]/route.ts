@@ -6,12 +6,18 @@
 import { NextResponse } from 'next/server';
 import { getBulletinService } from '@/app-services/bulletin.service';
 import { ServiceError } from '@/app-services/errors';
+import { authorizeActor } from '@/infra/security/actor-auth';
 
 interface RouteContext {
   params: Promise<{ id: string }>;
 }
 
-export async function GET(_request: Request, props: RouteContext): Promise<Response> {
+export async function GET(request: Request, props: RouteContext): Promise<Response> {
+  const auth = authorizeActor(request, ['MODERATOR', 'ADMIN']);
+  if (!auth.authorized) {
+    return auth.response;
+  }
+
   const { id } = await props.params;
 
   try {

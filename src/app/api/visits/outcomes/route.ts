@@ -107,7 +107,6 @@ export async function POST(req: Request): Promise<Response> {
       : undefined;
 
   const channel = typeof body.channel === 'string' ? body.channel : 'USSD';
-  const clusterKey = typeof body.clusterKey === 'string' ? body.clusterKey.trim() : undefined;
 
   try {
     const service = getStatutoryService();
@@ -119,7 +118,6 @@ export async function POST(req: Request): Promise<Response> {
       phoneHash,
       channel,
       idempotencyKey,
-      clusterKey,
     });
 
     return new Response(JSON.stringify(result), {

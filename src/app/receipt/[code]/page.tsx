@@ -14,9 +14,10 @@ import {
   resolveNarrativeText,
   type ProjectReceiptDto,
   type WardMetadataDto,
-} from '@/app/api/projects/[code]/route';
+} from '@/lib/project-receipt';
 import { DEMO_WARDS } from '@/fixtures/demo-scenario';
 import { ReceiptAudioButton } from './ReceiptAudioButton';
+import { ReceiptPrintButton } from '@/components/ReceiptPrintButton';
 
 interface PageProps {
   params: Promise<{ code: string }>;
@@ -47,7 +48,7 @@ export default async function ReceiptPage(props: PageProps) {
   const matchedWard = DEMO_WARDS.find((dw) => dw.id === receipt?.wardId) || DEMO_WARDS[0];
   const ward: WardMetadataDto = {
     code: matchedWard.code,
-    name: matchedWard.code === 'ET-AA-W09' ? 'WOREDA 9' : matchedWard.name.toUpperCase(),
+    name: matchedWard.name.toUpperCase(),
     locales: matchedWard.locales,
   };
 
@@ -145,13 +146,7 @@ export default async function ReceiptPage(props: PageProps) {
           >
             ← simulator
           </a>
-          <button
-            type="button"
-            onClick={() => typeof window !== 'undefined' && window.print()}
-            className="px-2.5 py-1 border border-[var(--rule)] bg-white hover:bg-neutral-100 rounded text-[11px] text-[var(--ink)] transition"
-          >
-            print receipt
-          </button>
+          <ReceiptPrintButton />
         </div>
 
         {/* The Receipt Card Layout (08 §5) */}

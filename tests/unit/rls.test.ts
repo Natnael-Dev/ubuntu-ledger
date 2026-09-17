@@ -55,8 +55,8 @@ describe("T-06: RLS Security Invariant Verification", () => {
   const fullSql = migrations.map((m) => m.content).join("\n");
 
   describe("Level 1: RLS Enablement Coverage", () => {
-    it("has migrations 001 through 011 present", () => {
-      expect(migrations.length).toBe(11);
+    it("has migrations 001 through 012 present", () => {
+      expect(migrations.length).toBe(12);
       const prefixes = migrations.map((m) => m.filename.slice(0, 3));
       expect(prefixes).toEqual([
         "001",
@@ -70,6 +70,7 @@ describe("T-06: RLS Security Invariant Verification", () => {
         "009",
         "010",
         "011",
+        "012",
       ]);
     });
 
@@ -191,6 +192,12 @@ describe("T-06: RLS Security Invariant Verification", () => {
       expect(noDeleteRegex.test(fullSql)).toBe(true);
     });
 
+    it("enforces TRUNCATE immutability seal trigger on audit_event per 012_audit_truncate_seal.sql", () => {
+      const triggerRegex = /create\s+trigger\s+audit_no_truncate\s+before\s+truncate\s+on\s+audit_event\s+for\s+each\s+statement\s+execute\s+function\s+seal_truncate_immutability\(\)\s*;/i;
+      expect(triggerRegex.test(fullSql)).toBe(true);
+      expect(/alter\s+table\s+audit_event\s+enable\s+always\s+trigger\s+audit_no_truncate\s*;/i.test(fullSql)).toBe(true);
+    });
+
     it("enforces privacy invariants: no coordinates and no voice transcripts", () => {
       expect(/latitude|longitude/i.test(fullSql)).toBe(false);
       expect(/\btranscript\b/i.test(fullSql)).toBe(false);
@@ -294,6 +301,45 @@ describe("T-06: RLS Security Invariant Verification", () => {
           expect(Array.isArray(res.rows)).toBe(true);
         } finally {
           await client.query("RESET ROLE");
+          client.release();
+        }
+      });
+
+      it("runtime proof: rejects TRUNCATE on audit_event with IMMUTABILITY VIOLATION", async () => {
+        const { getPostgresPool } = await import("@/infra/db/postgres/pool");
+        const pool = getPostgresPool();
+        const client = await pool.connect();
+        try {
+          await expect(client.query("TRUNCATE TABLE audit_event")).rejects.toThrow(
+            /IMMUTABILITY VIOLATION/i
+          );
+        } finally {
+          client.release();
+        }
+      });
+
+      it("runtime proof: UPDATE on audit_event affects 0 rows due to audit_no_update rule", async () => {
+        const { getPostgresPool } = await import("@/infra/db/postgres/pool");
+        const pool = getPostgresPool();
+        const client = await pool.connect();
+        try {
+          const res = await client.query(
+            "UPDATE audit_event SET entity_type = 'tampered' WHERE seq = 1"
+          );
+          expect(res.rowCount).toBe(0);
+        } finally {
+          client.release();
+        }
+      });
+
+      it("runtime proof: DELETE on audit_event affects 0 rows due to audit_no_delete rule", async () => {
+        const { getPostgresPool } = await import("@/infra/db/postgres/pool");
+        const pool = getPostgresPool();
+        const client = await pool.connect();
+        try {
+          const res = await client.query("DELETE FROM audit_event WHERE seq = 1");
+          expect(res.rowCount).toBe(0);
+        } finally {
           client.release();
         }
       });

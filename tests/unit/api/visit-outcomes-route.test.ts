@@ -120,4 +120,21 @@ describe('POST /api/visits/outcomes Route Handler', () => {
     const json4 = await r4.json();
     expect(json4.code).toBe('E_RATE_LIMITED');
   });
+
+  it('SEC-04: ignores client-supplied clusterKey and processes outcome cleanly', async () => {
+    const maliciousPayload = {
+      serviceCode: 'ET-ID-REPLACE',
+      outcomeCode: 1,
+      phoneHash: 'malicious_client_probe_01',
+      channel: 'USSD',
+      clusterKey: 'attacker-forged-cluster-key',
+      idempotencyKey: 'idemp_sec04_01',
+    };
+
+    const res = await POST(makeRequest(maliciousPayload));
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json.accepted).toBe(true);
+    expect(json.thankYouKey).toBe('outcome.recorded');
+  });
 });

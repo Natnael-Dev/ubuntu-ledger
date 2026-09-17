@@ -7,13 +7,13 @@
 import { systemClock } from '@/infra/clock';
 import { getServiceContainer } from '@/infra/db/container';
 import type { ProjectRecord } from '@/infra/db/types';
-import { DEMO_PROJECTS, DEMO_WARDS } from '@/fixtures/demo-scenario';
+import { ALL_DEMO_PROJECTS, DEMO_WARDS } from '@/fixtures/demo-scenario';
 import {
   getProjectReceipt,
   problemResponse,
   type ProjectReceiptDto,
   type WardMetadataDto,
-} from '@/app/api/projects/[code]/route';
+} from '@/lib/project-receipt';
 
 export interface WardReceiptsResponseDto {
   ward: WardMetadataDto;
@@ -61,7 +61,7 @@ export async function GET(
     ? Array.from(inMemoryRepo.projects.values()).filter((p) => p.wardId === ward.id)
     : [];
 
-  const fixtureProjects = DEMO_PROJECTS.filter((p) => p.wardId === ward.id);
+  const fixtureProjects = ALL_DEMO_PROJECTS.filter((p) => p.wardId === ward.id);
 
   // Deduplicate project codes
   const projectCodes = new Set<string>();
@@ -84,7 +84,7 @@ export async function GET(
   }
 
   // Format ward name per 05 §4
-  const displayName = ward.code === 'ET-AA-W09' ? 'Woreda 9' : ward.name;
+  const displayName = ward.name;
 
   const responseBody: WardReceiptsResponseDto = {
     ward: {

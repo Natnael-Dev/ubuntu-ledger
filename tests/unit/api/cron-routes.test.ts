@@ -133,6 +133,20 @@ describe('T-21: Probation Cron Endpoints (05-api-contracts.md §11, 11-tasks.md 
       const body = await res.json();
       expect(body.ok).toBe(true);
     });
+
+    it('SEC-02: fails closed when CRON_SECRET is missing or unset', async () => {
+      delete process.env.CRON_SECRET;
+      const req = createRequest('http://localhost/api/cron/probation/pings', {
+        headers: {
+          Authorization: 'Bearer dev-cron-secret-2026',
+        },
+      });
+      const res = await pingsRoute(req);
+
+      expect(res.status).toBe(401);
+      const body = await res.json();
+      expect(body.code).toBe('E_UNAUTHORIZED');
+    });
   });
 
   describe('2. GET /api/cron/probation/pings', () => {

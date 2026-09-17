@@ -30,3 +30,7 @@ yarn-error.log*
 Thumbs.db
 .vscode/
 .idea/
+
+# Supabase local runtime
+supabase/.temp/
+supabase/.branches/

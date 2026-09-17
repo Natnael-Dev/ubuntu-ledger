@@ -190,9 +190,44 @@ describe("T-13: PostgreSQL Real Concurrency and Multi-Connection Verification", 
 
       beforeAll(async () => {
         pool = getPostgresPool();
+        const client = await pool.connect();
+        try {
+          await client.query(`
+            INSERT INTO inspection_task (id, project_id, asset_id, dispatched_at, expires_at, witness_target, witness_count, closed_at)
+            VALUES (
+              '00000000-0000-0000-0000-000000000001',
+              '00000000-0000-4000-a000-000000000100',
+              '00000000-0000-4000-a000-000000000200',
+              NOW(),
+              NOW() + interval '7 days',
+              2,
+              0,
+              NULL
+            )
+            ON CONFLICT (id) DO UPDATE SET witness_target = 2, witness_count = 0, closed_at = NULL
+          `);
+          await client.query(`
+            INSERT INTO respondent (id, ward_id, phone_hash, phone_enc, msisdn_prefix, registered_at, locale)
+            VALUES 
+              ('00000000-0000-0000-0000-00000000000a', '00000000-0000-4000-a000-000000000001', 'hash-test-a', NULL, '254712', NOW(), 'en'),
+              ('00000000-0000-0000-0000-00000000000b', '00000000-0000-4000-a000-000000000001', 'hash-test-b', NULL, '254722', NOW(), 'en')
+            ON CONFLICT (id) DO NOTHING
+          `);
+        } finally {
+          client.release();
+        }
       });
 
       afterAll(async () => {
+        const client = await pool.connect();
+        try {
+          await client.query(`DELETE FROM observation WHERE task_id = '00000000-0000-0000-0000-000000000001'`);
+          await client.query(`DELETE FROM idempotency_record WHERE key IN ('concurrent-obs-a', 'concurrent-obs-b')`);
+          await client.query(`DELETE FROM inspection_task WHERE id = '00000000-0000-0000-0000-000000000001'`);
+          await client.query(`DELETE FROM respondent WHERE id IN ('00000000-0000-0000-0000-00000000000a', '00000000-0000-0000-0000-00000000000b')`);
+        } finally {
+          client.release();
+        }
         await closePostgresPool();
       });
 

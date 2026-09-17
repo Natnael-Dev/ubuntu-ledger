@@ -84,6 +84,73 @@ describe('T-28: Radio Bulletin Domain & Service (S-12)', () => {
       const normalized = normalizeForBannedWordCheck(zwText);
       expect(normalized).toContain('corrupt');
     });
+
+    it('SEC-06: detects Greek homoglyphs (omicron, iota, alpha, epsilon)', () => {
+      expect(() => validateBulletinScript('c\u03BFrrupt public official')).toThrow(
+        /Content integrity violation/
+      );
+      expect(() => validateBulletinScript('taking a br\u03B9be')).toThrow(
+        /Content integrity violation/
+      );
+      expect(() => validateBulletinScript('election fr\u03B1ud detected')).toThrow(
+        /Content integrity violation/
+      );
+      expect(() => validateBulletinScript('grand th\u03B5ft recorded')).toThrow(
+        /Content integrity violation/
+      );
+    });
+
+    it('SEC-06: detects Cyrillic lookalikes (і, В)', () => {
+      expect(() => validateBulletinScript('taking a br\u0456be')).toThrow(
+        /Content integrity violation/
+      );
+      expect(() => validateBulletinScript('giving a \u0412ribe')).toThrow(
+        /Content integrity violation/
+      );
+    });
+
+    it('SEC-06: strips invisible word-joiner and soft hyphen', () => {
+      expect(() => validateBulletinScript('cor\u2060rupt system')).toThrow(
+        /Content integrity violation/
+      );
+      expect(() => validateBulletinScript('cor\u00ADrupt administration')).toThrow(
+        /Content integrity violation/
+      );
+    });
+
+    it('SEC-06: strips combining accents and diacritical marks', () => {
+      expect(() => validateBulletinScript('c\u0300o\u0301r\u0302r\u0303u\u0304p\u0305t')).toThrow(
+        /Content integrity violation/
+      );
+      expect(() => validateBulletinScript('b\u0300r\u0301i\u0302b\u0303e')).toThrow(
+        /Content integrity violation/
+      );
+    });
+
+    it('SEC-06: detects leetspeak substitutions (0, 1, 3, 4, @, $, 7)', () => {
+      expect(() => validateBulletinScript('c0rrupt')).toThrow(/Content integrity violation/);
+      expect(() => validateBulletinScript('br1be')).toThrow(/Content integrity violation/);
+      expect(() => validateBulletinScript('fr@ud')).toThrow(/Content integrity violation/);
+      expect(() => validateBulletinScript('$tole money')).toThrow(/Content integrity violation/);
+      expect(() => validateBulletinScript('cr1m1nal')).toThrow(/Content integrity violation/);
+    });
+
+    it('SEC-06: detects delimiter insertion (c.o.r.r.u.p.t, b_r_i_b_e, b r i b e)', () => {
+      expect(() => validateBulletinScript('c.o.r.r.u.p.t')).toThrow(/Content integrity violation/);
+      expect(() => validateBulletinScript('b_r_i_b_e')).toThrow(/Content integrity violation/);
+      expect(() => validateBulletinScript('b r i b e')).toThrow(/Content integrity violation/);
+      expect(() => validateBulletinScript('f-r-a-u-d')).toThrow(/Content integrity violation/);
+    });
+
+    it('SEC-06: strictly preserves legitimate Amharic text without false positives', () => {
+      const amharicText = 'ይህ ፕሮጀክት የተሳካ ነው፡ የህዝብ አገልግሎት መስጫ ማዕከል፤';
+      expect(() => validateBulletinScript(amharicText)).not.toThrow();
+    });
+
+    it('SEC-06: strictly preserves legitimate Afaan Oromoo text without false positives', () => {
+      const oromoText = "sakatta'aa fi qorannoo bu'uura godhatee hojjatamaa jira.";
+      expect(() => validateBulletinScript(oromoText)).not.toThrow();
+    });
   });
 
   // ============================================================================
@@ -156,6 +223,48 @@ describe('T-28: Radio Bulletin Domain & Service (S-12)', () => {
       );
       expect(result.valid).toBe(false);
       expect(result.reason).toContain('canonical footer');
+    });
+
+    it('SEC-05: rejects defamatory prose naming individuals inserted between frames', () => {
+      const header = `Ward ${WARD_CODE} Public Services Observation Report · Period: ${PERIOD_START} to ${PERIOD_END}.`;
+      const attackScript = `${header} Head Administrator Ato Girma at Desk 4 is demanding money. ${BULLETIN_FRAMES.footer}`;
+      const result = validateFrameGrammar(attackScript, WARD_CODE, PERIOD_START, PERIOD_END);
+      expect(result.valid).toBe(false);
+      expect(result.reason).toMatch(/unauthorized tokens|invalid sentence frame/);
+    });
+
+    it('SEC-05: rejects pre-header arbitrary text injection', () => {
+      const canonicalScript = compileBulletinScript(WARD_CODE, PERIOD_START, PERIOD_END, [makeFact()])!;
+      const attackScript = `CRITICAL ALERT: REVOLT NOW! ${canonicalScript}`;
+      const result = validateFrameGrammar(attackScript, WARD_CODE, PERIOD_START, PERIOD_END);
+      expect(result.valid).toBe(false);
+      expect(result.reason).toMatch(/canonical header/);
+    });
+
+    it('SEC-05: rejects post-footer arbitrary URL / text injection', () => {
+      const canonicalScript = compileBulletinScript(WARD_CODE, PERIOD_START, PERIOD_END, [makeFact()])!;
+      const attackScript = `${canonicalScript} VISIT HTTP://MALICIOUS-SITE.ORG FOR REVENGE.`;
+      const result = validateFrameGrammar(attackScript, WARD_CODE, PERIOD_START, PERIOD_END);
+      expect(result.valid).toBe(false);
+      expect(result.reason).toContain('canonical footer');
+    });
+
+    it('SEC-05: rejects HTML / XSS injection into script', () => {
+      const header = `Ward ${WARD_CODE} Public Services Observation Report · Period: ${PERIOD_START} to ${PERIOD_END}.`;
+      const attackScript = `${header} <script>alert("xss")</script> ${BULLETIN_FRAMES.footer}`;
+      const result = validateFrameGrammar(attackScript, WARD_CODE, PERIOD_START, PERIOD_END);
+      expect(result.valid).toBe(false);
+      expect(result.reason).toMatch(/unauthorized tokens|invalid sentence frame/);
+    });
+
+    it('SEC-05: rejects delimiter / divider injection', () => {
+      const canonicalScript = compileBulletinScript(WARD_CODE, PERIOD_START, PERIOD_END, [makeFact()])!;
+      const attackScript = canonicalScript.replace(
+        BULLETIN_FRAMES.footer,
+        `==================== ${BULLETIN_FRAMES.footer}`
+      );
+      const result = validateFrameGrammar(attackScript, WARD_CODE, PERIOD_START, PERIOD_END);
+      expect(result.valid).toBe(false);
     });
   });
 

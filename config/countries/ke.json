@@ -1,0 +1,27 @@
+{
+  "countryCode": "KE",
+  "name": "Kenya",
+  "dialCode": "254",
+  "currency": "KES",
+  "defaultLocale": "sw",
+  "locales": ["sw", "en"],
+  "adminTiers": [
+    { "level": 0, "name": "National", "label": "National Government" },
+    { "level": 1, "name": "County", "label": "County Government" },
+    { "level": 2, "name": "SubCounty", "label": "Sub-County" },
+    { "level": 3, "name": "Ward", "label": "Ward" },
+    { "level": 4, "name": "Village", "label": "Village Unit" }
+  ],
+  "appealBodies": {
+    "administrative": "County Public Service Board / Ward Administrator",
+    "ombudsman": "Commission on Administrative Justice (Office of the Ombudsman)",
+    "anticorruption": "Ethics and Anti-Corruption Commission (EACC)"
+  },
+  "statutorySourceTypes": [
+    "COUNTY_ACT",
+    "GAZETTE_NOTICE",
+    "CIRCULAR",
+    "NATIONAL_ACT",
+    "REGULATION"
+  ]
+}

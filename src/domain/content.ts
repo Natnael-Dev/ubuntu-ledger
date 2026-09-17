@@ -2,7 +2,7 @@
 // Authoritative sources: docs/specs/06-voice-and-ussd.md §4, §5, §11 (CH-01, CH-02, CH-06, CH-08),
 // docs/specs/16-i18n-and-content.md §1, §2, §4, §5
 
-export type Locale = 'en' | 'am' | 'om';
+export type Locale = 'en' | 'am' | 'om' | 'sw';
 
 export type SlotValues = Record<string, string | number | boolean | null | undefined>;
 
@@ -33,6 +33,17 @@ export function assertNoBannedWords(text: string): void {
   for (const term of BANNED_TERMS) {
     if (lower.includes(term)) {
       throw new Error(`Content integrity violation: text contains banned term '${term}'`);
+    }
+  }
+
+  // Collapsed Latin projection check (catches delimiter insertions like c.o.r.r.u.p.t, b_r_i_b_e)
+  // SAFETY: Ethiopic fidel characters (U+1200-U+137F) do NOT match [a-z] and become empty string,
+  // preventing false positives on legitimate Ethiopian text.
+  const collapsedLatin = lower.replace(/[^a-z]/g, '');
+  const projectedWithL = collapsedLatin.replace(/i/g, 'l');
+  for (const term of BANNED_TERMS) {
+    if (collapsedLatin.includes(term) || projectedWithL.includes(term)) {
+      throw new Error(`Content integrity violation: text contains obfuscated banned term '${term}'`);
     }
   }
 }
@@ -240,6 +251,72 @@ export const MESSAGES: Record<Locale, Record<string, string>> = {
     'error.code_not_found': 'Koodiin hin beekamne. Koodiin gabatee pirojektii irra jira.',
     'error.task_closed': 'Sakatta\'iinsi kun cufameera. Pirojektii biraaf 1 bilbilaa.',
     'hint.invalid_input': 'Galtee sirrii hin taane. ',
+  },
+
+  sw: {
+    // Root Menu
+    'menu.root': '1 Kagua mradi\n2 Ada za huduma\n3 Ripoti hitilafu\n4 Lugha',
+    'prompt.enter_project_code': 'Weka nambari ya mradi ya tarakimu 4 kutoka ubaoni:',
+
+    // Receipt Summary & Submenu
+    'receipt.summary': '{title}. {currency} {amount}. Mkandarasi {contractor}. Tarehe {due}.',
+    'receipt.unofficial': '{title}. {currency} {amount}. HAKUNA HATI RASMI — kiwango hiki ni makadirio.',
+    'receipt.menu': '1 Jibu ukaguzi\n2 Sikiliza tena\n3 Nani alikagua?\n0 Rudi',
+
+    // Asset Question Templates
+    'q.borehole.head_fitted': 'Je, pampu ya mkono imewekwa kwenye kisima?\n1 Ndiyo 2 La',
+    'q.borehole.water_flows': 'Pampu kwa sekunde 30 — je, maji yanatoka?\n1 Ndiyo 2 La',
+    'q.borehole.board_posted': 'Je, kibao cha mradi chenye nambari ya mkataba kimewekwa?\n1 Ndiyo 2 La',
+
+    'q.generator.runs_on_outage': 'Umeme unapokatika, je, jenereta inafanya kazi?\n1 Ndiyo 2 La',
+    'q.generator.fridge_green': 'Je, taa ya friji ya chanjo inaonyesha rangi ya kijani?\n1 Ndiyo 2 La',
+    'q.generator.board_posted': 'Je, kibao cha mradi chenye nambari ya mkataba kimewekwa?\n1 Ndiyo 2 La',
+
+    'q.latrine.doors_fitted': 'Je, milango yote imewekwa na inafungika?\n1 Ndiyo 2 La',
+    'q.latrine.water_present': 'Je, kuna maji mahali pa kunawa mikono?\n1 Ndiyo 2 La',
+    'q.latrine.board_posted': 'Je, kibao cha mradi chenye nambari ya mkataba kimewekwa?\n1 Ndiyo 2 La',
+
+    // Observation Confirmations
+    'observation.counted': 'Asante. Majirani {count} kati ya {target} wamekagua.',
+    'observation.duplicate': 'Asante. Eneo hili tayari limehesabiwa, hivyo jumla inabaki {count}.',
+
+    // Narrative States
+    'narrative.under_probation_n_days': 'Ukarabati umedaiwa. Ukaguzi wa siku 7 unaendelea. Zimesalia siku {days} kabla ya kufungwa.',
+    'narrative.reports_disagree': 'Ripoti zinatofautiana. Msimamizi anakagua. Usichukulie kama imekamilika.',
+    'narrative.repair_failed_durability': 'Ukarabati haukudumu siku 7. Mkataba {code}. Uliza kwenye mkutano wa wadi.',
+    'narrative.awaiting_reports_n_of_3': 'Majirani {count} kati ya {target} wamekagua hadi sasa.',
+    'narrative.no_source_document': 'Hakuna hati rasmi iliyopatikana kwa kiwango hiki.',
+
+    // Provenance Sentence (Trust UI)
+    'provenance.sentence': 'Majirani {count} walikagua hii siku ya {weekday}. {yes} walisema ndiyo, {no} walisema la. Ukaguzi wa mwisho {ago}.',
+
+    // Service Fees Branch
+    'services.menu': '1 Kubadilisha kitambulisho\n2 Usajili wa kliniki\n0 Rudi',
+    'statutory.card': 'Ada rasmi {currency} {fee}. Leta: {documents}. Ziara zinazotarajiwa: {visits}.',
+    'statutory.menu': '1 Nitasema nini nikiombwa zaidi?\n2 Wengine wanaripoti nini?\n3 Nimeshatembelea tayari\n0 Rudi',
+    'script.request_official_receipt': '{source} inasema ada ni {currency} {fee}. Je, ninaweza kupata risiti rasmi ya kiasi chochote cha ziada?',
+
+    // Divergence Summaries
+    'divergence.summary': 'Katika siku 30 zilizopita, {pct}% ya ripoti {n} zilisema kiasi zaidi kiliombwa. Wastani wa ziada: {currency} {median}.',
+    'divergence.not_enough_reports': 'Bado hakuna ripoti za kutosha kuonyesha mwenendo. Ripoti yako imerekodiwa.',
+
+    // Report Fault Branch
+    'prompt.enter_asset_code': 'Weka nambari ya kifaa kutoka ubaoni:',
+    'fault.menu': '1 Hakifanyi kazi\n2 Kinafanya kazi sasa\n0 Rudi',
+    'fault.recorded': 'Ripoti ya hitilafu imerekodiwa. Asante.',
+
+    // Language Selection Branch
+    'language.menu': '1 English\n2 አማርኛ\n3 Afaan Oromoo\n4 Kiswahili\n0 Rudi',
+    'language.selected': 'Lugha imesasishwa.',
+
+    // Outcome Menu
+    'outcome.menu': '1 Nililipa ada rasmi\n2 Niliombwa zaidi\n3 Sikupata risiti\n4 Niliombwa hati ya ziada\n5 Ofisi ilifungwa\n0 Rudi',
+    'outcome.recorded': 'Imerekodiwa. Asante.',
+
+    // Errors & Inline Hints
+    'error.code_not_found': 'Nambari haitambuliwi. Nambari zimechapishwa kwenye kibao cha mradi.',
+    'error.task_closed': 'Ukaguzi huu umefungwa. Piga 1 kwa mradi mwingine.',
+    'hint.invalid_input': 'Ingizo si sahihi. ',
   },
 };
 

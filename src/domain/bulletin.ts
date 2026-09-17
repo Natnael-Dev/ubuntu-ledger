@@ -13,7 +13,7 @@
 // Frame grammar: fixed sentence templates with numeric/code slots only; no free-form accusations.
 // Unicode homoglyphs are normalised before banned-word check.
 
-import { assertNoBannedWords } from './content';
+import { assertNoBannedWords, BANNED_TERMS } from './content';
 
 // ============================================================================
 // TYPES
@@ -100,26 +100,68 @@ export const BULLETIN_FRAMES = {
 export type BulletinFrameKey = keyof typeof BULLETIN_FRAMES;
 
 // ============================================================================
-// UNICODE HOMOGLYPH NORMALISATION
+// UNICODE HOMOGLYPH & LEETSPEAK NORMALISATION (SEC-06)
 // ============================================================================
 
+export const HOMOGLYPH_MAP: Record<string, string> = {
+  // Cyrillic lowercase & uppercase
+  'а': 'a', 'А': 'a', 'в': 'b', 'В': 'b', 'е': 'e', 'Е': 'e',
+  'і': 'i', 'І': 'i', 'ј': 'j', 'Ј': 'j', 'к': 'k', 'К': 'k',
+  'м': 'm', 'М': 'm', 'н': 'h', 'Н': 'h', 'о': 'o', 'О': 'o',
+  'р': 'p', 'Р': 'p', 'с': 'c', 'С': 'c', 'т': 't', 'Т': 't',
+  'у': 'y', 'У': 'y', 'х': 'x', 'Х': 'x',
+
+  // Greek lowercase & uppercase
+  'α': 'a', 'Α': 'a', 'β': 'b', 'Β': 'b', 'ε': 'e', 'Ε': 'e',
+  'ι': 'i', 'Ι': 'i', 'κ': 'k', 'Κ': 'k', 'ν': 'v', 'Ν': 'v',
+  'ο': 'o', 'Ο': 'o', 'ρ': 'p', 'Ρ': 'p', 'υ': 'u', 'Υ': 'u',
+  'χ': 'x', 'Χ': 'x',
+};
+
+export const LEET_MAP: Record<string, string> = {
+  '0': 'o',
+  '1': 'i',
+  '!': 'i',
+  '|': 'i',
+  '3': 'e',
+  '4': 'a',
+  '@': 'a',
+  '5': 's',
+  '$': 's',
+  '7': 't',
+  '+': 't',
+  '8': 'b',
+};
+
 /**
- * Normalises common Unicode homoglyphs used to evade banned-word detection.
- * This covers Latin lookalikes (Cyrillic, Greek, etc.) and zero-width characters.
+ * Normalises common Unicode homoglyphs, invisible characters, diacritical marks,
+ * and leetspeak substitutions used to evade banned-word detection.
+ * Strictly preserves Ethiopic (Amharic) and Oromo orthography.
  */
 export function normalizeForBannedWordCheck(text: string): string {
-  return text
-    .normalize('NFKD')
-    .replace(/\u200B|\u200C|\u200D|\uFEFF/g, '') // strip zero-width chars
-    .replace(/[а-яА-ЯёЁ]/g, (ch) => {
-      // Common Cyrillic lookalikes -> Latin
-      const map: Record<string, string> = {
-        'а': 'a', 'е': 'e', 'о': 'o', 'р': 'p', 'с': 'c', 'х': 'x',
-        'А': 'A', 'Е': 'E', 'О': 'O', 'Р': 'P', 'С': 'C', 'Х': 'X',
-      };
-      return map[ch] || ch;
-    })
-    .toLowerCase();
+  // 1. NFKD decomposition
+  let t = text.normalize('NFKD');
+
+  // 2. Strip all zero-width, formatting, and invisible characters
+  t = t.replace(/[\u00AD\u180E\u200B-\u200F\u202A-\u202E\u2060-\u206F\uFEFF]/g, '');
+
+  // 3. Strip Latin combining diacritical marks (U+0300 - U+036F)
+  // Ethiopic marks (U+135D-U+135F) are untouched.
+  t = t.replace(/[\u0300-\u036F]/g, '');
+
+  // 4. Map Homoglyphs (Cyrillic & Greek lookalikes)
+  t = t.replace(/[\u0400-\u04FF\u0370-\u03FF]/g, (ch) => HOMOGLYPH_MAP[ch] || ch);
+
+  // 5. Lowercase
+  t = t.toLowerCase();
+
+  // 6. Map Leetspeak
+  let leetProjected = '';
+  for (const char of t) {
+    leetProjected += LEET_MAP[char] || char;
+  }
+
+  return leetProjected;
 }
 
 // ============================================================================
@@ -127,23 +169,32 @@ export function normalizeForBannedWordCheck(text: string): string {
 // ============================================================================
 
 /**
- * Validates bulletin script text against the banned lexicon with homoglyph normalisation.
- * Throws an Error with which term was found if any banned term appears.
+ * Validates bulletin script text against the banned lexicon with homoglyph normalisation
+ * and collapsed Latin projection to prevent delimiter evasion.
  */
 export function validateBulletinScript(scriptText: string): void {
   const normalized = normalizeForBannedWordCheck(scriptText);
-  // Use the existing assertNoBannedWords from content.ts
+  // Check 1: direct normalized text
   assertNoBannedWords(normalized);
+
+  // Check 2: Collapsed Latin projection check (catches c.o.r.r.u.p.t, b_r_i_b_e, etc.)
+  const projectedLatin = normalized.replace(/[^a-z]/g, '');
+  const projectedWithL = projectedLatin.replace(/i/g, 'l');
+  for (const term of BANNED_TERMS) {
+    if (projectedLatin.includes(term) || projectedWithL.includes(term)) {
+      throw new Error(`Content integrity violation: text contains obfuscated banned term '${term}'`);
+    }
+  }
 }
 
 // ============================================================================
-// FRAME GRAMMAR VALIDATOR
+// FRAME GRAMMAR VALIDATOR (SEC-05)
 // ============================================================================
 
 /**
- * Validates that the script conforms to the bulletin frame grammar.
- * A valid script must begin with the header frame and end with the footer frame.
- * Returns { valid: true } if ok, { valid: false, reason: string } if violation.
+ * Validates that the script conforms strictly to the bulletin frame grammar.
+ * Rejects any arbitrary text, unapproved sentences, defaming prose, HTML,
+ * or corrupted slots inserted between or around frames.
  */
 export function validateFrameGrammar(
   scriptText: string,
@@ -155,28 +206,86 @@ export function validateFrameGrammar(
     return { valid: false, reason: 'Script text is empty' };
   }
 
-  const expectedHeaderPrefix = `Ward ${wardCode} Public Services Observation Report`;
-  const expectedPeriodFragment = `${periodStart} to ${periodEnd}`;
+  // Normalize all whitespaces/newlines to single space
+  const normalized = scriptText.trim().replace(/\s+/g, ' ');
 
-  if (!scriptText.includes(expectedHeaderPrefix)) {
+  const footerLiteral = BULLETIN_FRAMES.footer;
+  if (!normalized.endsWith(footerLiteral)) {
     return {
       valid: false,
-      reason: `Script must include the canonical header: "${expectedHeaderPrefix}"`,
+      reason: 'Script must end with the canonical footer',
     };
   }
 
-  if (!scriptText.includes(expectedPeriodFragment)) {
+  const withoutFooter = normalized.slice(0, normalized.length - footerLiteral.length).trim();
+
+  const expectedHeader = `Ward ${wardCode} Public Services Observation Report · Period: ${periodStart} to ${periodEnd}.`;
+  if (!withoutFooter.startsWith(expectedHeader)) {
+    if (!withoutFooter.includes('Public Services Observation Report')) {
+      return {
+        valid: false,
+        reason: 'Script must include the canonical header',
+      };
+    }
     return {
       valid: false,
-      reason: `Script must include the period: "${expectedPeriodFragment}"`,
+      reason: `Script header does not match expected canonical header: "${expectedHeader}"`,
     };
   }
 
-  const expectedFooter = BULLETIN_FRAMES.footer;
-  if (!scriptText.includes(expectedFooter)) {
+  const bodyText = withoutFooter.slice(expectedHeader.length).trim();
+  if (!bodyText) {
     return {
       valid: false,
-      reason: `Script must end with the canonical footer`,
+      reason: 'Script must contain at least one fact frame',
+    };
+  }
+
+  // Parse fact frames strictly
+  let remaining = bodyText;
+  const parsedFacts: string[] = [];
+
+  while (remaining.length > 0) {
+    remaining = remaining.trim();
+    if (!remaining.startsWith('Service ')) {
+      return {
+        valid: false,
+        reason: `Script contains unauthorized tokens or invalid sentence frame: "${remaining.slice(0, 40)}"`,
+      };
+    }
+
+    // Match FACT_WITH_FEE
+    const feeMatch = remaining.match(
+      /^(Service [A-Za-z0-9_-]+ at office [A-Za-z0-9_-]+: in the last \d+ days, \d+(?:\.\d+)?% of \d+ reports indicated a payment request above the statutory ceiling\. Median additional amount: [A-Z]{3} \d+\.\d{2}\.)(?:\s+|$)/
+    );
+    if (feeMatch) {
+      parsedFacts.push(feeMatch[1]);
+      remaining = remaining.slice(feeMatch[0].length);
+      continue;
+    }
+
+    // Match FACT_NO_FEE
+    const noFeeMatch = remaining.match(
+      /^(Service [A-Za-z0-9_-]+ at office [A-Za-z0-9_-]+: \d+ reports received in the last \d+ days\. No significant divergence recorded\.)(?:\s+|$)/
+    );
+    if (noFeeMatch) {
+      parsedFacts.push(noFeeMatch[1]);
+      remaining = remaining.slice(noFeeMatch[0].length);
+      continue;
+    }
+
+    return {
+      valid: false,
+      reason: `Fact frame does not match any valid template: "${remaining.slice(0, 50)}"`,
+    };
+  }
+
+  // Exact structural match
+  const reconstructed = [expectedHeader, ...parsedFacts, footerLiteral].join(' ');
+  if (reconstructed !== normalized) {
+    return {
+      valid: false,
+      reason: 'Script contains extraneous tokens or unapproved formatting',
     };
   }
 

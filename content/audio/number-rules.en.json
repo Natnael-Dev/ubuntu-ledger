@@ -1,0 +1,12 @@
+{
+  "locale": "en",
+  "strategy": "descending-additive",
+  "examples": [
+    { "input": 0, "expectedKeys": ["num.0"] },
+    { "input": 1, "expectedKeys": ["num.1"] },
+    { "input": 50, "expectedKeys": ["num.50"] },
+    { "input": 20000, "expectedKeys": ["num.20000"] },
+    { "input": 150000, "expectedKeys": ["num.100000", "num.50000"] },
+    { "input": 320000, "expectedKeys": ["num.300000", "num.20000"] }
+  ]
+}

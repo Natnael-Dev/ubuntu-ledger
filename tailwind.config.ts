@@ -9,6 +9,10 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ["var(--font-sans)", "IBM Plex Sans", "system-ui", "sans-serif"],
+        mono: ["var(--font-mono)", "IBM Plex Mono", "Courier New", "monospace"],
+      },
       colors: {
         paper: "var(--paper)",
         ink: {
@@ -34,3 +38,4 @@ const config: Config = {
 };
 
 export default config;
+

@@ -1,0 +1,22 @@
+{
+  "wardCode": "ET-AA-W09",
+  "name": "Woreda 9",
+  "countryCode": "ET",
+  "adminHierarchy": {
+    "national": "Ethiopia",
+    "region": "Addis Ababa",
+    "zone": "Arada Sub-City",
+    "woreda": "Woreda 9"
+  },
+  "defaultLocale": "am",
+  "locales": ["am", "om", "en"],
+  "radioPartner": {
+    "name": "Sheger FM 102.1",
+    "broadcastDay": "Thursday",
+    "timeSlot": "19:30"
+  },
+  "monitorRoster": {
+    "targetActiveMonitors": 15,
+    "clusterThresholdK": 3
+  }
+}

@@ -19,13 +19,15 @@ import {
   PUT as putProjectReceipt,
   DELETE as deleteProjectReceipt,
   PATCH as patchProjectReceipt,
+} from '@/app/api/projects/[code]/route';
+import {
   getProjectReceipt,
   formatCurrency,
   formatPromisedDate,
   formatArchivedDate,
   truncateHash,
   resolveNarrativeText,
-} from '@/app/api/projects/[code]/route';
+} from '@/lib/project-receipt';
 import {
   getServiceContainer,
   resetServiceContainer,

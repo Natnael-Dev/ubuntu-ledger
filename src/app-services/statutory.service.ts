@@ -7,6 +7,7 @@
 
 import type { Clock } from '@/infra/clock';
 import { systemClock } from '@/infra/clock';
+import { deriveClusterKey } from '@/domain/sybil';
 import { ServiceError } from './errors';
 import {
   type StatutoryRuleDomain,
@@ -282,7 +283,6 @@ export class StatutoryService {
       phoneHash,
       channel,
       idempotencyKey,
-      clusterKey,
     } = input;
 
     if (!serviceCode || !serviceCode.trim()) {
@@ -362,9 +362,24 @@ export class StatutoryService {
       );
     }
 
-    // 3. Save outcome
-    const effectiveClusterKey =
-      clusterKey?.trim() || `cluster_${phoneHash.trim().slice(0, 8)}`;
+    // 3. Save outcome with canonical server-side cluster derivation (SEC-04 / Spec 07 §3)
+    let msisdnPrefixBucket = '000000';
+    if (input.msisdnPrefixBucket && /^\d{6}$/.test(input.msisdnPrefixBucket.trim())) {
+      msisdnPrefixBucket = input.msisdnPrefixBucket.trim();
+    } else {
+      const digits = phoneHash.replace(/\D/g, '');
+      if (digits.length >= 6) {
+        msisdnPrefixBucket = digits.slice(0, 6);
+      }
+    }
+
+    const effectiveClusterKey = deriveClusterKey({
+      taskId: service.id,
+      geoCell: input.geoCell ?? null,
+      wardId: service.wardId,
+      msisdnPrefixBucket,
+      registeredAt: input.registeredAt || nowIso,
+    });
 
     const outcomeRecord: VisitOutcomeDomain = {
       id: `vo_${Math.random().toString(36).substring(2, 11)}`,

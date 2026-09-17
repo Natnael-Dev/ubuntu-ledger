@@ -50,7 +50,7 @@ async function seedDemoDatabase(): Promise<void> {
            admin_tier_labels = EXCLUDED.admin_tier_labels,
            default_locale = EXCLUDED.default_locale,
            locales = EXCLUDED.locales`,
-        [c.code, c.name, c.currency, c.adminTierLabels, c.defaultLocale, c.locales]
+        [c.code, c.name, c.currency, JSON.stringify(c.adminTierLabels), c.defaultLocale, c.locales]
       );
     }
     console.log(`✓ Seeded ${DEMO_COUNTRIES.length} countries`);

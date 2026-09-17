@@ -17,6 +17,7 @@ import type {
   SourceConfidence,
   Channel,
 } from '@/domain/types';
+import type { Locale } from '@/domain/content';
 import { deriveClusterKey } from '@/domain/sybil';
 import {
   createAuditEventRecord,
@@ -74,9 +75,22 @@ export const DEMO_IDS = {
 
   SERVICE_ID_REPLACE: '00000000-0000-4000-a000-000000000500',
   SERVICE_CLINIC_INTAKE: '00000000-0000-4000-a000-000000000501',
+  SERVICE_KE_BURIAL_PERMIT: '00000000-0000-4000-a000-000000000502',
 
   RULE_ID_REPLACE: '00000000-0000-4000-a000-000000000510',
   RULE_CLINIC_INTAKE: '00000000-0000-4000-a000-000000000511',
+  RULE_KE_BURIAL_PERMIT: '00000000-0000-4000-a000-000000000512',
+
+  DOC_NAIROBI_COUNTY_BUDGET: '00000000-0000-4000-a000-000000000013',
+
+  PROJECT_7011: '00000000-0000-4000-a000-000000000106',
+  PROJECT_7022: '00000000-0000-4000-a000-000000000107',
+
+  ASSET_7011_SOLAR: '00000000-0000-4000-a000-000000000206',
+  ASSET_7022_BOREHOLE: '00000000-0000-4000-a000-000000000207',
+
+  TASK_7011: '00000000-0000-4000-a000-000000000303',
+  TASK_7022: '00000000-0000-4000-a000-000000000304',
 
   BULLETIN_DRAFT: '00000000-0000-4000-a000-000000000600',
 } as const;
@@ -91,7 +105,7 @@ export interface DemoCountryFixture {
   currency: string;
   adminTierLabels: string[];
   defaultLocale: string;
-  locales: string[];
+  locales: Locale[];
 }
 
 export interface DemoWardFixture {
@@ -100,7 +114,7 @@ export interface DemoWardFixture {
   code: string;
   name: string;
   adminPath: string[];
-  locales: string[];
+  locales: Locale[];
   radioPartner?: string;
 }
 
@@ -307,7 +321,7 @@ export const DEMO_WARDS: DemoWardFixture[] = [
     id: DEMO_IDS.WARD_W09,
     countryCode: DEMO_IDS.COUNTRY_ET,
     code: 'ET-AA-W09',
-    name: 'Woreda 09',
+    name: 'Woreda 9',
     adminPath: ['Addis Ababa', 'Kirkos', 'Woreda 09', 'Kebele 08'],
     locales: ['am', 'om', 'en'],
     radioPartner: 'Radio Fana Woreda Desk',
@@ -366,6 +380,22 @@ export const DEMO_SOURCE_DOCUMENTS: DemoSourceDocumentFixture[] = [
     pageCount: 42,
     ingestReviewer: 'H.T.',
     reviewedAt: '2026-09-08T14:00:00.000Z',
+  },
+];
+
+export const DEMO_KENYA_SOURCE_DOCUMENTS: DemoSourceDocumentFixture[] = [
+  {
+    id: DEMO_IDS.DOC_NAIROBI_COUNTY_BUDGET,
+    wardId: DEMO_IDS.WARD_ROY,
+    title: 'Nairobi City County CIDP FY2026/27 Roysambu Ward Estimates',
+    issuer: 'Nairobi City County Finance Bureau',
+    publishedOn: '2026-07-01',
+    archivedAt: '2026-09-01T08:00:00.000Z',
+    storagePath: 'budgets/nairobi-roysambu-2026.pdf',
+    sha256: '9a2f1c8e4b7d30129e4719b62a3f8901cd45b230198afe761234bc567890def1',
+    pageCount: 38,
+    ingestReviewer: 'M.K.',
+    reviewedAt: '2026-09-02T10:00:00.000Z',
   },
 ];
 
@@ -555,6 +585,47 @@ export const DEMO_PROJECTS: DemoProjectFixture[] = [
   },
 ];
 
+export const DEMO_KENYA_PROJECTS: DemoProjectFixture[] = [
+  {
+    id: DEMO_IDS.PROJECT_7011,
+    wardId: DEMO_IDS.WARD_ROY,
+    projectCode: '7011',
+    title: 'Roysambu dispensary solar backup',
+    officialTitle: 'Roysambu Health Centre rooftop solar backup system and battery bank',
+    assetType: 'generator',
+    contractorName: 'Kenya Solar Solutions Ltd',
+    amountMinor: 85000000, // KES 850,000.00
+    currency: 'KES',
+    promisedCompletion: '2026-09-30',
+    sourceDocumentId: DEMO_IDS.DOC_NAIROBI_COUNTY_BUDGET,
+    sourcePage: 19,
+    confidence: 'OFFICIAL_CITED',
+    fiscal: 'COMMITTED',
+    audit: 'AWAITING_THRESHOLD',
+    createdAt: '2026-08-01T08:00:00.000Z',
+    updatedAt: '2026-09-10T12:00:00.000Z',
+  },
+  {
+    id: DEMO_IDS.PROJECT_7022,
+    wardId: DEMO_IDS.WARD_ROY,
+    projectCode: '7022',
+    title: 'Kasarani community borehole solarization',
+    officialTitle: 'Roysambu Ward Kasarani primary school borehole submersible pump',
+    assetType: 'borehole',
+    contractorName: 'Nairobi Water Works',
+    amountMinor: 120000000, // KES 1,200,000.00
+    currency: 'KES',
+    promisedCompletion: '2026-10-15',
+    sourceDocumentId: DEMO_IDS.DOC_NAIROBI_COUNTY_BUDGET,
+    sourcePage: 24,
+    confidence: 'OFFICIAL_CITED',
+    fiscal: 'COMMITTED',
+    audit: 'TASK_DISPATCHED',
+    createdAt: '2026-08-15T09:00:00.000Z',
+    updatedAt: '2026-09-12T14:00:00.000Z',
+  },
+];
+
 // ============================================================================
 // 7. ASSETS (Coarse Geo-Cell, Landmarks, Zero GPS Coordinates)
 // ============================================================================
@@ -613,6 +684,27 @@ export const DEMO_ASSETS: DemoAssetFixture[] = [
     landmark: 'Beside bus stop at Kirkos south perimeter',
     geoCell: 'et-aa-0918',
     createdAt: '2026-09-04T14:00:00.000Z',
+  },
+];
+
+export const DEMO_KENYA_ASSETS: DemoAssetFixture[] = [
+  {
+    id: DEMO_IDS.ASSET_7011_SOLAR,
+    projectId: DEMO_IDS.PROJECT_7011,
+    assetType: 'generator',
+    label: 'Dispensary Solar Backup Inverter',
+    landmark: 'Roysambu Health Centre Main Building',
+    geoCell: 'ke-nrb-roy01',
+    createdAt: '2026-08-01T08:00:00.000Z',
+  },
+  {
+    id: DEMO_IDS.ASSET_7022_BOREHOLE,
+    projectId: DEMO_IDS.PROJECT_7022,
+    assetType: 'borehole',
+    label: 'Kasarani Borehole Submersible Pump',
+    landmark: 'Kasarani Primary School Gate',
+    geoCell: 'ke-nrb-roy02',
+    createdAt: '2026-08-15T09:00:00.000Z',
   },
 ];
 
@@ -945,6 +1037,44 @@ export const DEMO_STATUTORY_RULES: DemoStatutoryRuleFixture[] = [
     validTo: null,
   },
 ];
+
+export const DEMO_KENYA_SERVICES: DemoServiceFixture[] = [
+  {
+    id: DEMO_IDS.SERVICE_KE_BURIAL_PERMIT,
+    wardId: DEMO_IDS.WARD_ROY,
+    code: 'KE-BURIAL-PERMIT',
+    officeCode: 'ROY-CIVIL-01',
+    labelKey: 'service.burial_permit',
+  },
+];
+
+export const DEMO_KENYA_STATUTORY_RULES: DemoStatutoryRuleFixture[] = [
+  {
+    id: DEMO_IDS.RULE_KE_BURIAL_PERMIT,
+    serviceId: DEMO_IDS.SERVICE_KE_BURIAL_PERMIT,
+    feeCeilingMinor: 20000, // 200.00 KES
+    currency: 'KES',
+    requiredDocuments: [
+      { labelKey: 'doc.death_notification_hospital', audioKey: 'prompt.doc_hospital_notification' },
+      { labelKey: 'doc.applicant_national_id', audioKey: 'prompt.doc_applicant_id' },
+    ],
+    expectedVisits: 1,
+    refusalScriptKey: 'script.request_official_receipt',
+    appealRouteKey: 'appeal.county_ombuds',
+    sourceDocumentId: DEMO_IDS.DOC_NAIROBI_COUNTY_BUDGET,
+    sourcePage: 12,
+    reviewerInitials: 'M.K.',
+    reviewedAt: '2026-09-02T11:00:00.000Z',
+    validFrom: '2026-07-01T00:00:00.000Z',
+    validTo: null,
+  },
+];
+
+export const ALL_DEMO_PROJECTS: DemoProjectFixture[] = [...DEMO_PROJECTS, ...DEMO_KENYA_PROJECTS];
+export const ALL_DEMO_SOURCE_DOCUMENTS: DemoSourceDocumentFixture[] = [...DEMO_SOURCE_DOCUMENTS, ...DEMO_KENYA_SOURCE_DOCUMENTS];
+export const ALL_DEMO_ASSETS: DemoAssetFixture[] = [...DEMO_ASSETS, ...DEMO_KENYA_ASSETS];
+export const ALL_DEMO_SERVICES: DemoServiceFixture[] = [...DEMO_SERVICES, ...DEMO_KENYA_SERVICES];
+export const ALL_DEMO_STATUTORY_RULES: DemoStatutoryRuleFixture[] = [...DEMO_STATUTORY_RULES, ...DEMO_KENYA_STATUTORY_RULES];
 
 // ============================================================================
 // 13. VISIT OUTCOMES & PRE-COMPUTED DIVERGENCE (k-Anonymity Test Scenarios)

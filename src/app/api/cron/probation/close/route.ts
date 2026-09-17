@@ -7,30 +7,10 @@ import {
   getProbationCronService,
   type ProbationCronService,
 } from '@/app-services/probation-cron.service';
-
-function isAuthorized(request: Request): boolean {
-  const cronSecret = process.env.CRON_SECRET || 'dev-cron-secret-2026';
-  const authHeader =
-    request.headers.get('authorization') ||
-    request.headers.get('Authorization');
-
-  if (authHeader) {
-    const parts = authHeader.split(' ');
-    if (parts.length === 2 && parts[0].toLowerCase() === 'bearer') {
-      return parts[1] === cronSecret;
-    }
-  }
-
-  const xCronSecret = request.headers.get('x-cron-secret');
-  if (xCronSecret && xCronSecret === cronSecret) {
-    return true;
-  }
-
-  return false;
-}
+import { isCronAuthorized } from '@/infra/security/cron-auth';
 
 export async function GET(request: Request) {
-  if (!isAuthorized(request)) {
+  if (!isCronAuthorized(request)) {
     return NextResponse.json(
       { error: 'Unauthorized', code: 'E_UNAUTHORIZED' },
       { status: 401 }

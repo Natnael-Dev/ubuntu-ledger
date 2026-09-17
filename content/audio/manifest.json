@@ -1,0 +1,443 @@
+{
+  "en/menu.root": {
+    "locale": "en",
+    "key": "menu.root",
+    "file": "en/menu.root.mp3",
+    "durationMs": 1200,
+    "sha256": "10f5660260f5b70d7cdff98ba4c08ac5aa532ba427841137b1296bdfeeaf762a"
+  },
+  "en/prompt.enter_project_code": {
+    "locale": "en",
+    "key": "prompt.enter_project_code",
+    "file": "en/prompt.enter_project_code.mp3",
+    "durationMs": 1200,
+    "sha256": "1d6e21ce8d1045bd64d223abd1fc3d53df442283d9c5892b269a223dce629a88"
+  },
+  "en/receipt.summary": {
+    "locale": "en",
+    "key": "receipt.summary",
+    "file": "en/receipt.summary.mp3",
+    "durationMs": 1200,
+    "sha256": "ec704c2224fe1d40e4f361331d286d38f6b7cb9265a7e21a3e80f4815b0a14e5"
+  },
+  "en/receipt.menu": {
+    "locale": "en",
+    "key": "receipt.menu",
+    "file": "en/receipt.menu.mp3",
+    "durationMs": 1200,
+    "sha256": "9e6d4b9f5facda6f91c88559beabf1661371858bcc276e13fdf1bbcd04ad52ad"
+  },
+  "en/q.generator.runs_on_outage": {
+    "locale": "en",
+    "key": "q.generator.runs_on_outage",
+    "file": "en/q.generator.runs_on_outage.mp3",
+    "durationMs": 1200,
+    "sha256": "1c6c8d6750556a4052bfd83ac9a6e4dc9b6f2e246c59226951d22faf2baf1cf2"
+  },
+  "en/q.generator.fridge_green": {
+    "locale": "en",
+    "key": "q.generator.fridge_green",
+    "file": "en/q.generator.fridge_green.mp3",
+    "durationMs": 1200,
+    "sha256": "b78e7839718bd6590465db798196e7d440a36f46710e4b99cbeb9c82a1ca2095"
+  },
+  "en/observation.counted": {
+    "locale": "en",
+    "key": "observation.counted",
+    "file": "en/observation.counted.mp3",
+    "durationMs": 1200,
+    "sha256": "710ab8a608ef3ab4062e7e3426982c9253aa6d3bcdfbe36e0a6dfe4364c22f2f"
+  },
+  "en/provenance.sentence": {
+    "locale": "en",
+    "key": "provenance.sentence",
+    "file": "en/provenance.sentence.mp3",
+    "durationMs": 1200,
+    "sha256": "ce994eca63d8d86372cd678679bf434727be6dd7f86c42eddb32bce6cfe19e37"
+  },
+  "en/prompt.goodbye": {
+    "locale": "en",
+    "key": "prompt.goodbye",
+    "file": "en/prompt.goodbye.mp3",
+    "durationMs": 1200,
+    "sha256": "fdec498c3f7917435772a359c574eeae3102cabd37e7e19d8e87b9a9711e9c9d"
+  },
+  "en/statutory.card": {
+    "locale": "en",
+    "key": "statutory.card",
+    "file": "en/statutory.card.mp3",
+    "durationMs": 1200,
+    "sha256": "be11f6d2a068f7e59a65893646cd338407e7639d395f7b1e309737b527cb60ba"
+  },
+  "en/narrative.under_probation_n_days": {
+    "locale": "en",
+    "key": "narrative.under_probation_n_days",
+    "file": "en/narrative.under_probation_n_days.mp3",
+    "durationMs": 1200,
+    "sha256": "094b987b0a50e121ee546353801606da85629450c23f02290fbe77e380b12cfa"
+  },
+  "en/language.menu": {
+    "locale": "en",
+    "key": "language.menu",
+    "file": "en/language.menu.mp3",
+    "durationMs": 1200,
+    "sha256": "573754f9d3742802d7ba5e6df1da6505de4ffddac5daa31c2540674d8d13c22f"
+  },
+  "en/prompt.invalid_hint": {
+    "locale": "en",
+    "key": "prompt.invalid_hint",
+    "file": "en/prompt.invalid_hint.mp3",
+    "durationMs": 1200,
+    "sha256": "ff5d6368cb05e913aa79bca06f276738a27866de61e9f008352fe903bae9283c"
+  },
+  "en/prompt.repeat_hint": {
+    "locale": "en",
+    "key": "prompt.repeat_hint",
+    "file": "en/prompt.repeat_hint.mp3",
+    "durationMs": 1200,
+    "sha256": "83f5f29b88f0bc150e4aaa83305c9ca5ec196ff52ff979a830bfb6a66ca9f70c"
+  },
+  "en/num.0": {
+    "locale": "en",
+    "key": "num.0",
+    "file": "en/num.0.mp3",
+    "durationMs": 1200,
+    "sha256": "c4ee855bc54e6c86b0f3b8aec35ffe48bca559e5f3307ccd545a8cb576f587a0"
+  },
+  "en/num.1": {
+    "locale": "en",
+    "key": "num.1",
+    "file": "en/num.1.mp3",
+    "durationMs": 1200,
+    "sha256": "50b880b55f42cebbfb85c96472cf71043f36c4ee60f4d2edad9dfe36dd51e500"
+  },
+  "en/num.50": {
+    "locale": "en",
+    "key": "num.50",
+    "file": "en/num.50.mp3",
+    "durationMs": 1200,
+    "sha256": "85cfdf55c008ededc10d8394f7d6becf9a3b5f5e7f5bd7fd772297e30dd304ba"
+  },
+  "en/num.20000": {
+    "locale": "en",
+    "key": "num.20000",
+    "file": "en/num.20000.mp3",
+    "durationMs": 1200,
+    "sha256": "769e7acf1566e8b8739dd974116a2903bb009a781571230598327cecf051b851"
+  },
+  "en/num.50000": {
+    "locale": "en",
+    "key": "num.50000",
+    "file": "en/num.50000.mp3",
+    "durationMs": 1200,
+    "sha256": "650dae9e4d8a9e190e9cd7cc5f6d11e231f586dbf4d2ae089aa49198e5b67738"
+  },
+  "en/num.100000": {
+    "locale": "en",
+    "key": "num.100000",
+    "file": "en/num.100000.mp3",
+    "durationMs": 1200,
+    "sha256": "22eada1079f054aaddb48de8d07f8d5e925069c6d0cd38128ae98ce9178dcb91"
+  },
+  "en/num.300000": {
+    "locale": "en",
+    "key": "num.300000",
+    "file": "en/num.300000.mp3",
+    "durationMs": 1200,
+    "sha256": "3be457b080ffb5a6319e4ffdb705255d4389bc05437a22c00b3f55ddf2ec5dd5"
+  },
+  "am/menu.root": {
+    "locale": "am",
+    "key": "menu.root",
+    "file": "am/menu.root.mp3",
+    "durationMs": 1200,
+    "sha256": "c9c2ff1260d14bd4cc700f8018ea429d0175ed827dc8c065da10ea66b54ff7c1"
+  },
+  "am/prompt.enter_project_code": {
+    "locale": "am",
+    "key": "prompt.enter_project_code",
+    "file": "am/prompt.enter_project_code.mp3",
+    "durationMs": 1200,
+    "sha256": "b644c87562950cc3254f5abc226cceae028dd4085bc15a1275262acdc90ed08c"
+  },
+  "am/receipt.summary": {
+    "locale": "am",
+    "key": "receipt.summary",
+    "file": "am/receipt.summary.mp3",
+    "durationMs": 1200,
+    "sha256": "fddd0583486446c4975ebfb3cda4f7ed08e17127d07da9389269cea9d3ce3225"
+  },
+  "am/receipt.menu": {
+    "locale": "am",
+    "key": "receipt.menu",
+    "file": "am/receipt.menu.mp3",
+    "durationMs": 1200,
+    "sha256": "802809ec90680c29fc7435ea854e4f64c5e746bc49abd7be1cc652b29df9c546"
+  },
+  "am/q.generator.runs_on_outage": {
+    "locale": "am",
+    "key": "q.generator.runs_on_outage",
+    "file": "am/q.generator.runs_on_outage.mp3",
+    "durationMs": 1200,
+    "sha256": "ef167891802cc7f952f4c1145e5a65fe0b5b18cf854884eb097ecb4dad54c4de"
+  },
+  "am/q.generator.fridge_green": {
+    "locale": "am",
+    "key": "q.generator.fridge_green",
+    "file": "am/q.generator.fridge_green.mp3",
+    "durationMs": 1200,
+    "sha256": "f40cd7088bef24a9955e3116f74e69129f395fa3d25237d4bc50e9e2eeb873e0"
+  },
+  "am/observation.counted": {
+    "locale": "am",
+    "key": "observation.counted",
+    "file": "am/observation.counted.mp3",
+    "durationMs": 1200,
+    "sha256": "6d6950e015e3085c6e8f9f02a98ce3155cfa408674a0f323841171c63886cb60"
+  },
+  "am/provenance.sentence": {
+    "locale": "am",
+    "key": "provenance.sentence",
+    "file": "am/provenance.sentence.mp3",
+    "durationMs": 1200,
+    "sha256": "41f987da0a1f25f7915582139e51dc18129eb28664b11649a3a88e160e543ef7"
+  },
+  "am/prompt.goodbye": {
+    "locale": "am",
+    "key": "prompt.goodbye",
+    "file": "am/prompt.goodbye.mp3",
+    "durationMs": 1200,
+    "sha256": "8a3594d392077d6a5a823414211abea597517aa26834a48c6e0837053c92332c"
+  },
+  "am/statutory.card": {
+    "locale": "am",
+    "key": "statutory.card",
+    "file": "am/statutory.card.mp3",
+    "durationMs": 1200,
+    "sha256": "2ef65db006939674b39a0de149ed679c6b6ef3658fcc19dbfef3a2c2301de3dc"
+  },
+  "am/narrative.under_probation_n_days": {
+    "locale": "am",
+    "key": "narrative.under_probation_n_days",
+    "file": "am/narrative.under_probation_n_days.mp3",
+    "durationMs": 1200,
+    "sha256": "9d7b19e78591a6b76d73bad9d3d09a7dd36a28794af49fc94b49dbdf07b19010"
+  },
+  "am/language.menu": {
+    "locale": "am",
+    "key": "language.menu",
+    "file": "am/language.menu.mp3",
+    "durationMs": 1200,
+    "sha256": "dc9f9f919753767a266341e0a01677115e3af973a153090811cd0d037fc7dd43"
+  },
+  "am/prompt.invalid_hint": {
+    "locale": "am",
+    "key": "prompt.invalid_hint",
+    "file": "am/prompt.invalid_hint.mp3",
+    "durationMs": 1200,
+    "sha256": "ba7b0e246b751c028fa0f375c1e1d9b51aa519c24d29a17f882245772ca82459"
+  },
+  "am/prompt.repeat_hint": {
+    "locale": "am",
+    "key": "prompt.repeat_hint",
+    "file": "am/prompt.repeat_hint.mp3",
+    "durationMs": 1200,
+    "sha256": "195e7d2b91104869ed6df8cd43dbc2714f0f54d5c5cace5856116de34affc5e0"
+  },
+  "am/num.0": {
+    "locale": "am",
+    "key": "num.0",
+    "file": "am/num.0.mp3",
+    "durationMs": 1200,
+    "sha256": "28ce9d584007fe91e233862744c030cc76f2285a4fe6ca7b25e5f150a1863110"
+  },
+  "am/num.1": {
+    "locale": "am",
+    "key": "num.1",
+    "file": "am/num.1.mp3",
+    "durationMs": 1200,
+    "sha256": "4f482f634e901d842c64a73f27f883101cfe4bb0455391dad82a6f6bf93e1e8e"
+  },
+  "am/num.50": {
+    "locale": "am",
+    "key": "num.50",
+    "file": "am/num.50.mp3",
+    "durationMs": 1200,
+    "sha256": "a0f2ea75dd227e0016c7fb4b13b9184914f5192189268d3dff1eff8ec61929db"
+  },
+  "am/num.20000": {
+    "locale": "am",
+    "key": "num.20000",
+    "file": "am/num.20000.mp3",
+    "durationMs": 1200,
+    "sha256": "33337ee441f8f462f5848d3d156e9462c7613ca0b8e462bd5306836d6ca6e735"
+  },
+  "am/num.50000": {
+    "locale": "am",
+    "key": "num.50000",
+    "file": "am/num.50000.mp3",
+    "durationMs": 1200,
+    "sha256": "c26cfea0160a7d97dcb5f411d84a899ebde06c4a21356af6166f30870671899e"
+  },
+  "am/num.100000": {
+    "locale": "am",
+    "key": "num.100000",
+    "file": "am/num.100000.mp3",
+    "durationMs": 1200,
+    "sha256": "e6602c035f94f8bb553d59c6910d5887398620b2fd077818003bd68dd8a8e8f6"
+  },
+  "am/num.300000": {
+    "locale": "am",
+    "key": "num.300000",
+    "file": "am/num.300000.mp3",
+    "durationMs": 1200,
+    "sha256": "66fa0078dd119dcac2e306141c314277f052e013637a52364fc8c97c5091d0a7"
+  },
+  "om/menu.root": {
+    "locale": "om",
+    "key": "menu.root",
+    "file": "om/menu.root.mp3",
+    "durationMs": 1200,
+    "sha256": "6efe61e84fac959369b056c7dc59e3a3130d166de81b3777e913cfb6d620b201"
+  },
+  "om/prompt.enter_project_code": {
+    "locale": "om",
+    "key": "prompt.enter_project_code",
+    "file": "om/prompt.enter_project_code.mp3",
+    "durationMs": 1200,
+    "sha256": "0f7d9a0f59764a49ac454c0fd2bd5ba1a6925d27df072e26301b1fc0b4bd3465"
+  },
+  "om/receipt.summary": {
+    "locale": "om",
+    "key": "receipt.summary",
+    "file": "om/receipt.summary.mp3",
+    "durationMs": 1200,
+    "sha256": "71c98f5b8c62cc8c3a1327c90824080611383af71d13ed5ded306308442096a8"
+  },
+  "om/receipt.menu": {
+    "locale": "om",
+    "key": "receipt.menu",
+    "file": "om/receipt.menu.mp3",
+    "durationMs": 1200,
+    "sha256": "26f6f37942a8951d4d7b69b19ee1f6660691d34b5ab7f409c7d5a8d9588d722c"
+  },
+  "om/q.generator.runs_on_outage": {
+    "locale": "om",
+    "key": "q.generator.runs_on_outage",
+    "file": "om/q.generator.runs_on_outage.mp3",
+    "durationMs": 1200,
+    "sha256": "221941c90879bfcea8b5ca2bceac2946ca27899b0959d3220764742c0b503451"
+  },
+  "om/q.generator.fridge_green": {
+    "locale": "om",
+    "key": "q.generator.fridge_green",
+    "file": "om/q.generator.fridge_green.mp3",
+    "durationMs": 1200,
+    "sha256": "4dc8fbdb11371d83da52aa1b2264e81b60bec1dacb6d9cbee5247519973164e2"
+  },
+  "om/observation.counted": {
+    "locale": "om",
+    "key": "observation.counted",
+    "file": "om/observation.counted.mp3",
+    "durationMs": 1200,
+    "sha256": "5d5a2e0da6e3ea0c17aad54c25c9a618ce9caf20cfc20d1a2db515cf2fd056fe"
+  },
+  "om/provenance.sentence": {
+    "locale": "om",
+    "key": "provenance.sentence",
+    "file": "om/provenance.sentence.mp3",
+    "durationMs": 1200,
+    "sha256": "73d79e87141c1f671aef38c3c48254d7485de42422a9e3f3547cfcf1ac3b8435"
+  },
+  "om/prompt.goodbye": {
+    "locale": "om",
+    "key": "prompt.goodbye",
+    "file": "om/prompt.goodbye.mp3",
+    "durationMs": 1200,
+    "sha256": "0b8184ae30c13bfee05ef19cbffa99929da728986503b42318782d5c57d3a94e"
+  },
+  "om/statutory.card": {
+    "locale": "om",
+    "key": "statutory.card",
+    "file": "om/statutory.card.mp3",
+    "durationMs": 1200,
+    "sha256": "7cc8af657a69b75598986fba9cec58dfe0303d069873bac1c120afe24c2350c9"
+  },
+  "om/narrative.under_probation_n_days": {
+    "locale": "om",
+    "key": "narrative.under_probation_n_days",
+    "file": "om/narrative.under_probation_n_days.mp3",
+    "durationMs": 1200,
+    "sha256": "7b9f5cb38450356a7725d2149b643dde323f4e425c61b830df100a3b516c620b"
+  },
+  "om/language.menu": {
+    "locale": "om",
+    "key": "language.menu",
+    "file": "om/language.menu.mp3",
+    "durationMs": 1200,
+    "sha256": "d3dfc15479fd8ec74998119fb5bfd879ab3501b3be19f0ad68f7e1b98661a004"
+  },
+  "om/prompt.invalid_hint": {
+    "locale": "om",
+    "key": "prompt.invalid_hint",
+    "file": "om/prompt.invalid_hint.mp3",
+    "durationMs": 1200,
+    "sha256": "04b59481db85054a21115712e0ede8c93554c55232e3531c38ad14492f4befad"
+  },
+  "om/prompt.repeat_hint": {
+    "locale": "om",
+    "key": "prompt.repeat_hint",
+    "file": "om/prompt.repeat_hint.mp3",
+    "durationMs": 1200,
+    "sha256": "64056b30a3e95397da26a00c4d4c8236d6ec70c3aa5007fb415fef5d46b7518b"
+  },
+  "om/num.0": {
+    "locale": "om",
+    "key": "num.0",
+    "file": "om/num.0.mp3",
+    "durationMs": 1200,
+    "sha256": "ddd552cb6c666d533b5e66bea83d1f558fe23390b91474c8704c94893e8f4464"
+  },
+  "om/num.1": {
+    "locale": "om",
+    "key": "num.1",
+    "file": "om/num.1.mp3",
+    "durationMs": 1200,
+    "sha256": "3e7e035e66bf6d724590aa8a9932635319ec13da416f756f48f10de954d7fe31"
+  },
+  "om/num.50": {
+    "locale": "om",
+    "key": "num.50",
+    "file": "om/num.50.mp3",
+    "durationMs": 1200,
+    "sha256": "bf683e2ec90b68ee0f607be6dad7acc5ef0ef2d5fa6c5468a1933a5854281d04"
+  },
+  "om/num.20000": {
+    "locale": "om",
+    "key": "num.20000",
+    "file": "om/num.20000.mp3",
+    "durationMs": 1200,
+    "sha256": "d44985d6d0170b2d9599ef7ae2284f24d188b6beb00c38fac7f362be2c2d7c01"
+  },
+  "om/num.50000": {
+    "locale": "om",
+    "key": "num.50000",
+    "file": "om/num.50000.mp3",
+    "durationMs": 1200,
+    "sha256": "9a48c7be31ec0fdb4b8ed529a8e070d266b064d3befa6987b58f532b06323bf2"
+  },
+  "om/num.100000": {
+    "locale": "om",
+    "key": "num.100000",
+    "file": "om/num.100000.mp3",
+    "durationMs": 1200,
+    "sha256": "8a21cca7d3d586531dfcd80bdeb30e05e3ee2665a81f1a6a6850ee4643053f71"
+  },
+  "om/num.300000": {
+    "locale": "om",
+    "key": "num.300000",
+    "file": "om/num.300000.mp3",
+    "durationMs": 1200,
+    "sha256": "ab30544cbc09488eaa6d1445a00d1cb50070e7949e7ca4c475b4c9639b1e18b5"
+  }
+}

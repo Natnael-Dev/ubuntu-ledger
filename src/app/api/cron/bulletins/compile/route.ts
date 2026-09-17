@@ -9,30 +9,10 @@ import { getBulletinService } from '@/app-services/bulletin.service';
 import { getStatutoryService } from '@/app-services/statutory.service';
 import { DEMO_SERVICES, DEMO_WARDS } from '@/fixtures/demo-scenario';
 import { systemClock } from '@/infra/clock';
-
-function isAuthorized(request: Request): boolean {
-  const cronSecret = process.env.CRON_SECRET || 'dev-cron-secret-2026';
-  const authHeader =
-    request.headers.get('authorization') ||
-    request.headers.get('Authorization');
-
-  if (authHeader) {
-    const parts = authHeader.split(' ');
-    if (parts.length === 2 && parts[0].toLowerCase() === 'bearer') {
-      return parts[1] === cronSecret;
-    }
-  }
-
-  const xCronSecret = request.headers.get('x-cron-secret');
-  if (xCronSecret && xCronSecret === cronSecret) {
-    return true;
-  }
-
-  return false;
-}
+import { isCronAuthorized } from '@/infra/security/cron-auth';
 
 export async function POST(request: Request) {
-  if (!isAuthorized(request)) {
+  if (!isCronAuthorized(request)) {
     return NextResponse.json(
       { error: 'Unauthorized', code: 'E_UNAUTHORIZED' },
       { status: 401 }

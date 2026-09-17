@@ -374,11 +374,11 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
       </header>
 
       <div className="flex flex-col lg:flex-row gap-6 items-start">
-        {/* Left column: phone + persona */}
-        <div className="flex flex-col gap-4 w-full lg:w-auto">
+        {/* Column 1: Persona selector & mode controls */}
+        <div className="flex flex-col gap-4 w-full lg:w-72 shrink-0">
 
           {/* ── Channel Mode Switch (USSD / IVR) ── */}
-          <div className="flex gap-2 p-1 bg-gray-100 rounded-lg border border-[var(--rule)] w-full lg:w-72">
+          <div className="flex gap-2 p-1 bg-gray-100 rounded-lg border border-[var(--rule)] w-full">
             <button
               type="button"
               data-testid="mode-ussd"
@@ -422,7 +422,7 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
           </div>
 
           {/* ── Persona selector ── */}
-          <section aria-label="Persona selector" className="rounded-xl border border-[var(--rule)] bg-white p-4 w-full lg:w-72">
+          <section aria-label="Persona selector" className="rounded-xl border border-[var(--rule)] bg-white p-4 w-full">
             <h2 className="text-xs font-semibold uppercase tracking-wide text-[var(--ink-soft)] mb-3">
               Active Persona
             </h2>
@@ -457,10 +457,49 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
             </div>
           </section>
 
-          {/* ── Feature Phone ── */}
+          {/* ── IVR Audio Queue Card (visible when in IVR mode) ── */}
+          {channelMode === 'IVR' && (
+            <div
+              data-testid="ivr-audio-panel"
+              className="rounded-xl border border-blue-200 bg-blue-50/70 p-4 w-full"
+            >
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-xs font-semibold uppercase tracking-wider text-blue-900 flex items-center gap-1.5">
+                  <span className={`w-2 h-2 rounded-full ${sessionActive ? 'bg-green-500 animate-ping' : 'bg-blue-400'}`} />
+                  IVR Audio Queue
+                </h3>
+                <span className="text-[10px] font-mono text-blue-700 bg-blue-100 px-1.5 py-0.5 rounded">
+                  {activeAudioKeys.length} clip{activeAudioKeys.length === 1 ? '' : 's'}
+                </span>
+              </div>
+              {activeAudioKeys.length === 0 ? (
+                <p className="text-xs text-blue-600 italic">Call IVR to trigger audio playback</p>
+              ) : (
+                <div className="flex flex-col gap-1.5 mt-2">
+                  {activeAudioKeys.map((key, idx) => (
+                    <div
+                      key={`${key}-${idx}`}
+                      data-testid="audio-key-badge"
+                      className="text-[11px] font-mono bg-white text-blue-900 border border-blue-200 px-2 py-1 rounded shadow-sm flex items-center justify-between"
+                    >
+                      <span className="flex items-center gap-1 truncate">
+                        <span>🔊</span>
+                        <span className="truncate">{key}</span>
+                      </span>
+                      <span className="text-[9px] text-blue-500 shrink-0">#{idx + 1}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Column 2: The Physical Feature Phone Handset (Center Hero) */}
+        <div className="w-full lg:w-80 flex flex-col items-center shrink-0">
           <div
             data-testid="feature-phone"
-            className="rounded-3xl border-4 border-[var(--shell)] bg-[var(--shell)] shadow-2xl w-72 mx-auto"
+            className="rounded-3xl border-4 border-[var(--shell)] bg-[var(--shell)] shadow-2xl w-72"
           >
             {/* Phone speaker grille */}
             <div className="flex justify-center pt-4 pb-2">
@@ -616,128 +655,93 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
               </button>
             </div>
           </div>
-
-          {/* ── IVR Audio Queue Card (visible when in IVR mode) ── */}
-          {channelMode === 'IVR' && (
-            <div
-              data-testid="ivr-audio-panel"
-              className="rounded-xl border border-blue-200 bg-blue-50/70 p-4 w-full lg:w-72"
-            >
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="text-xs font-semibold uppercase tracking-wider text-blue-900 flex items-center gap-1.5">
-                  <span className={`w-2 h-2 rounded-full ${sessionActive ? 'bg-green-500 animate-ping' : 'bg-blue-400'}`} />
-                  IVR Audio Queue
-                </h3>
-                <span className="text-[10px] font-mono text-blue-700 bg-blue-100 px-1.5 py-0.5 rounded">
-                  {activeAudioKeys.length} clip{activeAudioKeys.length === 1 ? '' : 's'}
-                </span>
-              </div>
-              {activeAudioKeys.length === 0 ? (
-                <p className="text-xs text-blue-600 italic">Call IVR to trigger audio playback</p>
-              ) : (
-                <div className="flex flex-col gap-1.5 mt-2">
-                  {activeAudioKeys.map((key, idx) => (
-                    <div
-                      key={`${key}-${idx}`}
-                      data-testid="audio-key-badge"
-                      className="text-[11px] font-mono bg-white text-blue-900 border border-blue-200 px-2 py-1 rounded shadow-sm flex items-center justify-between"
-                    >
-                      <span className="flex items-center gap-1 truncate">
-                        <span>🔊</span>
-                        <span className="truncate">{key}</span>
-                      </span>
-                      <span className="text-[9px] text-blue-500 shrink-0">#{idx + 1}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
         </div>
 
-        {/* Right column: transcript */}
-        <section
-          aria-label="Session transcript"
-          className="flex-1 flex flex-col min-w-0 rounded-xl border border-[var(--rule)] bg-white overflow-hidden max-h-[80vh]"
-        >
-          <header className="flex items-center justify-between px-4 py-3 border-b border-[var(--rule)]">
-            <h2 className="text-xs font-semibold uppercase tracking-wide text-[var(--ink-soft)]">
-              HTTP Transcript
-            </h2>
-            <button
-              onClick={clearTranscript}
-              className="text-xs text-[var(--ink-soft)] hover:text-[var(--ink)] underline"
-            >
-              Clear
-            </button>
-          </header>
-
-          <div
-            ref={transcriptRef}
-            data-testid="transcript-panel"
-            className="flex-1 overflow-y-auto p-3 font-mono text-xs space-y-1.5"
+        {/* Column 3: Live Session Transcript & Demo Guide */}
+        <div className="flex-1 flex flex-col gap-4 w-full min-w-0">
+          <section
+            aria-label="Session transcript"
+            className="flex flex-col min-w-0 rounded-xl border border-[var(--rule)] bg-white overflow-hidden max-h-[70vh]"
           >
-            {transcript.length === 0 && (
-              <p className="text-[var(--ink-soft)] italic text-center mt-6">
-                Dial *890# to begin a session
-              </p>
-            )}
-            {transcript.map((entry) => (
-              <div
-                key={entry.id}
-                data-direction={entry.direction}
-                className={[
-                  'rounded px-2 py-1 whitespace-pre-wrap break-words',
-                  entry.direction === 'sent'
-                    ? 'bg-blue-50 text-blue-900 border-l-2 border-blue-400'
-                    : entry.direction === 'received'
-                    ? 'bg-green-50 text-green-900 border-l-2 border-green-400'
-                    : 'text-[var(--ink-soft)] italic',
-                ].join(' ')}
+            <header className="flex items-center justify-between px-4 py-3 border-b border-[var(--rule)]">
+              <h2 className="text-xs font-semibold uppercase tracking-wide text-[var(--ink-soft)]">
+                HTTP Transcript (POST /api/ussd)
+              </h2>
+              <button
+                onClick={clearTranscript}
+                className="text-xs text-[var(--ink-soft)] hover:text-[var(--ink)] underline"
               >
-                <span className="text-[9px] opacity-50 mr-2">#{entry.seq}</span>
-                {entry.text}
-              </div>
-            ))}
-          </div>
+                Clear
+              </button>
+            </header>
 
-          {/* Raw response display */}
-          {lastRawResponse && (
-            <div className="border-t border-[var(--rule)] p-3">
-              <p className="text-[10px] font-semibold text-[var(--ink-soft)] mb-1 uppercase tracking-wide">
-                Last raw backend response
-              </p>
-              <pre
-                data-testid="raw-response"
-                className="text-[10px] font-mono bg-gray-50 rounded p-2 text-[var(--ink)] whitespace-pre-wrap break-words border border-[var(--rule)]"
-              >
-                {lastRawResponse}
-              </pre>
+            <div
+              ref={transcriptRef}
+              data-testid="transcript-panel"
+              className="flex-1 overflow-y-auto p-3 font-mono text-xs space-y-1.5 min-h-[160px]"
+            >
+              {transcript.length === 0 && (
+                <p className="text-[var(--ink-soft)] italic text-center mt-6">
+                  Dial *890# to begin a session
+                </p>
+              )}
+              {transcript.map((entry) => (
+                <div
+                  key={entry.id}
+                  data-direction={entry.direction}
+                  className={[
+                    'rounded px-2 py-1 whitespace-pre-wrap break-words',
+                    entry.direction === 'sent'
+                      ? 'bg-blue-50 text-blue-900 border-l-2 border-blue-400'
+                      : entry.direction === 'received'
+                      ? 'bg-green-50 text-green-900 border-l-2 border-green-400'
+                      : 'text-[var(--ink-soft)] italic',
+                  ].join(' ')}
+                >
+                  <span className="text-[9px] opacity-50 mr-2">#{entry.seq}</span>
+                  {entry.text}
+                </div>
+              ))}
             </div>
-          )}
 
-          {/* Persona info footer */}
-          <div className="border-t border-[var(--rule)] px-4 py-2 text-[10px] font-mono text-[var(--ink-soft)]">
-            <span className={`font-semibold px-1.5 py-0.5 rounded ${badge.css}`}>{badge.label}</span>{' '}
-            {selectedPersona.label} · {selectedPersona.msisdn}
-          </div>
-        </section>
+            {/* Raw response display */}
+            {lastRawResponse && (
+              <div className="border-t border-[var(--rule)] p-3">
+                <p className="text-[10px] font-semibold text-[var(--ink-soft)] mb-1 uppercase tracking-wide">
+                  Last raw backend response
+                </p>
+                <pre
+                  data-testid="raw-response"
+                  className="text-[10px] font-mono bg-gray-50 rounded p-2 text-[var(--ink)] whitespace-pre-wrap break-words border border-[var(--rule)]"
+                >
+                  {lastRawResponse}
+                </pre>
+              </div>
+            )}
+
+            {/* Persona info footer */}
+            <div className="border-t border-[var(--rule)] px-4 py-2 text-[10px] font-mono text-[var(--ink-soft)]">
+              <span className={`font-semibold px-1.5 py-0.5 rounded ${badge.css}`}>{badge.label}</span>{' '}
+              {selectedPersona.label} · {selectedPersona.msisdn}
+            </div>
+          </section>
+
+          {/* Demo guide */}
+          <section className="rounded-xl border border-[var(--rule)] bg-white p-4 text-xs text-[var(--ink-soft)]">
+            <h2 className="font-semibold text-[var(--ink)] mb-2 font-sans">Checkpoint 2 — Demo Guide</h2>
+            <ol className="list-decimal list-inside space-y-1 font-mono text-[11px]">
+              <li>Select <strong>Amina</strong> (Demo Phone 1) → Dial *890# → press 1 → enter <strong>4412</strong> → press 1</li>
+              <li>Answer 3 questions (2=No for each) → backend responds with witness count</li>
+              <li>Note: counter moves 2 → 3 (threshold reached)</li>
+              <li>Switch to <strong>Girma</strong> (Same-Cluster Duplicate) → Dial *890# → repeat flow</li>
+              <li>Note: backend responds with <em>duplicate</em> message — counter stays at 3</li>
+            </ol>
+            <p className="mt-2 text-[10px] italic font-sans">
+              All responses come from the real <code>POST /api/ussd</code> backend. No client-side logic simulates the response.
+            </p>
+          </section>
+        </div>
       </div>
-
-      {/* Demo guide */}
-      <footer className="mt-6 rounded-xl border border-[var(--rule)] bg-white p-4 text-xs text-[var(--ink-soft)]">
-        <h2 className="font-semibold text-[var(--ink)] mb-2">Checkpoint 2 — Demo Guide</h2>
-        <ol className="list-decimal list-inside space-y-1">
-          <li>Select <strong>Amina</strong> (Demo Phone 1) → Dial *890# → press 1 → enter <strong>4412</strong> → press 1</li>
-          <li>Answer 3 questions (2=No for each) → backend responds with witness count</li>
-          <li>Note: counter moves 2 → 3 (threshold reached)</li>
-          <li>Switch to <strong>Girma</strong> (Same-Cluster Duplicate) → Dial *890# → repeat flow</li>
-          <li>Note: backend responds with <em>duplicate</em> message — counter stays at 3</li>
-        </ol>
-        <p className="mt-2 text-[10px] italic">
-          All responses come from the real <code>POST /api/ussd</code> backend. No client-side logic simulates the response.
-        </p>
-      </footer>
     </div>
   );
 }

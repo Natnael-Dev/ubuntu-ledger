@@ -55,16 +55,17 @@ export function SiteNav({ currentPath = '/' }: NavProps) {
                 key={href}
                 href={href}
                 role="listitem"
+                aria-label={label}
                 aria-current={isActive ? 'page' : undefined}
                 className={[
-                  'px-2 sm:px-3 py-1.5 font-mono text-[10px] sm:text-xs tracking-wider transition-colors',
+                  'px-2.5 sm:px-3 py-1.5 font-mono text-[11px] sm:text-xs tracking-wider transition-colors',
                   'focus:outline-none focus:ring-2 focus:ring-[var(--ink)] focus:ring-offset-1 rounded',
                   isActive
-                    ? 'text-[var(--ink)] font-semibold border-b-2 border-[var(--ink)]'
-                    : 'text-[var(--ink-soft)] hover:text-[var(--ink)]',
+                    ? 'text-[var(--ink)] font-bold border-b-2 border-[var(--ink)] bg-neutral-100/50'
+                    : 'text-[var(--ink-soft)] hover:text-[var(--ink)] hover:bg-neutral-50',
                 ].join(' ')}
               >
-                <span className="sm:hidden">{abbr}</span>
+                <span className="sm:hidden font-semibold">{abbr}</span>
                 <span className="hidden sm:inline">{label}</span>
               </Link>
             );

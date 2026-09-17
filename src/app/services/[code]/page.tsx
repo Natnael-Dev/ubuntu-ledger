@@ -53,12 +53,12 @@ export default async function ServiceCardPage(props: PageProps) {
 
   return (
     <main className="min-h-screen bg-[var(--paper)] text-[var(--ink)] py-10 px-4">
-      <div className="max-w-2xl mx-auto mb-6">
+      <div className="max-w-2xl mx-auto mb-4">
         <Link
           href="/"
-          className="font-mono text-xs text-[var(--ink-soft)] hover:text-[var(--ink)] underline"
+          className="font-mono text-xs text-[var(--ink-soft)] hover:text-[var(--ink)] hover:underline inline-flex items-center gap-1"
         >
-          ← Back to Ledger
+          ← Return to Proof-Line Overview
         </Link>
       </div>
 

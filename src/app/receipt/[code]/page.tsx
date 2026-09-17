@@ -5,6 +5,7 @@
 // - docs/specs/11-tasks.md T-19
 
 import React from 'react';
+import Link from 'next/link';
 import {
   getProjectReceipt,
   formatCurrency,
@@ -140,13 +141,21 @@ export default async function ReceiptPage(props: PageProps) {
       <main className="min-h-screen bg-[var(--paper)] text-[var(--ink)] py-8 px-4 flex flex-col items-center justify-start">
         {/* Print trigger bar for demo */}
         <div className="print-hide w-full max-w-[440px] mb-3 flex justify-between items-center text-xs text-[var(--ink-soft)] font-mono">
-          <a
-            href="/simulator"
-            className="hover:underline flex items-center gap-1"
+          <Link
+            href="/"
+            className="hover:text-[var(--ink)] hover:underline flex items-center gap-1"
           >
-            ← simulator
-          </a>
-          <ReceiptPrintButton />
+            ← Overview
+          </Link>
+          <div className="flex items-center gap-3">
+            <Link
+              href="/simulator"
+              className="hover:text-[var(--ink)] hover:underline"
+            >
+              Simulator →
+            </Link>
+            <ReceiptPrintButton />
+          </div>
         </div>
 
         {/* The Receipt Card Layout (08 §5) */}

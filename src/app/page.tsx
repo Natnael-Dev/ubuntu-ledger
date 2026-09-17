@@ -188,9 +188,51 @@ export default function Home() {
         <section aria-labelledby="proofline-heading">
           <SectionLabel>How Proof-Line Works</SectionLabel>
 
-          <h2 id="proofline-heading" className="text-xl font-semibold text-[var(--ink)] mb-6">
+          <h2 id="proofline-heading" className="text-xl font-semibold text-[var(--ink)] mb-4">
             Three enforced proofs. Each independently testable.
           </h2>
+
+          {/* Architectural Proof-Line Schematic (Step 9) */}
+          <div className="mb-8 p-4 bg-white border border-[var(--rule)]">
+            <p className="text-[10px] font-mono uppercase tracking-widest text-[var(--ink-soft)] mb-3">
+              The Closed-Loop Proof-Line Architecture
+            </p>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 text-center text-xs font-mono">
+              <div className="p-2.5 border border-[var(--rule)] bg-neutral-50 flex flex-col justify-between">
+                <span className="text-[9px] text-[var(--ink-soft)] font-bold uppercase">1. Source</span>
+                <span className="font-semibold text-[var(--ink)] my-1 text-[11px]">Gazette / Law</span>
+                <span className="text-[10px] text-[var(--ink-soft)]">SHA-256 citation</span>
+              </div>
+              <div className="p-2.5 border border-[var(--rule)] bg-neutral-50 flex flex-col justify-between">
+                <span className="text-[9px] text-[var(--ink-soft)] font-bold uppercase">2. Observation</span>
+                <span className="font-semibold text-[var(--ink)] my-1 text-[11px]">Citizen Input</span>
+                <span className="text-[10px] text-[var(--ink-soft)]">USSD *890# / PWA</span>
+              </div>
+              <div className="p-2.5 border border-[var(--rule)] bg-neutral-50 flex flex-col justify-between">
+                <span className="text-[9px] text-[var(--state-hold)] font-bold uppercase">3. Cluster</span>
+                <span className="font-semibold text-[var(--ink)] my-1 text-[11px]">Triangulation</span>
+                <span className="text-[10px] text-[var(--ink-soft)]">Sybil deduplication</span>
+              </div>
+              <div className="p-2.5 border border-[var(--rule)] bg-neutral-50 flex flex-col justify-between">
+                <span className="text-[9px] text-[var(--state-break)] font-bold uppercase">4. Probation</span>
+                <span className="font-semibold text-[var(--ink)] my-1 text-[11px]">7-Day Gate</span>
+                <span className="text-[10px] text-[var(--ink-soft)]">DB constraint lock</span>
+              </div>
+              <div className="p-2.5 border border-[var(--rule)] bg-neutral-50 flex flex-col justify-between">
+                <span className="text-[9px] text-[var(--state-open)] font-bold uppercase">5. Two-Ledger</span>
+                <span className="font-semibold text-[var(--ink)] my-1 text-[11px]">Dual Ledgers</span>
+                <span className="text-[10px] text-[var(--ink-soft)]">Zero averaging (k≥5)</span>
+              </div>
+              <div className="p-2.5 border border-[var(--rule)] bg-neutral-50 flex flex-col justify-between">
+                <span className="text-[9px] text-[var(--state-open)] font-bold uppercase">6. Proof</span>
+                <span className="font-semibold text-[var(--ink)] my-1 text-[11px]">Public Receipt</span>
+                <span className="text-[10px] text-[var(--ink-soft)]">Audit trail receipt</span>
+              </div>
+            </div>
+            <div className="mt-2 text-center text-[10px] font-mono text-[var(--ink-soft)] hidden sm:block">
+              Closed-loop verification pipeline · Every state transition is cryptographically verifiable &amp; sealed
+            </div>
+          </div>
 
           <div className="space-y-0">
             {PROOFS.map((proof, index) => (

@@ -99,39 +99,42 @@ export function MonitorPwaClient() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FBFBFA] text-[#111110] font-sans antialiased">
+    <div className="min-h-screen bg-[var(--paper)] text-[var(--ink)] font-sans antialiased">
       {/* Header */}
-      <header className="border-b border-[#E6E4DF] bg-white px-6 py-4">
-        <div className="max-w-4xl mx-auto flex flex-wrap items-center justify-between gap-4">
+      <header className="border-b border-[var(--rule)] bg-white px-4 sm:px-6 py-4">
+        <div className="max-w-4xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <div className="text-xs font-mono tracking-widest text-[#706E6A] uppercase">
-              Ward Proof-Line · T-29
+            <div className="text-[10px] font-mono uppercase tracking-widest text-[var(--ink-soft)]">
+              Ward Proof-Line // Field Monitor Interface
             </div>
-            <h1 className="text-xl font-bold font-serif tracking-tight text-[#111110]">
+            <h1 className="text-lg sm:text-xl font-bold font-sans tracking-tight text-[var(--ink)] mt-0.5">
               Monitor Field Observation (PWA)
             </h1>
+            <p className="text-xs text-[var(--ink-soft)] mt-0.5">
+              Offline observation outbox with client-side IndexedDB and idempotent background sync.
+            </p>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 self-start sm:self-auto">
             <SyncBadge />
             <button
               type="button"
               data-testid="airplane-mode-toggle"
               onClick={handleToggleAirplane}
-              className={`px-3 py-1 text-xs font-mono rounded border transition-colors ${
+              className={`px-3 py-1.5 text-xs font-mono border transition-colors ${
                 isAirplaneMode
-                  ? 'bg-amber-600 text-white border-amber-700 shadow-sm'
-                  : 'bg-white text-[#706E6A] border-[#D1CFCA] hover:bg-[#F4F3F0]'
+                  ? 'bg-amber-600 text-white border-amber-700 font-semibold'
+                  : 'bg-white text-[var(--ink-soft)] border-[var(--rule)] hover:bg-neutral-50 hover:text-[var(--ink)]'
               }`}
             >
-              {isAirplaneMode ? '✈ Airplane Mode: ON' : '✈ Airplane Mode: OFF'}
+              {isAirplaneMode ? '✈ Airplane Mode: ON (Buffered)' : '✈ Airplane Mode: OFF (Live)'}
             </button>
           </div>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="max-w-4xl mx-auto px-6 py-8 space-y-8">
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6">
         {/* Notice Banner */}
         {lastSubmissionNotice && (
           <div
@@ -143,84 +146,89 @@ export function MonitorPwaClient() {
         )}
 
         {/* Observation Form */}
-        <section className="bg-white border border-[#E6E4DF] rounded-lg p-6 shadow-sm">
-          <h2 className="text-base font-semibold font-serif mb-4 text-[#111110]">
-            Record Field Inspection
-          </h2>
+        <section className="bg-white border border-[var(--rule)] p-5 sm:p-6 space-y-4">
+          <div className="border-b border-[var(--rule)] pb-3">
+            <h2 className="text-sm sm:text-base font-bold font-sans text-[var(--ink)]">
+              Record Field Inspection
+            </h2>
+            <p className="text-xs text-[var(--ink-soft)] mt-0.5 font-mono">
+              Captures ground physical verification for municipal project tasks
+            </p>
+          </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-mono text-[#706E6A] uppercase mb-1">
+                <label className="block text-[11px] font-mono text-[var(--ink-soft)] uppercase tracking-wider mb-1">
                   Inspection Task ID
                 </label>
                 <input
                   type="text"
                   value={taskId}
                   onChange={(e) => setTaskId(e.target.value)}
-                  className="w-full text-xs font-mono p-2 border border-[#D1CFCA] rounded bg-[#FAF9F7]"
+                  className="w-full text-xs font-mono p-2.5 border border-[var(--rule)] bg-[var(--paper)] text-[var(--ink)] focus:outline-none focus:border-[var(--ink)]"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-mono text-[#706E6A] uppercase mb-1">
+                <label className="block text-[11px] font-mono text-[var(--ink-soft)] uppercase tracking-wider mb-1">
                   Monitor Phone Hash
                 </label>
                 <input
                   type="text"
                   value={phoneHash}
                   onChange={(e) => setPhoneHash(e.target.value)}
-                  className="w-full text-xs font-mono p-2 border border-[#D1CFCA] rounded bg-[#FAF9F7]"
+                  className="w-full text-xs font-mono p-2.5 border border-[var(--rule)] bg-[var(--paper)] text-[var(--ink)] focus:outline-none focus:border-[var(--ink)]"
                   required
                 />
               </div>
             </div>
 
             {/* Checklist */}
-            <div className="border-t border-[#E6E4DF] pt-4 space-y-2">
-              <div className="text-xs font-mono text-[#706E6A] uppercase mb-2">
+            <div className="border-t border-[var(--rule)] pt-4 space-y-2">
+              <div className="text-[11px] font-mono text-[var(--ink-soft)] uppercase tracking-wider mb-2">
                 Physical Verification Questions
               </div>
 
-              <label className="flex items-center gap-2 cursor-pointer text-sm">
+              <label className="flex items-center gap-2.5 cursor-pointer text-xs sm:text-sm text-[var(--ink)]">
                 <input
                   type="checkbox"
                   checked={q1}
                   onChange={(e) => setQ1(e.target.checked)}
-                  className="rounded border-[#D1CFCA] text-[#1F5C3D] focus:ring-0"
+                  className="rounded border-[var(--rule)] text-[var(--state-open)] focus:ring-0"
                 />
                 <span>Q1: Generator installed and physically present?</span>
               </label>
 
-              <label className="flex items-center gap-2 cursor-pointer text-sm">
+              <label className="flex items-center gap-2.5 cursor-pointer text-xs sm:text-sm text-[var(--ink)]">
                 <input
                   type="checkbox"
                   checked={q2}
                   onChange={(e) => setQ2(e.target.checked)}
-                  className="rounded border-[#D1CFCA] text-[#1F5C3D] focus:ring-0"
+                  className="rounded border-[var(--rule)] text-[var(--state-open)] focus:ring-0"
                 />
                 <span>Q2: Asset nameplate and municipal serial tag verified?</span>
               </label>
 
-              <label className="flex items-center gap-2 cursor-pointer text-sm">
+              <label className="flex items-center gap-2.5 cursor-pointer text-xs sm:text-sm text-[var(--ink)]">
                 <input
                   type="checkbox"
                   checked={q3}
                   onChange={(e) => setQ3(e.target.checked)}
-                  className="rounded border-[#D1CFCA] text-[#1F5C3D] focus:ring-0"
+                  className="rounded border-[var(--rule)] text-[var(--state-open)] focus:ring-0"
                 />
                 <span>Q3: Logbook maintenance entries inspected?</span>
               </label>
             </div>
 
             {/* Actions */}
-            <div className="border-t border-[#E6E4DF] pt-4 flex items-center justify-between gap-4">
+            <div className="border-t border-[var(--rule)] pt-4 flex flex-wrap items-center justify-between gap-3">
               <button
                 type="submit"
                 disabled={isSubmitting}
                 data-testid="btn-submit-observation"
-                className="px-4 py-2 bg-[#1F5C3D] text-white text-xs font-mono uppercase tracking-wider rounded hover:bg-[#16442D] transition-colors disabled:opacity-50"
+                className="px-4 py-2 bg-[var(--ink)] text-[var(--paper)] text-xs font-mono uppercase tracking-wider hover:bg-neutral-800 transition-colors disabled:opacity-50"
               >
                 {isSubmitting ? 'Recording...' : 'Submit Field Observation'}
               </button>
@@ -230,7 +238,7 @@ export function MonitorPwaClient() {
                   type="button"
                   data-testid="btn-sync-now"
                   onClick={handleManualSync}
-                  className="px-3 py-1.5 text-xs font-mono border border-[#D1CFCA] rounded hover:bg-[#F4F3F0] transition-colors"
+                  className="px-3 py-1.5 text-xs font-mono border border-[var(--rule)] bg-white text-[var(--ink)] hover:bg-neutral-50 transition-colors"
                 >
                   Sync Now
                 </button>
@@ -238,7 +246,7 @@ export function MonitorPwaClient() {
                   type="button"
                   data-testid="btn-clear-outbox"
                   onClick={handleClearOutbox}
-                  className="px-3 py-1.5 text-xs font-mono border border-red-200 text-red-700 rounded hover:bg-red-50 transition-colors"
+                  className="px-3 py-1.5 text-xs font-mono border border-red-300 text-red-700 bg-red-50 hover:bg-red-100 transition-colors"
                 >
                   Clear Queue
                 </button>
@@ -248,25 +256,25 @@ export function MonitorPwaClient() {
         </section>
 
         {/* Outbox Records Table */}
-        <section className="bg-white border border-[#E6E4DF] rounded-lg p-6 shadow-sm">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-base font-semibold font-serif text-[#111110]">
+        <section className="bg-white border border-[var(--rule)] p-5 sm:p-6 space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[var(--rule)] pb-3">
+            <h2 className="text-sm sm:text-base font-bold font-sans text-[var(--ink)]">
               Offline Outbox Records ({outboxItems.length})
             </h2>
-            <div className="text-xs font-mono text-[#706E6A]">
+            <div className="text-xs font-mono text-[var(--ink-soft)]">
               Stores locally in IndexedDB until flushed
             </div>
           </div>
 
           {outboxItems.length === 0 ? (
-            <div className="text-center py-8 text-xs font-mono text-[#706E6A]">
-              Outbox is empty. Record an observation above to test.
+            <div className="text-center py-8 text-xs font-mono text-[var(--ink-soft)]">
+              Outbox is empty. Record an observation above to test offline queueing.
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table data-testid="outbox-table" className="w-full text-xs font-mono border-collapse">
                 <thead>
-                  <tr className="border-b border-[#E6E4DF] text-left text-[#706E6A]">
+                  <tr className="border-b border-[var(--rule)] text-left text-[var(--ink-soft)] uppercase text-[10px]">
                     <th className="py-2 px-2">Idempotency Key</th>
                     <th className="py-2 px-2">Task</th>
                     <th className="py-2 px-2">Status</th>
@@ -274,35 +282,35 @@ export function MonitorPwaClient() {
                     <th className="py-2 px-2">Result / Detail</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[#F0EFEA]">
+                <tbody className="divide-y divide-[var(--rule)]">
                   {outboxItems.map((item) => (
-                    <tr key={item.clientIdempotencyKey} className="hover:bg-[#FAF9F7]">
-                      <td className="py-2.5 px-2 font-semibold">
+                    <tr key={item.clientIdempotencyKey} className="hover:bg-neutral-50">
+                      <td className="py-2.5 px-2 font-semibold text-[var(--ink)]">
                         {item.clientIdempotencyKey.slice(0, 8)}...
                       </td>
-                      <td className="py-2.5 px-2 text-[#706E6A]">
+                      <td className="py-2.5 px-2 text-[var(--ink-soft)]">
                         {item.taskId.slice(0, 8)}...
                       </td>
                       <td className="py-2.5 px-2">
                         <span
                           data-testid="item-status"
-                          className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold ${
+                          className={`inline-block px-2 py-0.5 text-[10px] font-bold ${
                             item.status === 'SYNCED'
                               ? 'bg-emerald-100 text-emerald-800'
                               : item.status === 'SYNCING'
                               ? 'bg-amber-100 text-amber-800 animate-pulse'
                               : item.status === 'FAILED'
                               ? 'bg-red-100 text-red-800'
-                              : 'bg-zinc-100 text-zinc-800'
+                              : 'bg-neutral-100 text-neutral-800'
                           }`}
                         >
                           {item.status}
                         </span>
                       </td>
-                      <td className="py-2.5 px-2 text-[#706E6A]">
+                      <td className="py-2.5 px-2 text-[var(--ink-soft)]">
                         {JSON.stringify(item.answers)}
                       </td>
-                      <td className="py-2.5 px-2 max-w-xs truncate text-[#706E6A]">
+                      <td className="py-2.5 px-2 max-w-xs truncate text-[var(--ink-soft)]">
                         {item.serverResponse
                           ? `Witnesses: ${item.serverResponse.witnessCount}/${item.serverResponse.witnessTarget}`
                           : item.lastError || (item.status === 'QUEUED' ? 'Pending flush' : '-')}

@@ -414,9 +414,15 @@ export function ProjectBoard({
         </div>
       </div>
 
+      {/* Mobile Swipe Hint */}
+      <div className="sm:hidden text-[10px] font-mono text-[var(--ink-soft)] flex items-center justify-between px-1">
+        <span>↔ Dense ledger: swipe to scroll columns</span>
+        <span>6 projects</span>
+      </div>
+
       {/* Dense Table (08-ui-ux-design.md §7) */}
       <div className="border border-[var(--rule)] bg-white overflow-x-auto">
-        <table className="w-full text-left border-collapse text-xs">
+        <table className="w-full min-w-[780px] text-left border-collapse text-xs">
           <thead>
             <tr className="border-b border-[var(--rule)] bg-neutral-50 text-[11px] font-mono text-[var(--ink-soft)] uppercase tracking-wider">
               <th

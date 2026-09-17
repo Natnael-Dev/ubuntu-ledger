@@ -465,6 +465,13 @@ describe('T-25: Statutory Rule Card & Pure Divergence Domain Logic', () => {
         async getVisitOutcomes() {
           return []; // 0 outcomes -> suppressed k=0 < 5
         },
+        async saveVisitOutcome() {},
+        async getVisitOutcomeByIdempotencyKey() {
+          return null;
+        },
+        async countVisitOutcomesByReporterAndDay() {
+          return 0;
+        },
       };
 
       const customService = new StatutoryService(mockRepo);

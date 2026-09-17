@@ -692,3 +692,71 @@ $ npm run build
   next build (exit 0, compiled 10/10 routes successfully)
 ```
 
+---
+
+## 2026-09-17 — Batch 7: Day 4 Wave 1 Swarm Execution (T-25, T-21 & Security Remediation)
+
+### T-25 [P0] Statutory Rule Card & k-Anonymity Divergence Aggregation
+- **Task:** T-25 / 03 §5 / 05 §6 / 07 §7 / 11 §DAY 4
+- **Why:** Required citizen service card showing official fee ceilings, required documents, and k-anonymously suppressed community divergence statistics ($k_{\min} = 5$).
+- **What I produced:**
+  - `src/domain/divergence.ts`: Pure domain logic calculating visit divergence, fee variance, and enforcing k-anonymity suppression ($k < 5$ suppresses count, median, and percentages without leaking incremental counts).
+  - `src/app-services/statutory.service.ts`: Application service with fixture-backed statutory data and `getStatutoryService()` singleton factory.
+  - `src/app/api/services/[code]/statutory/route.ts`: Next.js 15 async route handler returning 200 with statutory rule card and public divergence aggregate.
+  - `src/app/api/services/[code]/card/route.ts`: Canonical spec alias.
+  - `src/domain/ussd/session.ts`: Statutory lookup integration for USSD menu paths (`2*1`, `2*1*1`, `2*1*2`).
+  - `tests/unit/statutory.test.ts`: 19 tests validating domain calculations and k-anonymity gating.
+  - `tests/unit/api/statutory-route.test.ts`: 7 tests validating API responses, aliases, and 404 Problem JSON.
+
+### T-21 [P0] Probation Cron: Pings and Automatic Closure
+- **Task:** T-21 / 04 §3, §7 (INV-01) / 05 §7, §11 / 11 §DAY 3
+- **Why:** Automated scheduled pings on Day 1, Day 3, Day 7 to original reporter clusters only; automatic closure evaluation when probation window has elapsed.
+- **What I produced:**
+  - `src/infra/db/repositories/repair-ticket.repository.ts`: Extended repository with `findActiveProbationTickets()`, `findPendingPings()`, `listTicketsByWard()`, `schedulePing()`, `markPingSent()`, `updatePingResponse()`.
+  - `src/infra/db/postgres/repair-ticket.repository.ts`: Full PostgreSQL adapter with parameterization and `systemClock.now()` time reads.
+  - `src/app-services/probation-cron.service.ts`: Cron service scheduling pings, recording immutable audit events, and transitioning mature tickets to `VERIFIED_SUSTAINED`.
+  - `src/app/api/cron/probation/pings/route.ts`: Endpoint guarded with Bearer `CRON_SECRET`.
+  - `src/app/api/cron/probation/close/route.ts`: Endpoint guarded with Bearer `CRON_SECRET`.
+  - `tests/unit/probation-cron.test.ts`: 12 tests validating idempotency, Day-1/3/7 dispatch, and INV-01 maturity guards.
+  - `tests/unit/api/cron-routes.test.ts`: 9 tests validating secret authentication and HTTP status codes.
+
+### Checkpoint 3 Security Remediation (6/6 Defects Resolved)
+- **Defect 1:** Added mandatory authentication and actor role check (`x-actor-role: INGEST_REVIEWER | ADMIN`) to `POST /api/repairs/[id]/claim`.
+- **Defect 2:** Replaced synthetic non-UUID IDs in USSD ingress with `crypto.randomUUID()` and persisted respondents.
+- **Defect 3:** Implemented `WeakSet` cycle tracking in `src/lib/redact.ts` to prevent infinite recursion on circular references.
+- **Defect 4:** Expanded sensitive key scrub to cover `actor_ref`, `citizenId`, and storage paths.
+- **Defect 5:** Broadened `SENSITIVE_KEY_REGEX` to catch compound camelCase and snake_case tokens while preserving `authority`, `author`, `action`.
+- **Defect 6:** Recursively sanitized deep object structures (>10 levels).
+- `tests/adversarial/log-redaction.test.ts`: Added 4 adversarial regression tests (8/8 passed).
+
+---
+
+## 2026-09-17 — Batch 8: Day 4 Wave 3 (T-22 Municipal Operator Console)
+
+### T-22 [P0] Console: Project Board + Repair Claim Workflow
+- **Task:** T-22 / 08 §7, §8 / 11 §DAY 3, DAY 4 / 12 §4 (Demo Moment 0:44–0:56)
+- **Why:** Required operational interface for municipal administrators and monitors: dense table displaying fiscal/audit states, witness $n/\text{target}$, and probation countdown. Critical invariant: recording a contractor claim visibly does **NOT turn the project green**.
+- **What I produced:**
+  - `src/components/NarrativeState.tsx`: Pure presentation component rendering fiscal, audit, and probation state badges using semantic CSS color tokens (`--state-open`, `--state-hold`, `--state-break`, `--state-none`). Never computes internally.
+  - `src/components/WitnessCounter.tsx`: Monospaced witness indicator (`n of target`) with `aria-live="polite"`. Zero decorative charts.
+  - `src/components/ProbationCountdown.tsx`: Live countdown rendering remaining days/hours under amber check; turns red (`--state-break`) on `PROBATION_FAILED`.
+  - `src/app/console/ProjectBoard.tsx`: Client-side dense table component with sorting, status filtering (All, Under Probation, Broken/Failed, Discrepancy), text search, and modal for recording contractor repair claims. Submits to `/api/repairs/[id]/claim` with `x-actor-role: ADMIN`, updates state in-place to `REPAIR_CLAIMED` (amber), and provides early close attempt demonstrating the 409 `E_PROBATION_LOCKED` refusal.
+  - `src/app/console/page.tsx`: Server Component rendering the console shell with municipal header, operator role indicator, genesis audit chain badge, and 4-screen navigation tabs.
+  - `src/app/console/probation/page.tsx`: Route alias for the probation board.
+  - `tests/unit/console-board.test.ts`: 17 unit tests verifying `NarrativeState`, `WitnessCounter`, `ProbationCountdown`, and canonical data mapping.
+  - `tests/e2e/console.spec.ts`: 7 Playwright E2E tests verifying page rendering, table search, filtering, and the full interactive claim sequence proving that recording a claim visibly does not turn the project green.
+
+### Final Verification Suite (Post T-22)
+```
+$ npm run typecheck
+  tsc --noEmit (exit 0)
+$ npx eslint src/ tests/ --max-warnings 0
+  (exit 0, 0 errors, 0 warnings across whole codebase)
+$ npx vitest run
+  26 test files passed (374 passed | 8 skipped)
+$ npx playwright test
+  31 passed (29.2s)
+$ npm run build
+  next build (exit 0, compiled 11/11 routes successfully)
+```
+

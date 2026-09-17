@@ -15,6 +15,9 @@ import {
   type DivergenceAggregateDomain,
   type StatutoryCardResponseDto,
   type PublicObservedDivergenceDto,
+  type RecordVisitOutcomeInput,
+  type RecordVisitOutcomeResponseDto,
+  isValidOutcomeCode,
   findActiveStatutoryRule,
   buildStatutoryCardResponse,
   calculateDivergenceFromOutcomes,
@@ -38,6 +41,13 @@ export interface StatutoryRepository {
     windowDays?: number
   ): Promise<DivergenceAggregateDomain | null>;
   getVisitOutcomes(serviceId: string): Promise<VisitOutcomeDomain[]>;
+  saveVisitOutcome(outcome: VisitOutcomeDomain): Promise<void>;
+  getVisitOutcomeByIdempotencyKey(key: string): Promise<VisitOutcomeDomain | null>;
+  countVisitOutcomesByReporterAndDay(
+    phoneHash: string,
+    serviceId: string,
+    dayDate: string
+  ): Promise<number>;
 }
 
 /**
@@ -138,6 +148,30 @@ export class FixtureStatutoryRepository implements StatutoryRepository {
   async getVisitOutcomes(serviceId: string): Promise<VisitOutcomeDomain[]> {
     return this.visitOutcomes.filter((vo) => vo.serviceId === serviceId);
   }
+
+  async saveVisitOutcome(outcome: VisitOutcomeDomain): Promise<void> {
+    this.visitOutcomes.push(outcome);
+  }
+
+  async getVisitOutcomeByIdempotencyKey(
+    key: string
+  ): Promise<VisitOutcomeDomain | null> {
+    const found = this.visitOutcomes.find((vo) => vo.idempotencyKey === key);
+    return found || null;
+  }
+
+  async countVisitOutcomesByReporterAndDay(
+    phoneHash: string,
+    serviceId: string,
+    dayDate: string
+  ): Promise<number> {
+    return this.visitOutcomes.filter(
+      (vo) =>
+        vo.respondentHash === phoneHash &&
+        vo.serviceId === serviceId &&
+        vo.reportedAt.startsWith(dayDate)
+    ).length;
+  }
 }
 
 export class StatutoryService {
@@ -225,6 +259,133 @@ export class StatutoryService {
   ): Promise<PublicObservedDivergenceDto> {
     const card = await this.getStatutoryCard(serviceCode, { windowDays });
     return card.observed;
+  }
+
+  /**
+   * Records a citizen visit outcome (T-26).
+   * Enforces:
+   * 1. Service code existence (404 E_UNKNOWN_CODE)
+   * 2. Outcome code validity 1..5 (400 E_INVALID_OUTCOME_CODE)
+   * 3. Extra fee non-negative & visits (1..20) validation (400 E_INVALID_INPUT)
+   * 4. Idempotency by idempotencyKey: returns cached success without re-inserting
+   * 5. Rate limit: max 3 reports per phoneHash per service per day (429 E_RATE_LIMITED)
+   * 6. Silent response: NEVER echoes aggregate metrics (INV-07 / 05 §7)
+   */
+  async recordVisitOutcome(
+    input: RecordVisitOutcomeInput
+  ): Promise<RecordVisitOutcomeResponseDto> {
+    const {
+      serviceCode,
+      outcomeCode,
+      extraFeeMinor,
+      visits,
+      phoneHash,
+      channel,
+      idempotencyKey,
+      clusterKey,
+    } = input;
+
+    if (!serviceCode || !serviceCode.trim()) {
+      throw new ServiceError('E_UNKNOWN_CODE', 404, 'Service code is required');
+    }
+
+    const service = await this.repo.getServiceByCode(serviceCode.trim());
+    if (!service) {
+      throw new ServiceError(
+        'E_UNKNOWN_CODE',
+        404,
+        `Service '${serviceCode}' not found`
+      );
+    }
+
+    if (!isValidOutcomeCode(outcomeCode)) {
+      throw new ServiceError(
+        'E_INVALID_OUTCOME_CODE',
+        400,
+        `Invalid outcome code: ${outcomeCode}. Must be an integer between 1 and 5.`
+      );
+    }
+
+    if (
+      extraFeeMinor !== undefined &&
+      extraFeeMinor !== null &&
+      (!Number.isInteger(extraFeeMinor) || extraFeeMinor < 0)
+    ) {
+      throw new ServiceError(
+        'E_INVALID_INPUT',
+        400,
+        'extraFeeMinor must be a non-negative integer'
+      );
+    }
+
+    if (
+      visits !== undefined &&
+      visits !== null &&
+      (!Number.isInteger(visits) || visits < 1 || visits > 20)
+    ) {
+      throw new ServiceError(
+        'E_INVALID_INPUT',
+        400,
+        'visits must be an integer between 1 and 20'
+      );
+    }
+
+    if (!phoneHash || !phoneHash.trim()) {
+      throw new ServiceError('E_INVALID_INPUT', 400, 'phoneHash is required');
+    }
+
+    const effectiveIdempotencyKey =
+      idempotencyKey?.trim() ||
+      `outcome_${phoneHash.trim()}_${service.id}_${outcomeCode}_${this.clock.nowIso()}`;
+
+    // 1. Check idempotency
+    const existing = await this.repo.getVisitOutcomeByIdempotencyKey(
+      effectiveIdempotencyKey
+    );
+    if (existing) {
+      return { accepted: true, thankYouKey: 'outcome.recorded' };
+    }
+
+    // 2. Enforce rate limit (3 / phone_hash / service / day per 05 §12)
+    const nowIso = this.clock.nowIso();
+    const todayUtc = nowIso.slice(0, 10);
+    const countToday = await this.repo.countVisitOutcomesByReporterAndDay(
+      phoneHash.trim(),
+      service.id,
+      todayUtc
+    );
+    if (countToday >= 3) {
+      throw new ServiceError(
+        'E_RATE_LIMITED',
+        429,
+        'Daily submission limit reached: maximum 3 outcomes per service per day'
+      );
+    }
+
+    // 3. Save outcome
+    const effectiveClusterKey =
+      clusterKey?.trim() || `cluster_${phoneHash.trim().slice(0, 8)}`;
+
+    const outcomeRecord: VisitOutcomeDomain = {
+      id: `vo_${Math.random().toString(36).substring(2, 11)}`,
+      serviceId: service.id,
+      outcomeCode,
+      extraFeeMinor: extraFeeMinor ?? null,
+      visitsReported: visits ?? null,
+      respondentHash: phoneHash.trim(),
+      clusterKey: effectiveClusterKey,
+      channel: channel || 'USSD',
+      idempotencyKey: effectiveIdempotencyKey,
+      reportedAt: nowIso,
+    };
+
+    await this.repo.saveVisitOutcome(outcomeRecord);
+
+    // Invariant: NEVER echo aggregate state
+    return {
+      accepted: true,
+      thankYouKey: 'outcome.recorded',
+    };
   }
 }
 

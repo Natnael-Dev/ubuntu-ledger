@@ -23,6 +23,46 @@ export const ALERT_MIN_CLUSTERS = 5;
 export const ALERT_MIN_PCT_FEE = 60.0;
 export const SUPPRESSION_NOTICE_KEY = 'divergence.not_enough_reports' as const;
 
+export type OutcomeCode = 1 | 2 | 3 | 4 | 5;
+
+export interface OutcomeCodeDefinition {
+  code: OutcomeCode;
+  labelKey: string;
+  meaning: string;
+}
+
+export const OUTCOME_CODE_DEFINITIONS: Record<OutcomeCode, OutcomeCodeDefinition> = {
+  1: {
+    code: 1,
+    labelKey: 'outcome.served_at_official_fee',
+    meaning: 'Service received at the statutory fee',
+  },
+  2: {
+    code: 2,
+    labelKey: 'outcome.additional_payment_requested',
+    meaning: 'An amount above the statutory ceiling was requested',
+  },
+  3: {
+    code: 3,
+    labelKey: 'outcome.receipt_not_provided',
+    meaning: 'Payment made, no official receipt issued',
+  },
+  4: {
+    code: 4,
+    labelKey: 'outcome.undocumented_requirement',
+    meaning: 'A requirement not on the statutory list was asked for',
+  },
+  5: {
+    code: 5,
+    labelKey: 'outcome.office_inaccessible',
+    meaning: 'Office closed / service unavailable',
+  },
+};
+
+export function isValidOutcomeCode(code: unknown): code is OutcomeCode {
+  return typeof code === 'number' && Number.isInteger(code) && code >= 1 && code <= 5;
+}
+
 // ============================================================================
 // DOMAIN TYPES
 // ============================================================================
@@ -64,7 +104,7 @@ export interface ServiceDomain {
 export interface VisitOutcomeDomain {
   id: string;
   serviceId: string;
-  outcomeCode: number; // 1..5
+  outcomeCode: OutcomeCode | number; // 1..5
   extraFeeMinor?: number | null;
   visitsReported?: number | null;
   respondentHash: string;
@@ -72,6 +112,22 @@ export interface VisitOutcomeDomain {
   channel: Channel | string;
   idempotencyKey: string;
   reportedAt: string;
+}
+
+export interface RecordVisitOutcomeInput {
+  serviceCode: string;
+  outcomeCode: OutcomeCode | number;
+  extraFeeMinor?: number | null;
+  visits?: number | null;
+  phoneHash: string;
+  channel: Channel | string;
+  idempotencyKey?: string;
+  clusterKey?: string;
+}
+
+export interface RecordVisitOutcomeResponseDto {
+  accepted: true;
+  thankYouKey: 'outcome.recorded';
 }
 
 export interface DivergenceAggregateDomain {

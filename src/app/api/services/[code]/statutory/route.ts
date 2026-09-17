@@ -9,7 +9,7 @@ import { getStatutoryService } from '@/app-services/statutory.service';
 import { ServiceError } from '@/app-services/errors';
 
 export interface RouteContext {
-  params: Promise<{ code: string }> | { code: string };
+  params: Promise<{ code: string }>;
 }
 
 function problemResponse(

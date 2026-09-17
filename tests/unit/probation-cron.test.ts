@@ -29,7 +29,6 @@ describe('T-21: Probation Cron Service (04-state-machine.md §3, 11-tasks.md T-2
   const DAY_1_TIME = new Date(START_TIME.getTime() + 1 * 24 * 60 * 60 * 1000);
   const DAY_3_TIME = new Date(START_TIME.getTime() + 3 * 24 * 60 * 60 * 1000);
   const DAY_7_TIME = new Date(START_TIME.getTime() + 7 * 24 * 60 * 60 * 1000);
-  const DAY_8_TIME = new Date(START_TIME.getTime() + 8 * 24 * 60 * 60 * 1000);
 
   function createActiveTicket(overrides?: Partial<RepairTicketRecord>): RepairTicketRecord {
     return {
@@ -327,7 +326,7 @@ describe('T-21: Probation Cron Service (04-state-machine.md §3, 11-tasks.md T-2
         respondentId: 'r-1',
         scheduledFor: DAY_1_TIME,
       });
-      const ping2 = await repairTicketRepo.schedulePing({
+      await repairTicketRepo.schedulePing({
         ticketId: 't-1',
         respondentId: 'r-2',
         scheduledFor: DAY_7_TIME,

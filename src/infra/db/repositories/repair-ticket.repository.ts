@@ -7,6 +7,7 @@
 
 import type { ProbationState } from '@/domain/types';
 import { DEMO_REPAIR_TICKETS, DEMO_IDS } from '@/fixtures/demo-scenario';
+import { systemClock } from '@/infra/clock';
 
 export interface RepairTicketRecord {
   id: string;
@@ -254,11 +255,6 @@ export class InMemoryRepairTicketRepository implements RepairTicketRepository {
   }
 
   async findActiveProbationTickets(): Promise<RepairTicketRecord[]> {
-    const activeStates: ProbationState[] = [
-      'PROBATION_ACTIVE',
-      'PROBATION_DAY_0',
-      'REPAIR_CLAIMED',
-    ];
     const results: RepairTicketRecord[] = [];
     const seenIds = new Set<string>();
 
@@ -279,7 +275,7 @@ export class InMemoryRepairTicketRepository implements RepairTicketRepository {
   }
 
   async findPendingPings(asOf?: Date): Promise<ProbationPingRecord[]> {
-    const threshold = asOf ? asOf.getTime() : Date.now();
+    const threshold = asOf ? asOf.getTime() : systemClock.now().getTime();
     const results: ProbationPingRecord[] = [];
 
     for (const ping of this.pings.values()) {
@@ -335,7 +331,7 @@ export class InMemoryRepairTicketRepository implements RepairTicketRepository {
       ping.id ||
       (typeof crypto !== 'undefined' && crypto.randomUUID
         ? crypto.randomUUID()
-        : `ping-${Date.now()}-${Math.floor(Math.random() * 100000)}`);
+        : `ping-${systemClock.now().getTime()}-${Math.floor(Math.random() * 100000)}`);
 
     const record: ProbationPingRecord = {
       id,
@@ -360,7 +356,7 @@ export class InMemoryRepairTicketRepository implements RepairTicketRepository {
 
     this.pings.set(pingId, {
       ...ping,
-      sentAt: sentAt ?? new Date(),
+      sentAt: sentAt ?? systemClock.now(),
     });
   }
 
@@ -387,7 +383,7 @@ export class InMemoryRepairTicketRepository implements RepairTicketRepository {
     this.pings.set(pingId, {
       ...ping,
       stillWorking,
-      respondedAt: respondedAt ?? new Date(),
+      respondedAt: respondedAt ?? systemClock.now(),
     });
   }
 

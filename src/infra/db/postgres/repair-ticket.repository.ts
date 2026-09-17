@@ -9,6 +9,7 @@ import type {
   RepairTicketRepository,
   UpdateTicketExtra,
 } from '../repositories/repair-ticket.repository';
+import { systemClock } from '@/infra/clock';
 
 export class PostgresRepairTicketRepository implements RepairTicketRepository {
   constructor(private readonly client: PoolClient) {}
@@ -97,7 +98,7 @@ export class PostgresRepairTicketRepository implements RepairTicketRepository {
   }
 
   async findPendingPings(asOf?: Date): Promise<ProbationPingRecord[]> {
-    const threshold = asOf ?? new Date();
+    const threshold = asOf ?? systemClock.now();
     const res = await this.client.query(
       `SELECT id, ticket_id, respondent_id, scheduled_for, sent_at, responded_at, still_working, cluster_key
        FROM probation_ping
@@ -173,7 +174,7 @@ export class PostgresRepairTicketRepository implements RepairTicketRepository {
   }
 
   async markPingSent(pingId: string, sentAt?: Date): Promise<void> {
-    const timestamp = sentAt ?? new Date();
+    const timestamp = sentAt ?? systemClock.now();
     const res = await this.client.query(
       `UPDATE probation_ping
        SET sent_at = $2
@@ -212,7 +213,7 @@ export class PostgresRepairTicketRepository implements RepairTicketRepository {
     stillWorking: boolean,
     respondedAt?: Date
   ): Promise<void> {
-    const timestamp = respondedAt ?? new Date();
+    const timestamp = respondedAt ?? systemClock.now();
     const res = await this.client.query(
       `UPDATE probation_ping
        SET still_working = $2, responded_at = $3
@@ -225,22 +226,22 @@ export class PostgresRepairTicketRepository implements RepairTicketRepository {
     }
   }
 
-  private mapRowToRecord(row: Record<string, any>): RepairTicketRecord {
+  private mapRowToRecord(row: Record<string, unknown>): RepairTicketRecord {
     return {
-      id: row.id,
-      assetId: row.asset_id,
-      projectId: row.project_id ?? null,
-      wardId: row.ward_id ?? null,
+      id: String(row.id),
+      assetId: String(row.asset_id),
+      projectId: row.project_id ? String(row.project_id) : null,
+      wardId: row.ward_id ? String(row.ward_id) : null,
       state: row.state as ProbationState,
-      reportedBrokenAt: new Date(row.reported_broken_at),
-      repairClaimedAt: row.repair_claimed_at ? new Date(row.repair_claimed_at) : null,
-      claimedBy: row.claimed_by ?? null,
-      probationStartedAt: row.probation_started_at ? new Date(row.probation_started_at) : null,
-      probationEndsAt: row.probation_ends_at ? new Date(row.probation_ends_at) : null,
+      reportedBrokenAt: new Date(String(row.reported_broken_at)),
+      repairClaimedAt: row.repair_claimed_at ? new Date(String(row.repair_claimed_at)) : null,
+      claimedBy: row.claimed_by ? String(row.claimed_by) : null,
+      probationStartedAt: row.probation_started_at ? new Date(String(row.probation_started_at)) : null,
+      probationEndsAt: row.probation_ends_at ? new Date(String(row.probation_ends_at)) : null,
       probationDays: Number(row.probation_days),
-      resolvedAt: row.resolved_at ? new Date(row.resolved_at) : null,
-      failureReasonKey: row.failure_reason_key ?? null,
-      createdAt: row.created_at ? new Date(row.created_at) : undefined,
+      resolvedAt: row.resolved_at ? new Date(String(row.resolved_at)) : null,
+      failureReasonKey: row.failure_reason_key ? String(row.failure_reason_key) : null,
+      createdAt: row.created_at ? new Date(String(row.created_at)) : undefined,
     };
   }
 }

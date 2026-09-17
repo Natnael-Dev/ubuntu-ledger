@@ -6,7 +6,7 @@
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { GET as pingsRoute, POST as pingsPostRoute } from '@/app/api/cron/probation/pings/route';
-import { GET as closeRoute, POST as closePostRoute } from '@/app/api/cron/probation/close/route';
+import { GET as closeRoute } from '@/app/api/cron/probation/close/route';
 import { ProbationCronService } from '@/app-services/probation-cron.service';
 import {
   InMemoryRepairTicketRepository,

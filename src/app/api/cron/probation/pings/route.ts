@@ -48,13 +48,14 @@ export async function GET(request: Request) {
     const result = await service.processPings();
 
     return NextResponse.json(result, { status: 200 });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const err = error as { message?: string; code?: string; status?: number };
     return NextResponse.json(
       {
-        error: error.message || 'Failed to process probation pings',
-        code: error.code || 'E_INTERNAL',
+        error: err?.message || 'Failed to process probation pings',
+        code: err?.code || 'E_INTERNAL',
       },
-      { status: error.status || 500 }
+      { status: err?.status || 500 }
     );
   }
 }

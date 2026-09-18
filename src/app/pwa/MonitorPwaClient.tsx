@@ -300,18 +300,18 @@ export function MonitorPwaClient() {
   const failedItems = outboxItems.filter((item) => item.status === 'FAILED');
 
   return (
-    <div className="min-h-screen bg-[var(--paper)] text-[var(--ink)] font-sans antialiased">
+    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans antialiased pb-16">
       {/* Header */}
-      <header className="border-b border-[var(--rule)] bg-white px-4 sm:px-6 py-4">
+      <header className="border-b border-slate-200 bg-white px-4 sm:px-6 py-4 shadow-sm">
         <div className="max-w-4xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <div className="text-[10px] font-mono uppercase tracking-widest text-[var(--ink-soft)]">
+            <div className="text-[10px] font-mono uppercase tracking-widest text-slate-500 font-bold">
               Ward Proof-Line // Field Monitor Interface
             </div>
-            <h1 className="text-lg sm:text-xl font-bold font-sans tracking-tight text-[var(--ink)] mt-0.5">
+            <h1 className="text-lg sm:text-xl font-bold font-sans tracking-tight text-slate-900 mt-0.5">
               Monitor Field Observation (PWA)
             </h1>
-            <p className="text-xs text-[var(--ink-soft)] mt-0.5">
+            <p className="text-xs text-slate-500 mt-0.5">
               Offline observation outbox with client-side IndexedDB and idempotent background sync.
             </p>
           </div>
@@ -324,7 +324,7 @@ export function MonitorPwaClient() {
               <label
                 htmlFor="airplane-mode-toggle"
                 id="connectivity-label"
-                className="text-[11px] font-mono uppercase tracking-wider text-[var(--ink-soft)] sr-only sm:not-sr-only"
+                className="text-[11px] font-mono uppercase tracking-wider text-slate-500 sr-only sm:not-sr-only font-bold"
               >
                 Simulation:
               </label>
@@ -341,10 +341,10 @@ export function MonitorPwaClient() {
                 }
                 data-testid="airplane-mode-toggle"
                 onClick={handleToggleAirplane}
-                className={`px-3 py-2.5 min-h-[44px] text-xs font-mono border transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--ink)] ${
+                className={`px-3 py-2.5 min-h-[44px] text-xs font-mono rounded-xl border transition-all shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-blue-600 ${
                   isAirplaneMode
-                    ? 'bg-amber-600 text-white border-amber-700 font-semibold'
-                    : 'bg-white text-[var(--ink-soft)] border-[var(--rule)] hover:bg-neutral-50 hover:text-[var(--ink)]'
+                    ? 'bg-amber-600 text-white border-amber-700 font-bold shadow-amber-500/20'
+                    : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50 hover:text-slate-900'
                 }`}
               >
                 {isAirplaneMode ? '✈ Airplane Mode: ON (Buffered)' : '✈ Airplane Mode: OFF (Live)'}
@@ -354,12 +354,12 @@ export function MonitorPwaClient() {
         </div>
       </header>
 
-      {/* Main Content Container (Layout provides root <main>) */}
+      {/* Main Content Container */}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6">
         {/* Context & Demo Scenario Banner */}
-        <div className="border border-[var(--rule)] bg-[var(--paper-warm)] p-4 sm:p-5">
+        <div className="border border-slate-200 bg-white rounded-2xl p-5 sm:p-6 shadow-sm">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
-            <p className="font-mono text-[10px] uppercase tracking-widest text-[var(--ink-soft)] font-bold">
+            <p className="font-mono text-[10px] uppercase tracking-widest text-blue-600 font-bold">
               Field Monitor Protocol // Low-Connectivity Ward Verification
             </p>
             <div className="flex items-center gap-2">
@@ -406,7 +406,7 @@ export function MonitorPwaClient() {
             data-testid="submission-notice"
             role="status"
             aria-live="polite"
-            className="p-3 text-sm font-mono border bg-blue-50 text-blue-900 border-blue-200"
+            className="p-4 text-sm font-mono border rounded-xl bg-blue-50 text-blue-900 border-blue-200 shadow-sm"
           >
             {lastSubmissionNotice}
           </div>
@@ -417,7 +417,7 @@ export function MonitorPwaClient() {
           <section
             data-testid="sync-error-banner"
             aria-labelledby="sync-error-heading"
-            className="border-2 border-red-500 bg-red-50/80 p-5 space-y-4"
+            className="border-2 border-red-500 bg-red-50/90 rounded-2xl p-5 sm:p-6 space-y-4 shadow-sm"
           >
             <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 border-b border-red-200 pb-3">
               <div>
@@ -439,7 +439,7 @@ export function MonitorPwaClient() {
                   type="button"
                   data-testid="btn-retry-failed"
                   onClick={handleRetryAllFailed}
-                  className="px-3 py-2 min-h-[40px] text-xs font-mono font-bold bg-amber-700 text-white hover:bg-amber-800 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-amber-950"
+                  className="px-3 py-2 min-h-[40px] text-xs font-mono font-bold bg-amber-600 text-white hover:bg-amber-700 rounded-xl transition-all shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-amber-800"
                   title="Retry sending all failed observations"
                 >
                   ↻ Retry Sync
@@ -448,7 +448,7 @@ export function MonitorPwaClient() {
                   type="button"
                   data-testid="btn-export-outbox"
                   onClick={handleExportOutbox}
-                  className="px-3 py-2 min-h-[40px] text-xs font-mono font-semibold border border-[var(--ink)] bg-white text-[var(--ink)] hover:bg-neutral-100 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--ink)]"
+                  className="px-3 py-2 min-h-[40px] text-xs font-mono font-semibold border border-slate-300 bg-white text-slate-800 hover:bg-slate-50 rounded-xl transition-all shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-slate-800"
                   title="Download outbox records as forensic JSON audit trail"
                 >
                   ⬇ Export Outbox (JSON)
@@ -457,7 +457,7 @@ export function MonitorPwaClient() {
                   type="button"
                   data-testid="btn-discard-failed"
                   onClick={handleDiscardAllFailed}
-                  className="px-3 py-2 min-h-[40px] text-xs font-mono border border-red-400 text-red-800 bg-white hover:bg-red-100 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-red-800"
+                  className="px-3 py-2 min-h-[40px] text-xs font-mono border border-red-300 text-red-700 bg-white hover:bg-red-50 rounded-xl transition-all shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-red-700"
                   title="Discard failed observations from local store"
                 >
                   ✕ Discard Failed
@@ -469,9 +469,9 @@ export function MonitorPwaClient() {
               <div className="text-[11px] text-red-900 font-semibold uppercase tracking-wider">
                 Failed Records Detail:
               </div>
-              <ul className="space-y-1 text-red-900 bg-white border border-red-200 p-3">
+              <ul className="space-y-1 text-red-900 bg-white border border-red-200 rounded-xl p-3 shadow-inner">
                 {failedItems.map((item) => (
-                  <li key={item.clientIdempotencyKey} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 py-1 border-b border-neutral-100 last:border-0">
+                  <li key={item.clientIdempotencyKey} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 py-1.5 border-b border-neutral-100 last:border-0">
                     <div>
                       <span className="font-bold">Key: {item.clientIdempotencyKey.slice(0, 12)}...</span>
                       <span className="text-[11px] text-neutral-600 ml-2">[{item.lastError || 'Unknown transmission error'}]</span>
@@ -480,14 +480,14 @@ export function MonitorPwaClient() {
                       <button
                         type="button"
                         onClick={() => void handleRetryItem(item.clientIdempotencyKey)}
-                        className="px-2 py-1 text-[11px] border border-amber-600 bg-amber-50 text-amber-900 hover:bg-amber-100 transition-colors"
+                        className="px-2.5 py-1 text-[11px] rounded-lg border border-amber-600 bg-amber-50 text-amber-900 hover:bg-amber-100 transition-colors"
                       >
                         Retry Single
                       </button>
                       <button
                         type="button"
                         onClick={() => void handleDiscardItem(item.clientIdempotencyKey)}
-                        className="px-2 py-1 text-[11px] border border-red-300 bg-red-50 text-red-800 hover:bg-red-100 transition-colors"
+                        className="px-2.5 py-1 text-[11px] rounded-lg border border-red-300 bg-red-50 text-red-800 hover:bg-red-100 transition-colors"
                       >
                         Discard
                       </button>
@@ -502,13 +502,13 @@ export function MonitorPwaClient() {
         {/* Observation Form Section */}
         <section
           aria-labelledby="record-inspection-heading"
-          className="bg-white border border-[var(--rule)] p-5 sm:p-6 space-y-5"
+          className="bg-white border border-slate-200 rounded-2xl p-5 sm:p-6 space-y-5 shadow-sm"
         >
-          <div className="border-b border-[var(--rule)] pb-3">
-            <h2 id="record-inspection-heading" className="text-sm sm:text-base font-bold font-sans text-[var(--ink)]">
+          <div className="border-b border-slate-200 pb-3">
+            <h2 id="record-inspection-heading" className="text-sm sm:text-base font-bold font-sans text-slate-900">
               Record Field Inspection
             </h2>
-            <p className="text-xs text-[var(--ink-soft)] mt-0.5 font-mono">
+            <p className="text-xs text-slate-500 mt-0.5 font-mono">
               Captures ground physical verification for municipal project tasks
             </p>
           </div>
@@ -516,28 +516,28 @@ export function MonitorPwaClient() {
           {/* Audit #104: Thickened 5-Step Form Progress Bar for Outdoor Visibility */}
           <div
             aria-labelledby="progress-bar-heading"
-            className="border-2 border-[var(--ink)] bg-[var(--paper)] p-3 sm:p-4 space-y-3"
+            className="border-2 border-slate-900 bg-slate-50 rounded-xl p-3 sm:p-4 space-y-3"
           >
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
-              <span id="progress-bar-heading" className="font-mono text-[11px] font-bold uppercase tracking-widest text-[var(--ink)]">
+              <span id="progress-bar-heading" className="font-mono text-[11px] font-bold uppercase tracking-widest text-slate-900">
                 Field Progress Indicator // High-Contrast Outdoor Mode
               </span>
-              <span className="font-mono text-xs font-bold text-[var(--ink)]">
+              <span className="font-mono text-xs font-bold text-slate-900">
                 Step {formStep} of 5: {FORM_STEPS[formStep - 1]?.label} ({Math.round((formStep / 5) * 100)}%)
               </span>
             </div>
 
-            {/* Thick Outdoor Progress Bar (16px high with stark 2px ink border) */}
+            {/* Thick Outdoor Progress Bar */}
             <div
               role="progressbar"
               aria-valuenow={formStep}
               aria-valuemin={1}
               aria-valuemax={5}
               aria-label={`Form progression: step ${formStep} of 5 (${FORM_STEPS[formStep - 1]?.label})`}
-              className="w-full h-4 sm:h-5 bg-neutral-200 border-2 border-[var(--ink)] overflow-hidden"
+              className="w-full h-4 sm:h-5 bg-slate-200 border-2 border-slate-900 rounded-full overflow-hidden"
             >
               <div
-                className="h-full bg-[var(--ink)] transition-all duration-300"
+                className="h-full bg-blue-600 transition-all duration-300"
                 style={{ width: `${(formStep / 5) * 100}%` }}
               />
             </div>
@@ -554,12 +554,12 @@ export function MonitorPwaClient() {
                     onClick={() => setFormStep(step.id)}
                     aria-current={isActive ? 'step' : undefined}
                     aria-label={`Step ${step.id}: ${step.label} (${isDone ? 'Completed' : isActive ? 'Active' : 'Pending'})`}
-                    className={`p-2 border-2 text-left transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--ink)] ${
+                    className={`p-2 border-2 text-left rounded-lg transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-blue-600 ${
                       isActive
-                        ? 'border-[var(--ink)] bg-[var(--ink)] text-[var(--paper)] font-bold shadow-sm'
+                        ? 'border-blue-600 bg-blue-600 text-white font-bold shadow-sm'
                         : isDone
-                        ? 'border-[var(--ink)] bg-emerald-50 text-emerald-950 font-bold hover:bg-emerald-100'
-                        : 'border-neutral-300 bg-white text-[var(--ink-soft)] font-medium hover:border-neutral-400'
+                        ? 'border-emerald-600 bg-emerald-50 text-emerald-950 font-bold hover:bg-emerald-100'
+                        : 'border-slate-300 bg-white text-slate-500 font-medium hover:border-slate-400'
                     }`}
                   >
                     <div className="text-[10px] tracking-wider uppercase font-semibold">
@@ -578,7 +578,7 @@ export function MonitorPwaClient() {
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label htmlFor="task-id-input" className="block text-[11px] font-mono text-[var(--ink-soft)] uppercase tracking-wider mb-1">
+                <label htmlFor="task-id-input" className="block text-[11px] font-mono text-slate-600 uppercase tracking-wider mb-1 font-semibold">
                   Inspection Task ID
                 </label>
                 <input
@@ -588,14 +588,14 @@ export function MonitorPwaClient() {
                   onChange={(e) => setTaskId(e.target.value)}
                   aria-invalid={taskId.length > 0 ? !isTaskIdValid : undefined}
                   aria-describedby="task-id-hint"
-                  className={`w-full text-xs font-mono p-2.5 border bg-[var(--paper)] text-[var(--ink)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ink)] ${
+                  className={`w-full text-xs font-mono p-2.5 rounded-xl border bg-slate-50 text-slate-900 focus:bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 ${
                     taskId.length > 0 && !isTaskIdValid
                       ? 'border-red-500 ring-1 ring-red-300'
-                      : 'border-[var(--rule)] focus:border-[var(--ink)]'
+                      : 'border-slate-200 focus:border-blue-600'
                   }`}
                   required
                 />
-                <p id="task-id-hint" className={`text-[10px] mt-1 font-mono ${taskId.length > 0 && !isTaskIdValid ? 'text-red-600' : 'text-[var(--ink-soft)]'}`}>
+                <p id="task-id-hint" className={`text-[10px] mt-1 font-mono ${taskId.length > 0 && !isTaskIdValid ? 'text-red-600' : 'text-slate-500'}`}>
                   {taskId.length > 0 && !isTaskIdValid
                     ? '✗ Must be a valid UUID v4 (e.g. 00000000-0000-4000-a000-...)'
                     : 'UUID v4 task identifier from the inspection ledger'}
@@ -603,7 +603,7 @@ export function MonitorPwaClient() {
               </div>
 
               <div>
-                <label htmlFor="phone-hash-input" className="block text-[11px] font-mono text-[var(--ink-soft)] uppercase tracking-wider mb-1">
+                <label htmlFor="phone-hash-input" className="block text-[11px] font-mono text-slate-600 uppercase tracking-wider mb-1 font-semibold">
                   Monitor Phone Hash
                 </label>
                 <input
@@ -613,14 +613,14 @@ export function MonitorPwaClient() {
                   onChange={(e) => setPhoneHash(e.target.value)}
                   aria-invalid={phoneHash.length > 0 ? (!isPhoneHashValid || isPhoneRawNumber) : undefined}
                   aria-describedby="phone-hash-hint"
-                  className={`w-full text-xs font-mono p-2.5 border bg-[var(--paper)] text-[var(--ink)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ink)] ${
+                  className={`w-full text-xs font-mono p-2.5 rounded-xl border bg-slate-50 text-slate-900 focus:bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 ${
                     phoneHash.length > 0 && (!isPhoneHashValid || isPhoneRawNumber)
                       ? 'border-red-500 ring-1 ring-red-300'
-                      : 'border-[var(--rule)] focus:border-[var(--ink)]'
+                      : 'border-slate-200 focus:border-blue-600'
                   }`}
                   required
                 />
-                <p id="phone-hash-hint" className={`text-[10px] mt-1 font-mono ${phoneHash.length > 0 && (!isPhoneHashValid || isPhoneRawNumber) ? 'text-red-600' : 'text-[var(--ink-soft)]'}`}>
+                <p id="phone-hash-hint" className={`text-[10px] mt-1 font-mono ${phoneHash.length > 0 && (!isPhoneHashValid || isPhoneRawNumber) ? 'text-red-600' : 'text-slate-500'}`}>
                   {isPhoneRawNumber
                     ? '✗ ZERO-PII: Raw phone numbers are strictly rejected. Use SHA-256 hash.'
                     : phoneHash.length > 0 && !isPhoneHashValid
@@ -631,48 +631,48 @@ export function MonitorPwaClient() {
             </div>
 
             {/* Physical Checklist Section */}
-            <div className="border-t border-[var(--rule)] pt-4 space-y-2">
-              <div className="text-[11px] font-mono text-[var(--ink-soft)] uppercase tracking-wider mb-2">
+            <div className="border-t border-slate-200 pt-4 space-y-2">
+              <div className="text-[11px] font-mono text-slate-600 uppercase tracking-wider mb-2 font-bold">
                 Physical Verification Questions
               </div>
 
-              <label className="flex items-center gap-2.5 cursor-pointer text-xs sm:text-sm text-[var(--ink)] py-2 focus-within:ring-1 focus-within:ring-[var(--ink)]">
+              <label className="flex items-center gap-2.5 cursor-pointer text-xs sm:text-sm text-slate-800 py-2 focus-within:ring-1 focus-within:ring-blue-600">
                 <input
                   type="checkbox"
                   checked={q1}
                   onChange={(e) => setQ1(e.target.checked)}
-                  className="rounded border-[var(--rule)] text-[var(--state-open)] focus:ring-0"
+                  className="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
                 />
                 <span>Q1: Generator installed and physically present?</span>
               </label>
 
-              <label className="flex items-center gap-2.5 cursor-pointer text-xs sm:text-sm text-[var(--ink)] py-2 focus-within:ring-1 focus-within:ring-[var(--ink)]">
+              <label className="flex items-center gap-2.5 cursor-pointer text-xs sm:text-sm text-slate-800 py-2 focus-within:ring-1 focus-within:ring-blue-600">
                 <input
                   type="checkbox"
                   checked={q2}
                   onChange={(e) => setQ2(e.target.checked)}
-                  className="rounded border-[var(--rule)] text-[var(--state-open)] focus:ring-0"
+                  className="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
                 />
                 <span>Q2: Asset nameplate and municipal serial tag verified?</span>
               </label>
 
-              <label className="flex items-center gap-2.5 cursor-pointer text-xs sm:text-sm text-[var(--ink)] py-2 focus-within:ring-1 focus-within:ring-[var(--ink)]">
+              <label className="flex items-center gap-2.5 cursor-pointer text-xs sm:text-sm text-slate-800 py-2 focus-within:ring-1 focus-within:ring-blue-600">
                 <input
                   type="checkbox"
                   checked={q3}
                   onChange={(e) => setQ3(e.target.checked)}
-                  className="rounded border-[var(--rule)] text-[var(--state-open)] focus:ring-0"
+                  className="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
                 />
                 <span>Q3: Logbook maintenance entries inspected?</span>
               </label>
             </div>
 
             {/* Verification Review Summary (Step 4 preview) */}
-            <div className="border border-[var(--rule)] bg-[var(--paper-warm)] p-3 font-mono text-xs space-y-1">
-              <div className="text-[10px] uppercase tracking-wider text-[var(--ink-soft)] font-bold">
+            <div className="border border-slate-200 bg-slate-50 rounded-xl p-3.5 font-mono text-xs space-y-1">
+              <div className="text-[10px] uppercase tracking-wider text-slate-500 font-bold">
                 Verification Ledger Summary
               </div>
-              <div className="flex flex-wrap items-center justify-between text-[11px] text-[var(--ink)] gap-2">
+              <div className="flex flex-wrap items-center justify-between text-[11px] text-slate-800 gap-2">
                 <span>Task: {taskId ? `${taskId.slice(0, 8)}...` : '(empty)'}</span>
                 <span>Monitor: {phoneHash ? `${phoneHash.slice(0, 10)}...` : '(empty)'}</span>
                 <span>Verification: {[q1, q2, q3].filter(Boolean).length}/3 Checked</span>
@@ -681,12 +681,12 @@ export function MonitorPwaClient() {
             </div>
 
             {/* Actions */}
-            <div className="border-t border-[var(--rule)] pt-4 flex flex-wrap items-center justify-between gap-3">
+            <div className="border-t border-slate-200 pt-4 flex flex-wrap items-center justify-between gap-3">
               <button
                 type="submit"
                 disabled={isSubmitting}
                 data-testid="btn-submit-observation"
-                className="px-4 py-2.5 min-h-[44px] bg-[var(--ink)] text-[var(--paper)] text-xs font-mono uppercase tracking-wider hover:bg-neutral-800 transition-colors disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--ink)]"
+                className="px-5 py-2.5 min-h-[44px] bg-blue-600 text-white text-xs font-mono font-semibold uppercase tracking-wider rounded-xl hover:bg-blue-700 active:scale-[0.99] transition-all shadow-sm disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-blue-600"
               >
                 {isSubmitting ? 'Recording...' : 'Submit Field Observation'}
               </button>
@@ -696,7 +696,7 @@ export function MonitorPwaClient() {
                   type="button"
                   data-testid="btn-sync-now"
                   onClick={handleManualSync}
-                  className="px-3 py-2.5 min-h-[44px] text-xs font-mono border border-[var(--rule)] bg-white text-[var(--ink)] hover:bg-neutral-50 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[var(--ink)]"
+                  className="px-3.5 py-2.5 min-h-[44px] text-xs font-mono font-semibold rounded-xl border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 transition-all shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-blue-600"
                 >
                   Sync Now
                 </button>
@@ -704,7 +704,7 @@ export function MonitorPwaClient() {
                   type="button"
                   data-testid="btn-clear-outbox"
                   onClick={handleClearOutbox}
-                  className="px-3 py-2.5 min-h-[44px] text-xs font-mono border border-red-300 text-red-700 bg-red-50 hover:bg-red-100 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-red-700"
+                  className="px-3.5 py-2.5 min-h-[44px] text-xs font-mono font-semibold rounded-xl border border-red-200 text-red-700 bg-red-50 hover:bg-red-100 transition-all shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-red-700"
                 >
                   Clear Queue
                 </button>
@@ -716,79 +716,79 @@ export function MonitorPwaClient() {
         {/* Outbox Records Table Section */}
         <section
           aria-labelledby="outbox-records-heading"
-          className="bg-white border border-[var(--rule)] p-5 sm:p-6 space-y-4"
+          className="bg-white border border-slate-200 rounded-2xl p-5 sm:p-6 space-y-4 shadow-sm"
         >
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[var(--rule)] pb-3">
-            <h2 id="outbox-records-heading" className="text-sm sm:text-base font-bold font-sans text-[var(--ink)]">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-3">
+            <h2 id="outbox-records-heading" className="text-sm sm:text-base font-bold font-sans text-slate-900">
               Offline Outbox Records ({outboxItems.length})
             </h2>
-            <div className="text-xs font-mono text-[var(--ink-soft)]">
+            <div className="text-xs font-mono text-slate-500">
               Stores locally in IndexedDB until flushed
             </div>
           </div>
 
           {outboxItems.length === 0 ? (
-            <div className="text-center py-8 text-xs font-mono text-[var(--ink-soft)]">
+            <div className="text-center py-8 text-xs font-mono text-slate-500">
               Outbox is empty. Record an observation above to test offline queueing.
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table data-testid="outbox-table" className="w-full text-xs font-mono border-collapse">
                 <thead>
-                  <tr className="border-b border-[var(--rule)] text-left text-[var(--ink-soft)] uppercase text-[10px]">
-                    <th className="py-2 px-2">Idempotency Key</th>
-                    <th className="py-2 px-2">Task</th>
-                    <th className="py-2 px-2">Status</th>
-                    <th className="py-2 px-2">Answers</th>
-                    <th className="py-2 px-2">Result / Detail</th>
-                    <th className="py-2 px-2">Action</th>
+                  <tr className="border-b border-slate-200 text-left text-slate-500 uppercase text-[10px]">
+                    <th className="py-2.5 px-3">Idempotency Key</th>
+                    <th className="py-2.5 px-3">Task</th>
+                    <th className="py-2.5 px-3">Status</th>
+                    <th className="py-2.5 px-3">Answers</th>
+                    <th className="py-2.5 px-3">Result / Detail</th>
+                    <th className="py-2.5 px-3">Action</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[var(--rule)]">
+                <tbody className="divide-y divide-slate-100">
                   {outboxItems.map((item) => (
-                    <tr key={item.clientIdempotencyKey} className="hover:bg-neutral-50">
-                      <td className="py-2.5 px-2 font-semibold text-[var(--ink)]">
+                    <tr key={item.clientIdempotencyKey} className="hover:bg-slate-50/80 transition-colors">
+                      <td className="py-3 px-3 font-semibold text-slate-900">
                         {item.clientIdempotencyKey.slice(0, 8)}...
                       </td>
-                      <td className="py-2.5 px-2 text-[var(--ink-soft)]">
+                      <td className="py-3 px-3 text-slate-500">
                         {item.taskId.slice(0, 8)}...
                       </td>
-                      <td className="py-2.5 px-2">
+                      <td className="py-3 px-3">
                         <span
                           data-testid="item-status"
-                          className={`inline-block px-2 py-0.5 text-[10px] font-bold ${
+                          className={`inline-block px-2 py-0.5 text-[10px] font-bold rounded-md ${
                             item.status === 'SYNCED'
                               ? 'bg-emerald-100 text-emerald-800'
                               : item.status === 'SYNCING'
                               ? 'bg-amber-100 text-amber-800 animate-pulse'
                               : item.status === 'FAILED'
                               ? 'bg-red-100 text-red-800'
-                              : 'bg-neutral-100 text-neutral-800'
+                              : 'bg-slate-100 text-slate-800'
                           }`}
                         >
                           {item.status}
                         </span>
                       </td>
-                      <td className="py-2.5 px-2 text-[var(--ink-soft)]">
+                      <td className="py-3 px-3 text-slate-600">
                         {(() => {
                           const total = Object.keys(item.answers).length;
                           const passed = Object.values(item.answers).filter(Boolean).length;
                           return `${passed}/${total} ✓`;
                         })()}
                       </td>
-                      <td className="py-2.5 px-2 max-w-xs truncate text-[var(--ink-soft)]">
+                      <td className="py-3 px-3 max-w-xs truncate text-slate-600">
                         {item.serverResponse
                           ? `Witnesses: ${item.serverResponse.witnessCount}/${item.serverResponse.witnessTarget}`
                           : item.lastError || (item.status === 'QUEUED' ? 'Pending flush' : '-')}
                       </td>
-                      <td className="py-2.5 px-2">
+                      <td className="py-3 px-3">
                         {item.status === 'FAILED' ? (
                           <div className="flex items-center gap-1.5">
                             <button
                               type="button"
                               data-testid="btn-retry-item"
                               onClick={() => void handleRetryItem(item.clientIdempotencyKey)}
-                              className="px-2.5 py-1.5 min-h-[32px] text-xs font-mono border border-amber-400 text-amber-800 bg-amber-50 hover:bg-amber-100 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-800"
+                              className="px-2.5 py-1.5 min-h-[32px] text-xs font-mono rounded-lg border border-amber-400 text-amber-800 bg-amber-50 hover:bg-amber-100 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber-800"
                               title="Retry this failed observation"
                             >
                               Retry
@@ -797,14 +797,14 @@ export function MonitorPwaClient() {
                               type="button"
                               data-testid="btn-discard-item"
                               onClick={() => void handleDiscardItem(item.clientIdempotencyKey)}
-                              className="px-2 py-1.5 min-h-[32px] text-xs font-mono border border-red-300 text-red-800 bg-white hover:bg-red-50 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-red-800"
+                              className="px-2.5 py-1.5 min-h-[32px] text-xs font-mono rounded-lg border border-red-300 text-red-800 bg-white hover:bg-red-50 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-red-800"
                               title="Discard this failed observation"
                             >
                               Discard
                             </button>
                           </div>
                         ) : (
-                          <span className="text-[10px] text-[var(--ink-soft)]">-</span>
+                          <span className="text-[10px] text-slate-400">-</span>
                         )}
                       </td>
                     </tr>

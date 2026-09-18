@@ -74,11 +74,11 @@ export default async function ServiceCardPage(props: PageProps) {
           `,
         }}
       />
-      <div className="min-h-screen bg-[var(--paper)] text-[var(--ink)] py-10 px-4 print:bg-white print:text-black print:p-0">
+      <div className="min-h-screen bg-slate-50 text-slate-900 py-10 px-4 print:bg-white print:text-black print:p-0">
         <nav aria-label="Return navigation" className="max-w-2xl mx-auto mb-4 print-hide">
           <Link
             href="/"
-            className="font-mono text-xs text-[var(--ink-soft)] hover:text-[var(--ink)] hover:underline inline-flex items-center gap-1 focus:outline-none focus:ring-1 focus:ring-[var(--ink)]"
+            className="font-mono text-xs text-slate-500 hover:text-blue-600 inline-flex items-center gap-1.5 focus:outline-none focus:ring-2 focus:ring-blue-600 font-medium transition-colors"
           >
             ← Return to Proof-Line Overview
           </Link>
@@ -90,20 +90,20 @@ export default async function ServiceCardPage(props: PageProps) {
         {/* Journey navigation */}
         <nav
           aria-label="Proof-Line steps"
-          className="mt-8 pt-4 border-t border-[var(--rule)] flex justify-between items-center font-mono text-[11px] text-[var(--ink-soft)] print-hide"
+          className="max-w-2xl mx-auto mt-8 pt-4 border-t border-slate-200 flex justify-between items-center font-mono text-[11px] text-slate-500 print-hide"
         >
           <Link
             href="/receipt/4412"
-            className="hover:text-[var(--ink)] transition-colors focus:outline-none focus:ring-1 focus:ring-[var(--ink)]"
+            className="hover:text-blue-600 transition-colors focus:outline-none focus:ring-1 focus:ring-blue-600"
           >
             ‹ Step 3: Receipt
           </Link>
-          <span aria-current="step" className="font-bold text-[var(--ink)]">
+          <span aria-current="step" className="font-bold text-slate-900">
             Step 4: Divergence
           </span>
           <Link
             href="/pwa"
-            className="hover:text-[var(--ink)] transition-colors focus:outline-none focus:ring-1 focus:ring-[var(--ink)]"
+            className="hover:text-blue-600 transition-colors focus:outline-none focus:ring-1 focus:ring-blue-600"
           >
             Step 5: Offline PWA ›
           </Link>

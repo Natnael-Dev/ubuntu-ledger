@@ -197,34 +197,34 @@ export default async function ReceiptPage(props: PageProps) {
           </div>
         </nav>
 
-        {/* The Receipt Card Layout (08 §5) */}
-        <article className="receipt-container max-w-[440px] w-full border border-[var(--rule)] bg-[var(--paper)] p-6 shadow-sm font-sans transition-all relative print:bg-white print:text-black print:border-black print:shadow-none">
+        {/* The Receipt Card Layout — Public Verification Artifact */}
+        <article className="receipt-container max-w-[480px] w-full border border-slate-200/90 bg-white p-6 sm:p-8 rounded-2xl shadow-lg shadow-slate-200/50 font-sans transition-all relative print:bg-white print:text-black print:border-black print:shadow-none">
           {/* Perforation top edge */}
-          <div className="perf-bold -mx-6 -mt-6 mb-5" />
+          <div className="perf-bold -mx-6 -mt-6 sm:-mx-8 sm:-mt-8 mb-6" />
 
           {/* Header */}
-          <header className="pb-4 border-b border-[var(--rule)] relative print:bg-white print:text-black print:border-black">
+          <header className="pb-5 border-b border-slate-100 relative print:bg-white print:text-black print:border-black">
             <div className="flex justify-between items-start">
               <div>
-                <div className="flex items-center gap-1.5 mb-1">
-                  <div className="w-3 h-3 border border-[var(--ink)] flex items-center justify-center">
-                    <div className="w-1 h-1 bg-[var(--state-open)]" />
+                <div className="flex items-center gap-2 mb-1.5">
+                  <div className="w-4 h-4 rounded bg-blue-600 flex items-center justify-center text-white">
+                    <span className="text-[10px] font-bold">U</span>
                   </div>
-                  <span className="font-mono text-[10px] font-bold text-[var(--ink)] uppercase tracking-widest">
+                  <span className="font-mono text-[10px] font-bold text-slate-900 uppercase tracking-widest">
                     Ubuntu Ledger
                   </span>
                 </div>
-                <div className="font-mono font-bold tracking-wider text-sm text-[var(--ink)]">
+                <div className="font-bold tracking-tight text-base text-slate-900">
                   {ward.name}
                 </div>
-                <div className="text-xs text-[var(--ink-soft)] font-mono">
-                  {ward.code} · Public spending receipt
+                <div className="text-xs text-slate-500 font-mono mt-0.5">
+                  {ward.code} · Public Spending Receipt
                 </div>
               </div>
 
               {/* Official circular verification stamp */}
-              <div className="shrink-0 opacity-80" title="Ubuntu Ledger Cryptographic Verification Seal">
-                <svg width="52" height="52" viewBox="0 0 52 52" fill="none" className="text-[var(--state-open)]">
+              <div className="shrink-0 opacity-90" title="Ubuntu Ledger Cryptographic Verification Seal">
+                <svg width="56" height="56" viewBox="0 0 52 52" fill="none" className="text-emerald-600">
                   <circle cx="26" cy="26" r="24" stroke="currentColor" strokeWidth="1.5" strokeDasharray="3 2" />
                   <circle cx="26" cy="26" r="19" stroke="currentColor" strokeWidth="0.75" />
                   <path id={`seal-txt-${receipt.projectCode}`} d="M 26,26 m -15,0 a 15,15 0 1,1 30,0 a 15,15 0 1,1 -30,0" fill="none" />
@@ -240,24 +240,24 @@ export default async function ReceiptPage(props: PageProps) {
           </header>
 
           {/* Project Summary Block */}
-          <section className="py-4 border-b border-[var(--rule)]">
+          <section className="py-5 border-b border-slate-100">
             <div className="flex justify-between items-baseline gap-2">
-              <span className="font-mono text-sm font-bold tracking-tight text-[var(--ink)]">
-                {receipt.projectCode}
+              <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-mono font-bold bg-blue-50 text-blue-700 border border-blue-200/60">
+                #{receipt.projectCode}
               </span>
               <span
-                className={`font-mono text-base font-bold tracking-tight text-right ${
-                  isUnofficial ? 'text-[var(--state-none)]' : 'text-[var(--ink)]'
+                className={`font-mono text-xl font-extrabold tracking-tight text-right ${
+                  isUnofficial ? 'text-slate-400' : 'text-slate-900'
                 }`}
               >
                 {formatCurrency(receipt.amountMinor, receipt.currency)}
               </span>
             </div>
-            <h1 className="mt-1 text-base font-semibold leading-snug text-[var(--ink)]">
+            <h1 className="mt-2 text-lg font-bold leading-snug text-slate-900">
               {receipt.title}
             </h1>
-            <div className="mt-3 flex justify-between items-center text-xs text-[var(--ink-soft)] font-mono">
-              <span className="text-[var(--ink)] font-sans">{receipt.contractor}</span>
+            <div className="mt-3 flex justify-between items-center text-xs text-slate-500 font-mono">
+              <span className="text-slate-700 font-medium font-sans">{receipt.contractor}</span>
               <span>{formatPromisedDate(receipt.promisedCompletion)}</span>
             </div>
           </section>

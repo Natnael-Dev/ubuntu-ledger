@@ -1,9 +1,10 @@
 // Homepage — Ubuntu Ledger / Ward Proof-Line
 // Modern civic architecture: Evidence → Human observation → Independent confirmation → Accountability
-// Design North Star: Light canvas (#F8FAFC), crisp surfaces (#FFFFFF), restrained civic blue (#2563EB) accents.
+// Design North Star: Light canvas (#F8FAFC), crisp surfaces (#FFFFFF), restrained charcoal section (#0B0F17), civic blue (#2563EB) accents.
 
 import React from 'react';
 import Link from 'next/link';
+import { UbuntuLedgerIcon } from '@/components/UbuntuLedgerIcon';
 
 export const metadata = {
   title: 'Ward Proof-Line · Ubuntu Ledger — Civic Evidence System',
@@ -92,19 +93,19 @@ const PORTALS = [
 
 export default function HomePage() {
   return (
-    <div className="bg-[#F8FAFC] min-h-screen text-slate-900">
+    <div className="bg-[#F8FAFC] min-h-screen text-slate-900 font-sans">
       {/* ─── Hero Section ──────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden border-b border-slate-200/80 bg-white pt-12 pb-16 md:pt-20 md:pb-24">
+      <section className="relative overflow-hidden border-b border-slate-200/80 bg-white pt-14 pb-18 md:pt-22 md:pb-26">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
-            {/* Tracked Uppercase Eyebrow */}
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-mono font-bold tracking-widest uppercase bg-blue-50 text-blue-700 border border-blue-200/60 mb-5">
-              <span className="w-1.5 h-1.5 rounded-full bg-blue-600" />
+            {/* Tracked Uppercase Eyebrow with Canonical Brand Icon */}
+            <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full text-xs font-mono font-bold tracking-widest uppercase bg-slate-50 text-slate-800 border border-slate-200 shadow-2xs mb-6">
+              <UbuntuLedgerIcon className="w-4 h-4 rounded-sm shrink-0" size={16} />
               <span>CIVIC EVIDENCE SYSTEM // OSF TRACK</span>
             </div>
 
             {/* Primary Brand Heading — Dark Navy Language */}
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-[#0F172A] leading-[1.1] mb-2 font-sans">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-[#0F172A] leading-[1.1] mb-3 font-sans">
               Ward Proof-Line
             </h1>
             <h2 className="text-2xl sm:text-3xl md:text-4xl text-blue-600 font-bold mb-6 font-sans">
@@ -112,33 +113,33 @@ export default function HomePage() {
             </h2>
 
             {/* Mission Paragraph */}
-            <p className="text-base sm:text-lg text-slate-600 leading-relaxed mb-8">
+            <p className="text-base sm:text-lg md:text-xl text-slate-600 leading-relaxed mb-8">
               A modern public evidence system for ward-level infrastructure accountability.
               Citizens in rural Kenya and Ethiopia confirm government works via basic USSD feature phones,
               anchoring public funds to independent physical evidence.
             </p>
 
             {/* Core Principle Banner */}
-            <div className="border-l-4 border-blue-600 bg-blue-50/50 p-4 rounded-r-xl mb-8">
-              <p className="text-sm sm:text-base font-semibold text-[#0F172A]">
-                Core Architectural Rule: <span className="text-blue-700">A contractor cannot close their own ticket.</span>
+            <div className="border-l-4 border-blue-600 bg-blue-50/60 p-5 rounded-r-2xl mb-10 shadow-xs">
+              <p className="text-base sm:text-lg font-bold text-[#0F172A]">
+                Core Architectural Rule: <span className="text-blue-700 font-extrabold">A contractor cannot close their own ticket.</span>
               </p>
-              <p className="text-xs sm:text-sm text-slate-600 mt-1">
-                Database-level constraints enforce citizen quorums and a 7-day probation lock before public funds are unlocked.
+              <p className="text-sm sm:text-base text-slate-600 mt-1.5 leading-relaxed">
+                Database-level constraints enforce citizen quorums and a mandatory 7-day probation lock before public funds are unlocked.
               </p>
             </div>
 
-            {/* Action Buttons */}
+            {/* Large, Tactile Action Buttons */}
             <div className="flex flex-wrap items-center gap-4">
               <Link
                 href="/receipt/4412"
-                className="inline-flex items-center justify-center px-7 py-3.5 rounded-xl text-sm font-semibold bg-blue-600 text-white hover:bg-blue-700 active:scale-95 shadow-sm shadow-blue-500/25 transition-all"
+                className="inline-flex items-center justify-center px-8 py-4 rounded-xl text-base font-semibold bg-blue-600 text-white hover:bg-blue-700 active:scale-98 shadow-sm shadow-blue-500/25 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
               >
                 View Verified Receipt
               </Link>
               <Link
                 href="/simulator"
-                className="inline-flex items-center justify-center px-7 py-3.5 rounded-xl text-sm font-semibold bg-white text-slate-700 hover:bg-slate-50 border border-slate-300 hover:border-slate-400 active:scale-95 transition-all shadow-xs"
+                className="inline-flex items-center justify-center px-8 py-4 rounded-xl text-base font-semibold bg-white text-slate-800 hover:bg-slate-50 hover:text-slate-950 border border-slate-300 hover:border-slate-400 active:scale-98 transition-all shadow-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
               >
                 Feature Phone Simulator
               </Link>
@@ -147,76 +148,76 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ─── Ward Snapshot (Civic Metric Blocks) ───────────────────────── */}
-      <section className="py-12 md:py-16 bg-slate-50/70 border-b border-slate-200">
+      {/* ─── Restrained Charcoal Civic Verification Overview ────────────── */}
+      <section className="py-16 md:py-22 bg-[#0B0F17] text-white border-b border-slate-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-8">
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 pb-6 border-b border-slate-800/80">
             <div>
-              <p className="text-xs font-bold uppercase tracking-wider text-blue-600 mb-1">
+              <p className="text-xs font-mono font-bold uppercase tracking-widest text-emerald-400 mb-2">
                 Woreda 09 · Municipal Audit Status
               </p>
-              <h2 className="text-2xl font-bold tracking-tight text-slate-900">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-white font-sans">
                 Civic Verification Overview
               </h2>
             </div>
-            <p className="text-xs text-slate-500 mt-2 md:mt-0 font-mono">
+            <p className="text-xs sm:text-sm text-slate-400 mt-2 md:mt-0 font-mono">
               Anchor: FY2026 Kirkos Capital Budget
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {/* Metric 1 */}
-            <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm hover:shadow transition-shadow">
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            <div className="bg-[#131924] p-6 rounded-2xl border border-slate-800 shadow-sm hover:border-slate-700 transition-colors">
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
                   Monitored Projects
                 </span>
-                <span className="w-2 h-2 rounded-full bg-blue-600" />
+                <span className="w-2.5 h-2.5 rounded-full bg-blue-500 shadow-xs shadow-blue-500/50" />
               </div>
-              <div className="text-3xl font-extrabold text-slate-900 mb-1">6 Contracts</div>
-              <p className="text-xs text-slate-500">
+              <div className="text-3xl sm:text-4xl font-extrabold text-white mb-2 tabular-nums">6 Contracts</div>
+              <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
                 Generator, borehole, sanitation, & solar assets under active citizen monitoring.
               </p>
             </div>
 
             {/* Metric 2 */}
-            <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm hover:shadow transition-shadow">
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            <div className="bg-[#131924] p-6 rounded-2xl border border-slate-800 shadow-sm hover:border-slate-700 transition-colors">
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
                   Probation Lock
                 </span>
-                <span className="w-2 h-2 rounded-full bg-amber-500" />
+                <span className="w-2.5 h-2.5 rounded-full bg-amber-400 shadow-xs shadow-amber-400/50" />
               </div>
-              <div className="text-3xl font-extrabold text-slate-900 mb-1">7 Days</div>
-              <p className="text-xs text-slate-500">
+              <div className="text-3xl sm:text-4xl font-extrabold text-white mb-2 tabular-nums">7 Days</div>
+              <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
                 Mandatory waiting window enforced by PostgreSQL CHECK constraints.
               </p>
             </div>
 
             {/* Metric 3 */}
-            <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm hover:shadow transition-shadow">
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            <div className="bg-[#131924] p-6 rounded-2xl border border-slate-800 shadow-sm hover:border-slate-700 transition-colors">
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
                   Sybil Defense
                 </span>
-                <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-xs shadow-emerald-400/50" />
               </div>
-              <div className="text-3xl font-extrabold text-slate-900 mb-1">Cluster-Binned</div>
-              <p className="text-xs text-slate-500">
+              <div className="text-2xl sm:text-3xl font-extrabold text-white mb-2">Cluster-Binned</div>
+              <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
                 Telecom cell deduplication stops colluding SIM rings from manipulating quorums.
               </p>
             </div>
 
             {/* Metric 4 */}
-            <div className="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm hover:shadow transition-shadow">
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            <div className="bg-[#131924] p-6 rounded-2xl border border-slate-800 shadow-sm hover:border-slate-700 transition-colors">
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
                   Two-Ledger Split
                 </span>
-                <span className="w-2 h-2 rounded-full bg-indigo-500" />
+                <span className="w-2.5 h-2.5 rounded-full bg-indigo-400 shadow-xs shadow-indigo-400/50" />
               </div>
-              <div className="text-3xl font-extrabold text-slate-900 mb-1">Strict Isolation</div>
-              <p className="text-xs text-slate-500">
+              <div className="text-2xl sm:text-3xl font-extrabold text-white mb-2">Strict Isolation</div>
+              <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
                 Statutory gazette regulations and citizen reports remain cryptographically distinct.
               </p>
             </div>
@@ -228,44 +229,44 @@ export default function HomePage() {
       <section className="py-16 md:py-24 bg-white border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-2xl mb-12">
-            <p className="text-xs font-bold uppercase tracking-wider text-blue-600 mb-1">
+            <p className="text-xs font-bold uppercase tracking-wider text-blue-600 mb-1.5">
               Cryptographic &amp; Institutional Guarantees
             </p>
-            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-slate-900">
               Three Proofs That Power Public Trust
             </h2>
-            <p className="text-sm text-slate-600 mt-2">
+            <p className="text-sm sm:text-base text-slate-600 mt-3 leading-relaxed">
               Unlike typical reporting apps that rely on goodwill, Ubuntu Ledger enforces accountability at the database schema level.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-7">
             {PROOFS.map((proof) => (
               <div
                 key={proof.id}
-                className="bg-slate-50/50 rounded-2xl border border-slate-200 p-6 flex flex-col justify-between hover:border-slate-300 transition-colors"
+                className="bg-slate-50/70 rounded-2xl border border-slate-200 p-7 flex flex-col justify-between hover:border-slate-300 hover:shadow-sm transition-all"
               >
                 <div>
-                  <div className="inline-block px-2.5 py-1 rounded-md text-[11px] font-bold tracking-wider uppercase bg-white border border-slate-200 text-slate-700 mb-4 shadow-sm">
+                  <div className="inline-block px-3 py-1 rounded-md text-xs font-bold tracking-wider uppercase bg-white border border-slate-200 text-slate-700 mb-4 shadow-2xs">
                     {proof.badge}
                   </div>
-                  <h3 className="text-lg font-bold text-slate-900 mb-2">
+                  <h3 className="text-xl font-bold text-slate-900 mb-2.5 font-sans">
                     {proof.title}
                   </h3>
-                  <p className="text-xs font-semibold text-blue-700 mb-3 leading-snug">
+                  <p className="text-sm font-semibold text-blue-700 mb-3.5 leading-snug">
                     &ldquo;{proof.claim}&rdquo;
                   </p>
-                  <p className="text-xs text-slate-600 leading-relaxed mb-6">
+                  <p className="text-sm text-slate-600 leading-relaxed mb-6">
                     {proof.mechanism}
                   </p>
                 </div>
 
                 <Link
                   href={proof.href}
-                  className="inline-flex items-center text-xs font-semibold text-blue-600 hover:text-blue-800 group"
+                  className="inline-flex items-center text-sm font-semibold text-blue-600 hover:text-blue-800 group pt-2 border-t border-slate-200/60"
                 >
                   <span>{proof.action}</span>
-                  <span className="ml-1 group-hover:translate-x-0.5 transition-transform">&rarr;</span>
+                  <span className="ml-1.5 group-hover:translate-x-1 transition-transform">&rarr;</span>
                 </Link>
               </div>
             ))}
@@ -277,13 +278,13 @@ export default function HomePage() {
       <section className="py-16 md:py-24 bg-slate-50/60">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-2xl mb-12">
-            <p className="text-xs font-bold uppercase tracking-wider text-blue-600 mb-1">
+            <p className="text-xs font-bold uppercase tracking-wider text-blue-600 mb-1.5">
               Live Product Surfaces
             </p>
-            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-slate-900">
               Explore the Working Surfaces
             </h2>
-            <p className="text-sm text-slate-600 mt-2">
+            <p className="text-sm sm:text-base text-slate-600 mt-3 leading-relaxed">
               Every route connects to a live backend database and authentic telecom protocol handlers.
             </p>
           </div>
@@ -293,26 +294,26 @@ export default function HomePage() {
               <Link
                 key={portal.href}
                 href={portal.href}
-                className="group bg-white rounded-2xl border border-slate-200 p-6 flex flex-col justify-between hover:border-blue-300 hover:shadow-md transition-all"
+                className="group bg-white rounded-2xl border border-slate-200 p-7 flex flex-col justify-between hover:border-blue-300 hover:shadow-md transition-all"
               >
                 <div>
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-[11px] font-mono text-slate-400 uppercase tracking-wider">
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="text-xs font-mono text-slate-400 uppercase tracking-wider font-semibold">
                       {portal.category}
                     </span>
-                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 group-hover:bg-blue-50 group-hover:text-blue-700 transition-colors">
+                    <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 group-hover:bg-blue-50 group-hover:text-blue-700 transition-colors">
                       {portal.tag}
                     </span>
                   </div>
-                  <h3 className="text-base font-bold text-slate-900 group-hover:text-blue-600 transition-colors mb-2">
+                  <h3 className="text-lg font-bold text-slate-900 group-hover:text-blue-600 transition-colors mb-2.5 font-sans">
                     {portal.title}
                   </h3>
-                  <p className="text-xs text-slate-600 leading-relaxed mb-6">
+                  <p className="text-sm text-slate-600 leading-relaxed mb-6">
                     {portal.description}
                   </p>
                 </div>
 
-                <div className="text-xs font-semibold text-blue-600 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                <div className="text-sm font-semibold text-blue-600 flex items-center gap-1.5 group-hover:translate-x-1 transition-transform pt-3 border-t border-slate-100">
                   <span>Open surface</span>
                   <span>&rarr;</span>
                 </div>
@@ -324,3 +325,4 @@ export default function HomePage() {
     </div>
   );
 }
+

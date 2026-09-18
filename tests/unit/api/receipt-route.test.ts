@@ -5,7 +5,7 @@
 // - docs/specs/04-state-machine.md §6
 // - docs/specs/11-tasks.md T-19
 
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import {
   GET as getWardReceipts,
   POST as postWardReceipts,
@@ -32,11 +32,23 @@ import {
   getServiceContainer,
   resetServiceContainer,
 } from '@/infra/db/container';
-import { DEMO_IDS } from '@/fixtures/demo-scenario';
+import { DEMO_IDS, DEMO_TIMELINE } from '@/fixtures/demo-scenario';
+import { systemClock } from '@/infra/clock';
 
 describe('Receipt API & Contracts (T-19)', () => {
+  // Pin systemClock to DEMO_ANCHOR_TIME so "days remaining" calculations are stable
+  // regardless of the real wall-clock date. DEMO_ANCHOR_TIME is the baseline runtime
+  // where exactly 5 days remain before PROBATION_ENDS_AT (2026-09-22T08:00:00.000Z).
+  let clockSpy: ReturnType<typeof vi.spyOn>;
+
   beforeEach(() => {
     resetServiceContainer();
+    const anchorMs = new Date(DEMO_TIMELINE.DEMO_ANCHOR_TIME).getTime();
+    clockSpy = vi.spyOn(systemClock, 'nowMs').mockReturnValue(anchorMs);
+  });
+
+  afterEach(() => {
+    clockSpy.mockRestore();
   });
 
   describe('1. GET /api/wards/[wardCode]/receipts (05 §4)', () => {

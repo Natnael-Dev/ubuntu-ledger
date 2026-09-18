@@ -58,28 +58,57 @@ export default async function ServiceCardPage(props: PageProps) {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--paper)] text-[var(--ink)] py-10 px-4">
-      <div className="max-w-2xl mx-auto mb-4">
-        <Link
-          href="/"
-          className="font-mono text-xs text-[var(--ink-soft)] hover:text-[var(--ink)] hover:underline inline-flex items-center gap-1"
+    <>
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
+            @media print {
+              body {
+                background: #ffffff !important;
+                color: #000000 !important;
+              }
+              .print-hide {
+                display: none !important;
+              }
+            }
+          `,
+        }}
+      />
+      <div className="min-h-screen bg-[var(--paper)] text-[var(--ink)] py-10 px-4 print:bg-white print:text-black print:p-0">
+        <nav aria-label="Return navigation" className="max-w-2xl mx-auto mb-4 print-hide">
+          <Link
+            href="/"
+            className="font-mono text-xs text-[var(--ink-soft)] hover:text-[var(--ink)] hover:underline inline-flex items-center gap-1 focus:outline-none focus:ring-1 focus:ring-[var(--ink)]"
+          >
+            ← Return to Proof-Line Overview
+          </Link>
+        </nav>
+
+        <h1 className="sr-only">Public Service Fee Divergence Card for {card.serviceCode}</h1>
+        <DivergenceCard card={card} />
+
+        {/* Journey navigation */}
+        <nav
+          aria-label="Proof-Line steps"
+          className="mt-8 pt-4 border-t border-[var(--rule)] flex justify-between items-center font-mono text-[11px] text-[var(--ink-soft)] print-hide"
         >
-          ← Return to Proof-Line Overview
-        </Link>
+          <Link
+            href="/receipt/4412"
+            className="hover:text-[var(--ink)] transition-colors focus:outline-none focus:ring-1 focus:ring-[var(--ink)]"
+          >
+            ‹ Step 3: Receipt
+          </Link>
+          <span aria-current="step" className="font-bold text-[var(--ink)]">
+            Step 4: Divergence
+          </span>
+          <Link
+            href="/pwa"
+            className="hover:text-[var(--ink)] transition-colors focus:outline-none focus:ring-1 focus:ring-[var(--ink)]"
+          >
+            Step 5: Offline PWA ›
+          </Link>
+        </nav>
       </div>
-
-      <h1 className="sr-only">Public Service Fee Divergence Card for {card.serviceCode}</h1>
-      <DivergenceCard card={card} />
-
-      {/* Journey navigation */}
-      <div className="mt-8 pt-4 border-t border-[var(--rule)] flex justify-between items-center font-mono text-[11px] text-[var(--ink-soft)]">
-        <Link href="/receipt/4412" className="hover:text-[var(--ink)] transition-colors">
-          ‹ Step 3: Receipt
-        </Link>
-        <Link href="/pwa" className="hover:text-[var(--ink)] transition-colors">
-          Step 5: Offline PWA ›
-        </Link>
-      </div>
-    </div>
+    </>
   );
 }

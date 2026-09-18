@@ -8,7 +8,7 @@
 // - docs/specs/04-state-machine.md §3, §7 (INV-01)
 // - docs/specs/05-api-contracts.md §8 (POST /api/repairs/[id]/claim, POST /api/repairs/[id]/close)
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import type { FiscalState, AuditState, ProbationState } from '@/domain/types';
 import { NarrativeState } from '@/components/NarrativeState';
@@ -55,6 +55,88 @@ function formatCurrency(minor: number, currency: string): string {
   })}`;
 }
 
+/**
+ * Accessible Focus Trap Hook (Audit #71)
+ * Traps Tab / Shift+Tab within the active modal container, handles Escape key to dismiss,
+ * and restores focus to the trigger element on unmount/close.
+ */
+function useFocusTrap(
+  isOpen: boolean,
+  containerRef: React.RefObject<HTMLElement | null>,
+  triggerRef: React.RefObject<HTMLElement | null>,
+  onClose: () => void
+) {
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const el = containerRef.current;
+    if (!el) return;
+
+    const focusableSelector =
+      'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+    // Focus initial element (prefer first input, else first focusable)
+    const focusables = Array.from(el.querySelectorAll<HTMLElement>(focusableSelector)).filter(
+      (node) => node.offsetParent !== null
+    );
+
+    if (focusables.length > 0) {
+      const firstInput = el.querySelector<HTMLElement>('input:not([disabled])');
+      if (firstInput && firstInput.offsetParent !== null) {
+        firstInput.focus();
+      } else {
+        focusables[0].focus();
+      }
+    } else {
+      el.focus();
+    }
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        e.stopPropagation();
+        onClose();
+        return;
+      }
+
+      if (e.key === 'Tab') {
+        const currentFocusables = Array.from(
+          el.querySelectorAll<HTMLElement>(focusableSelector)
+        ).filter((node) => node.offsetParent !== null);
+
+        if (currentFocusables.length === 0) {
+          e.preventDefault();
+          return;
+        }
+
+        const first = currentFocusables[0];
+        const last = currentFocusables[currentFocusables.length - 1];
+
+        if (e.shiftKey) {
+          if (document.activeElement === first || !el.contains(document.activeElement)) {
+            e.preventDefault();
+            last.focus();
+          }
+        } else {
+          if (document.activeElement === last || !el.contains(document.activeElement)) {
+            e.preventDefault();
+            first.focus();
+          }
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      // Restore focus on dismiss (Audit #71)
+      if (triggerRef.current) {
+        triggerRef.current.focus();
+      }
+    };
+  }, [isOpen, containerRef, triggerRef, onClose]);
+}
+
 export function ProjectBoard({
   initialProjects,
   wardName,
@@ -86,6 +168,47 @@ export function ProjectBoard({
 
   // Close attempt state
   const [isAttemptingClose, setIsAttemptingClose] = useState<string | null>(null);
+
+  // Focus Management Refs (Audit #71)
+  const claimModalRef = useRef<HTMLDivElement>(null);
+  const claimTriggerRef = useRef<HTMLElement | null>(null);
+  const refusalModalRef = useRef<HTMLDivElement>(null);
+  const refusalTriggerRef = useRef<HTMLElement | null>(null);
+
+  const closeClaimModal = useCallback(() => {
+    setClaimModalProject(null);
+  }, []);
+
+  const closeAlertBanner = useCallback(() => {
+    setAlertBanner(null);
+  }, []);
+
+  useFocusTrap(
+    Boolean(claimModalProject),
+    claimModalRef,
+    claimTriggerRef,
+    closeClaimModal
+  );
+
+  useFocusTrap(
+    alertBanner?.type === 'refusal',
+    refusalModalRef,
+    refusalTriggerRef,
+    closeAlertBanner
+  );
+
+  // Presentation Stat Totals & Locked Definition (Audit #75 / Task 3)
+  const totalBudgetMinor = projects.reduce((acc, p) => acc + p.amountMinor, 0);
+  const lockedBudgetMinor = projects
+    .filter((p) => p.fiscal === 'COMMITTED')
+    .reduce((acc, p) => acc + p.amountMinor, 0);
+  const currencyCode = projects[0]?.currency || 'ETB';
+  const activeProbationCount = projects.filter(
+    (p) =>
+      p.probationState === 'REPAIR_CLAIMED' ||
+      p.probationState === 'PROBATION_ACTIVE' ||
+      p.probationState === 'PROBATION_DAY_0'
+  ).length;
 
   function handleSort(field: SortField) {
     if (sortField === field) {
@@ -341,22 +464,47 @@ export function ProjectBoard({
         </div>
       </div>
 
-      {/* Alert / Notice Banner */}
+      {/* Alert / Notice Banner & Statutory Refusal Modal */}
       {alertBanner && (
         alertBanner.type === 'refusal' ? (
-          /* Statutory Refusal Card — INV-01 cryptographic enforcement (409 E_PROBATION_LOCKED) */
+          /* Statutory Refusal Modal Dialog — INV-01 cryptographic enforcement (409 E_PROBATION_LOCKED) */
           <div
-            data-testid="console-alert-banner"
-            role="alert"
-            className="border-2 border-[var(--ink)] bg-[var(--paper)] p-4 text-xs font-mono"
+            className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4"
+            onClick={(e) => {
+              if (e.target === e.currentTarget) closeAlertBanner();
+            }}
           >
-            <div className="flex items-start justify-between gap-3">
-              <div className="space-y-2 flex-1">
-                <div className="flex items-center gap-2 text-amber-800 font-bold text-[11px] uppercase tracking-wider">
-                  <span className="w-2.5 h-2.5 bg-amber-600 inline-block" />
-                  STATUTORY REFUSAL — PROBATION ACTIVE
+            <div
+              data-testid="console-alert-banner"
+              ref={refusalModalRef}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="refusal-modal-title"
+              aria-describedby="refusal-modal-desc"
+              tabIndex={-1}
+              className="border-2 border-[var(--ink)] bg-[var(--paper)] p-5 text-xs font-mono w-full max-w-lg shadow-none focus:outline-none space-y-3"
+            >
+              <div className="flex items-start justify-between gap-3 border-b border-[var(--rule)] pb-2">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2 text-amber-800 font-bold text-[11px] uppercase tracking-wider">
+                    <span className="w-2.5 h-2.5 bg-amber-600 inline-block" />
+                    STATUTORY REFUSAL — PROBATION ACTIVE
+                  </div>
+                  <h3 id="refusal-modal-title" className="font-bold text-sm text-[var(--ink)]">
+                    {alertBanner.title}
+                  </h3>
                 </div>
-                <div className="font-bold text-[var(--ink)]">{alertBanner.title}</div>
+                <button
+                  type="button"
+                  onClick={closeAlertBanner}
+                  className="text-neutral-500 hover:text-black font-mono font-bold px-2 py-1 text-xs border border-[var(--rule)] bg-white hover:bg-neutral-50 focus-visible:ring-2 focus-visible:ring-[var(--ink)] focus:outline-none flex-shrink-0"
+                  aria-label="Close statutory refusal dialog"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <div id="refusal-modal-desc" className="space-y-2">
                 <p className="text-[11px] leading-relaxed text-[var(--ink)] opacity-90">{alertBanner.message}</p>
                 <div className="bg-[var(--paper-warm)] border border-amber-200 p-2.5 space-y-1 text-[10px]">
                   <div className="flex gap-3">
@@ -381,28 +529,32 @@ export function ProjectBoard({
                 <p className="text-[10px] text-[var(--ink-soft)] italic">
                   This refusal is evidence the system is working as designed. No role — not ADMIN, not MODERATOR — may bypass INV-01.
                 </p>
-                <div className="mt-4 pt-3 border-t border-[var(--rule)] flex items-center justify-between">
-                  <span className="font-mono text-[10px] text-[var(--ink-soft)]">Proof B verified — probation lock active</span>
+              </div>
+
+              <div className="mt-4 pt-3 border-t border-[var(--rule)] flex items-center justify-between">
+                <span className="font-mono text-[10px] text-[var(--ink-soft)]">Proof B verified — probation lock active</span>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={closeAlertBanner}
+                    className="px-2.5 py-1 text-xs font-mono border border-[var(--rule)] bg-white hover:bg-neutral-50 text-[var(--ink)] focus-visible:ring-2 focus-visible:ring-[var(--ink)] focus:outline-none"
+                  >
+                    Dismiss
+                  </button>
                   <Link
                     href="/receipt/4412"
-                    className="font-mono text-[11px] text-[var(--ink)] hover:underline transition-colors"
+                    className="px-2.5 py-1 text-xs font-mono bg-[var(--ink)] text-[var(--paper)] hover:opacity-90 transition-colors focus-visible:ring-2 focus-visible:ring-[var(--ink)] focus:outline-none inline-block"
                   >
                     Step 3: Public Receipt ›
                   </Link>
                 </div>
               </div>
-              <button
-                type="button"
-                onClick={() => setAlertBanner(null)}
-                className="text-neutral-500 hover:text-black font-mono font-bold px-1 flex-shrink-0"
-              >
-                ✕
-              </button>
             </div>
           </div>
         ) : (
         <div
           data-testid="console-alert-banner"
+          role="alert"
           className={`p-3 border text-xs font-mono flex items-start justify-between gap-3 ${
             alertBanner.type === 'error'
               ? 'bg-red-50 border-red-300 text-red-900'
@@ -427,14 +579,67 @@ export function ProjectBoard({
           </div>
           <button
             type="button"
-            onClick={() => setAlertBanner(null)}
-            className="text-neutral-500 hover:text-black font-mono font-bold px-1"
+            onClick={closeAlertBanner}
+            className="text-neutral-500 hover:text-black font-mono font-bold px-1 focus-visible:ring-2 focus-visible:ring-[var(--ink)] focus:outline-none"
+            aria-label="Close notification banner"
           >
             ✕
           </button>
         </div>
         )
       )}
+
+      {/* Ledger Stats Bar with Explicit "Locked" Stat Definition (Audit #75 / Task 3) */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 border border-[var(--rule)] bg-white p-3 font-mono">
+        <div className="space-y-1">
+          <div className="text-[10px] text-[var(--ink-soft)] uppercase tracking-wider">
+            Total Allocated Budget
+          </div>
+          <div className="text-base font-bold text-[var(--ink)] tabular-nums">
+            {formatCurrency(totalBudgetMinor, currencyCode)}
+          </div>
+          <div className="text-[10px] text-[var(--ink-soft)]">
+            {projects.length} municipal infrastructure projects
+          </div>
+        </div>
+
+        <div className="space-y-1 border-t sm:border-t-0 sm:border-l border-[var(--rule)] pt-2 sm:pt-0 sm:pl-3">
+          <div className="flex items-center gap-1.5">
+            <span className="text-[10px] text-[var(--ink-soft)] uppercase tracking-wider">
+              Locked in Escrow
+            </span>
+            <span
+              className="inline-flex items-center px-1 py-0.2 text-[9px] font-semibold bg-amber-100 text-amber-900 border border-amber-300"
+              title="Statutory definition: Funds committed / held in escrow / non-disbursable pending community verification"
+            >
+              STATUTORY HOLD
+            </span>
+          </div>
+          <div className="text-base font-bold text-amber-900 tabular-nums">
+            {formatCurrency(lockedBudgetMinor, currencyCode)}
+          </div>
+          <p className="text-[10px] text-amber-900/90 leading-tight">
+            <strong>Locked stat definition:</strong> funds committed / held in escrow / non-disbursable pending community verification.
+          </p>
+        </div>
+
+        <div className="space-y-1 border-t sm:border-t-0 sm:border-l border-[var(--rule)] pt-2 sm:pt-0 sm:pl-3">
+          <div className="flex items-center gap-1.5">
+            <span className="text-[10px] text-[var(--ink-soft)] uppercase tracking-wider">
+              Probation Lock (INV-01)
+            </span>
+            <span className="inline-flex items-center px-1 py-0.2 text-[9px] font-semibold bg-neutral-100 text-[var(--ink)] border border-[var(--rule)]">
+              RULE INV-01
+            </span>
+          </div>
+          <div className="text-base font-bold text-[var(--ink)] tabular-nums">
+            {activeProbationCount} under review
+          </div>
+          <p className="text-[10px] text-[var(--ink-soft)] leading-tight">
+            Closure locked for 7 days post-repair claim. Contractor self-close is cryptographically refused.
+          </p>
+        </div>
+      </div>
 
       {/* Table Filters & Search */}
         <div className="flex flex-wrap items-center justify-between gap-3 py-1">
@@ -495,46 +700,59 @@ export function ProjectBoard({
       {/* Dense Table (08-ui-ux-design.md §7) */}
       <div className="border border-[var(--rule)] bg-white overflow-x-auto">
         <table className="w-full min-w-[780px] text-left border-collapse text-xs">
+          <caption className="sr-only">
+            Municipal Project Board Ledger for {wardName} ({wardCode}) — tracking project codes, contracts, amounts, fiscal status, audit verification, citizen witness counts, and repair probation states.
+          </caption>
           <thead>
             <tr className="border-b border-[var(--rule)] bg-neutral-50 text-[11px] font-mono text-[var(--ink-soft)] uppercase tracking-wider">
               <th
-                className="py-2 px-3 cursor-pointer select-none hover:text-[var(--ink)]"
+                scope="col"
+                className="py-2 px-3 cursor-pointer select-none hover:text-[var(--ink)] focus-visible:ring-1 focus-visible:ring-[var(--ink)] focus-visible:outline-none"
                 onClick={() => handleSort('projectCode')}
               >
                 Code {sortField === 'projectCode' && (sortAsc ? '▲' : '▼')}
               </th>
               <th
-                className="py-2 px-3 cursor-pointer select-none hover:text-[var(--ink)]"
+                scope="col"
+                className="py-2 px-3 cursor-pointer select-none hover:text-[var(--ink)] focus-visible:ring-1 focus-visible:ring-[var(--ink)] focus-visible:outline-none"
                 onClick={() => handleSort('title')}
               >
                 Project Title {sortField === 'title' && (sortAsc ? '▲' : '▼')}
               </th>
               <th
-                className="py-2 px-3 cursor-pointer select-none text-right hover:text-[var(--ink)]"
+                scope="col"
+                className="py-2 px-3 cursor-pointer select-none text-right hover:text-[var(--ink)] focus-visible:ring-1 focus-visible:ring-[var(--ink)] focus-visible:outline-none"
                 onClick={() => handleSort('amountMinor')}
               >
                 Amount {sortField === 'amountMinor' && (sortAsc ? '▲' : '▼')}
               </th>
               <th
-                className="py-2 px-3 cursor-pointer select-none hover:text-[var(--ink)]"
+                scope="col"
+                className="py-2 px-3 cursor-pointer select-none hover:text-[var(--ink)] focus-visible:ring-1 focus-visible:ring-[var(--ink)] focus-visible:outline-none"
                 onClick={() => handleSort('fiscal')}
               >
                 Fiscal {sortField === 'fiscal' && (sortAsc ? '▲' : '▼')}
               </th>
               <th
-                className="py-2 px-3 cursor-pointer select-none hover:text-[var(--ink)]"
+                scope="col"
+                className="py-2 px-3 cursor-pointer select-none hover:text-[var(--ink)] focus-visible:ring-1 focus-visible:ring-[var(--ink)] focus-visible:outline-none"
                 onClick={() => handleSort('audit')}
               >
                 Audit State {sortField === 'audit' && (sortAsc ? '▲' : '▼')}
               </th>
               <th
-                className="py-2 px-3 cursor-pointer select-none text-center hover:text-[var(--ink)]"
+                scope="col"
+                className="py-2 px-3 cursor-pointer select-none text-center hover:text-[var(--ink)] focus-visible:ring-1 focus-visible:ring-[var(--ink)] focus-visible:outline-none"
                 onClick={() => handleSort('witnesses')}
               >
                 Witnesses {sortField === 'witnesses' && (sortAsc ? '▲' : '▼')}
               </th>
-              <th className="py-2 px-3">Probation Countdown</th>
-              <th className="py-2 px-3 text-right">Actions</th>
+              <th scope="col" className="py-2 px-3">
+                Probation Countdown
+              </th>
+              <th scope="col" className="py-2 px-3 text-right">
+                Actions
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-[var(--rule)] font-mono text-xs">
@@ -559,7 +777,7 @@ export function ProjectBoard({
                   <td className="py-2.5 px-3 font-bold font-mono">
                     <Link
                       href={`/receipt/${p.projectCode}`}
-                      className="text-blue-700 hover:underline inline-flex items-center gap-1"
+                      className="text-blue-700 hover:underline inline-flex items-center gap-1 focus-visible:ring-1 focus-visible:ring-[var(--ink)] focus-visible:outline-none"
                       title="View public spending receipt"
                     >
                       <span>{p.projectCode}</span>
@@ -583,6 +801,16 @@ export function ProjectBoard({
                   {/* Fiscal State */}
                   <td className="py-2.5 px-3 whitespace-nowrap">
                     <NarrativeState kind="fiscal" state={p.fiscal} />
+                    {p.fiscal === 'COMMITTED' && (
+                      <div className="mt-0.5">
+                        <span
+                          className="inline-block text-[9px] font-mono text-amber-900 bg-amber-50 border border-amber-300 px-1 py-0.2 cursor-help"
+                          title="Locked: funds committed / held in escrow / non-disbursable pending community verification"
+                        >
+                          Locked: Escrow ⓘ
+                        </span>
+                      </div>
+                    )}
                   </td>
 
                   {/* Audit State */}
@@ -620,11 +848,12 @@ export function ProjectBoard({
                       <button
                         type="button"
                         data-testid={`claim-btn-${p.projectCode}`}
-                        onClick={() => {
+                        onClick={(e) => {
+                          claimTriggerRef.current = e.currentTarget;
                           setClaimModalProject(p);
                           setClaimedByInput(p.contractorName || 'AfroTech Infra');
                         }}
-                        className="px-2 py-1 text-xs font-mono font-medium border border-amber-600 bg-amber-50 text-amber-900 hover:bg-amber-100 transition-colors"
+                        className="px-2 py-1 text-xs font-mono font-medium border border-amber-600 bg-amber-50 text-amber-900 hover:bg-amber-100 transition-colors focus-visible:ring-2 focus-visible:ring-[var(--ink)] focus:outline-none"
                       >
                         [Record Claim]
                       </button>
@@ -636,8 +865,11 @@ export function ProjectBoard({
                           type="button"
                           data-testid={`attempt-close-btn-${p.projectCode}`}
                           disabled={isAttemptingClose === p.ticketId}
-                          onClick={() => attemptEarlyClose(p.ticketId!, p.projectCode)}
-                          className="px-2 py-1 text-[11px] font-mono border border-[var(--rule)] bg-white hover:bg-red-50 text-[var(--ink-soft)] hover:text-red-800 transition-colors disabled:opacity-50"
+                          onClick={(e) => {
+                            refusalTriggerRef.current = e.currentTarget;
+                            attemptEarlyClose(p.ticketId!, p.projectCode);
+                          }}
+                          className="px-2 py-1 text-[11px] font-mono border border-[var(--rule)] bg-white hover:bg-red-50 text-[var(--ink-soft)] hover:text-red-800 transition-colors disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-[var(--ink)] focus:outline-none"
                           title="Attempt to close probation early (will demonstrate 409 lock)"
                         >
                           {isAttemptingClose === p.ticketId ? 'Checking...' : '[Attempt Close]'}
@@ -703,24 +935,36 @@ export function ProjectBoard({
       {/* Claim Repair Modal */}
       {claimModalProject && (
         <div
-          data-testid="claim-repair-modal"
-          className="fixed inset-0 z-50 bg-black/40 backdrop-blur-[1px] flex items-center justify-center p-4"
+          className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) closeClaimModal();
+          }}
         >
-          <div className="bg-white border border-[var(--rule)] w-full max-w-md p-5 space-y-4 shadow-none">
+          <div
+            data-testid="claim-repair-modal"
+            ref={claimModalRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="claim-modal-title"
+            aria-describedby="claim-modal-desc"
+            tabIndex={-1}
+            className="bg-white border border-[var(--rule)] w-full max-w-md p-5 space-y-4 shadow-none focus:outline-none"
+          >
             <div className="flex items-center justify-between border-b border-[var(--rule)] pb-2">
-              <h3 className="text-sm font-mono font-bold uppercase text-[var(--ink)]">
+              <h3 id="claim-modal-title" className="text-sm font-mono font-bold uppercase text-[var(--ink)]">
                 Record Contractor Claim // Project {claimModalProject.projectCode}
               </h3>
               <button
                 type="button"
-                onClick={() => setClaimModalProject(null)}
-                className="text-neutral-400 hover:text-black font-mono"
+                onClick={closeClaimModal}
+                className="text-neutral-400 hover:text-black font-mono focus-visible:ring-2 focus-visible:ring-[var(--ink)] focus:outline-none px-1"
+                aria-label="Close claim dialog"
               >
                 ✕
               </button>
             </div>
 
-            <div className="text-xs font-mono space-y-1 bg-neutral-50 p-2.5 border border-[var(--rule)]">
+            <div id="claim-modal-desc" className="text-xs font-mono space-y-1 bg-neutral-50 p-2.5 border border-[var(--rule)]">
               <div className="text-[var(--ink-soft)]">Target Project:</div>
               <div className="font-semibold text-[var(--ink)]">{claimModalProject.title}</div>
               <div className="text-[11px] text-[var(--ink-soft)]">
@@ -739,7 +983,7 @@ export function ProjectBoard({
                   data-testid="claim-contractor-input"
                   value={claimedByInput}
                   onChange={(e) => setClaimedByInput(e.target.value)}
-                  className="w-full px-2.5 py-1.5 text-xs font-mono border border-[var(--rule)] bg-white text-[var(--ink)] focus:outline-none focus:border-[var(--ink)]"
+                  className="w-full px-2.5 py-1.5 text-xs font-mono border border-[var(--rule)] bg-white text-[var(--ink)] focus:outline-none focus:border-[var(--ink)] focus-visible:ring-1 focus-visible:ring-[var(--ink)]"
                   placeholder="e.g. AfroTech Infra"
                 />
               </div>
@@ -753,7 +997,7 @@ export function ProjectBoard({
                   data-testid="claim-note-input"
                   value={evidenceNoteInput}
                   onChange={(e) => setEvidenceNoteInput(e.target.value)}
-                  className="w-full px-2.5 py-1.5 text-xs font-mono border border-[var(--rule)] bg-white text-[var(--ink)] focus:outline-none focus:border-[var(--ink)]"
+                  className="w-full px-2.5 py-1.5 text-xs font-mono border border-[var(--rule)] bg-white text-[var(--ink)] focus:outline-none focus:border-[var(--ink)] focus-visible:ring-1 focus-visible:ring-[var(--ink)]"
                   placeholder="e.g. Stator rewound, commissioned under load"
                 />
               </div>
@@ -765,7 +1009,7 @@ export function ProjectBoard({
                 <select
                   value={actorRoleInput}
                   onChange={(e) => setActorRoleInput(e.target.value as 'ADMIN' | 'INGEST_REVIEWER')}
-                  className="w-full px-2.5 py-1.5 text-xs font-mono border border-[var(--rule)] bg-white text-[var(--ink)] focus:outline-none focus:border-[var(--ink)]"
+                  className="w-full px-2.5 py-1.5 text-xs font-mono border border-[var(--rule)] bg-white text-[var(--ink)] focus:outline-none focus:border-[var(--ink)] focus-visible:ring-1 focus-visible:ring-[var(--ink)]"
                 >
                   <option value="ADMIN">ADMIN (Municipal Administrator)</option>
                   <option value="INGEST_REVIEWER">INGEST_REVIEWER (Verification Specialist)</option>
@@ -782,8 +1026,8 @@ export function ProjectBoard({
               <div className="flex items-center justify-end gap-2 pt-2 border-t border-[var(--rule)]">
                 <button
                   type="button"
-                  onClick={() => setClaimModalProject(null)}
-                  className="px-3 py-1.5 text-xs font-mono border border-[var(--rule)] hover:bg-neutral-50 text-[var(--ink-soft)]"
+                  onClick={closeClaimModal}
+                  className="px-3 py-1.5 text-xs font-mono border border-[var(--rule)] hover:bg-neutral-50 text-[var(--ink-soft)] focus-visible:ring-2 focus-visible:ring-[var(--ink)] focus:outline-none"
                 >
                   Cancel
                 </button>
@@ -791,7 +1035,7 @@ export function ProjectBoard({
                   type="submit"
                   disabled={isSubmittingClaim}
                   data-testid="claim-submit-btn"
-                  className="px-3 py-1.5 text-xs font-mono font-medium bg-[var(--ink)] text-[var(--paper)] hover:opacity-90 disabled:opacity-50"
+                  className="px-3 py-1.5 text-xs font-mono font-medium bg-[var(--ink)] text-[var(--paper)] hover:opacity-90 disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-[var(--ink)] focus:outline-none"
                 >
                   {isSubmittingClaim ? 'Recording...' : 'Record Claim in Ledger'}
                 </button>

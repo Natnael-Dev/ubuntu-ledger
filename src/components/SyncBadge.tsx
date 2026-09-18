@@ -34,13 +34,21 @@ export function SyncBadge({ className = '', onSyncTrigger }: SyncBadgeProps) {
     const handleOnline = () => setIsOnline(engine.isOnline());
     const handleOffline = () => setIsOnline(false);
 
+    const handleRefresh = async () => {
+      const s = await engine.getSummary();
+      setSummary(s);
+      setIsOnline(engine.isOnline());
+    };
+
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
+    window.addEventListener('outbox-updated', handleRefresh);
 
     return () => {
       unsubscribe();
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
+      window.removeEventListener('outbox-updated', handleRefresh);
     };
   }, []);
 
@@ -57,20 +65,22 @@ export function SyncBadge({ className = '', onSyncTrigger }: SyncBadgeProps) {
   // Determine visual state
   if (!isOnline) {
     return (
-      <div
+      <button
+        type="button"
         data-testid="sync-badge"
         onClick={handleClick}
-        className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-mono rounded border transition-colors cursor-pointer bg-amber-50 text-amber-900 border-amber-300 ${className}`}
+        aria-label={`Network offline. ${summary.queued > 0 ? `${summary.queued} queued.` : ''} Click to check sync status.`}
+        className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-mono rounded border transition-colors cursor-pointer bg-amber-50 text-amber-900 border-amber-300 hover:bg-amber-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-amber-800 ${className}`}
         title="Network offline. Click to check sync status."
       >
-        <span className="w-2 h-2 rounded-full bg-amber-500" />
+        <span className="w-2 h-2 rounded-full bg-amber-500 shrink-0" aria-hidden="true" />
         <span data-testid="sync-status">Offline</span>
         {summary.queued > 0 && (
           <span data-testid="sync-count" className="font-semibold">
             ({summary.queued} queued)
           </span>
         )}
-      </div>
+      </button>
     );
   }
 
@@ -78,9 +88,12 @@ export function SyncBadge({ className = '', onSyncTrigger }: SyncBadgeProps) {
     return (
       <div
         data-testid="sync-badge"
+        role="status"
+        aria-live="polite"
+        aria-label={`Syncing ${summary.syncing} observations in flight.`}
         className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-mono rounded border bg-amber-50 text-amber-900 border-amber-300 animate-pulse ${className}`}
       >
-        <span className="w-2 h-2 rounded-full bg-amber-600 animate-ping" />
+        <span className="w-2 h-2 rounded-full bg-amber-600 animate-ping shrink-0" aria-hidden="true" />
         <span data-testid="sync-status">Syncing</span>
         <span data-testid="sync-count">({summary.syncing} in flight)...</span>
       </div>
@@ -89,48 +102,54 @@ export function SyncBadge({ className = '', onSyncTrigger }: SyncBadgeProps) {
 
   if (summary.failed > 0) {
     return (
-      <div
+      <button
+        type="button"
         data-testid="sync-badge"
         onClick={handleClick}
-        className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-mono rounded border transition-colors cursor-pointer bg-red-50 text-red-900 border-red-300 hover:bg-red-100 ${className}`}
+        aria-label={`Sync error: ${summary.failed} observation(s) failed. Click to retry.`}
+        className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-mono rounded border transition-colors cursor-pointer bg-red-50 text-red-900 border-red-300 hover:bg-red-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-red-800 ${className}`}
         title="Some observations failed to sync. Click to retry."
       >
-        <span className="w-2 h-2 rounded-full bg-red-600" />
+        <span className="w-2 h-2 rounded-full bg-red-600 shrink-0" aria-hidden="true" />
         <span data-testid="sync-status">Sync error</span>
         <span data-testid="sync-count" className="font-semibold">
           ({summary.failed} failed)
         </span>
-      </div>
+      </button>
     );
   }
 
   if (summary.queued > 0) {
     return (
-      <div
+      <button
+        type="button"
         data-testid="sync-badge"
         onClick={handleClick}
-        className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-mono rounded border transition-colors cursor-pointer bg-amber-50 text-amber-900 border-amber-300 hover:bg-amber-100 ${className}`}
+        aria-label={`Online: ${summary.queued} pending observations queued. Click to sync now.`}
+        className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-mono rounded border transition-colors cursor-pointer bg-amber-50 text-amber-900 border-amber-300 hover:bg-amber-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-amber-800 ${className}`}
         title="Pending observations. Click to sync now."
       >
-        <span className="w-2 h-2 rounded-full bg-amber-500" />
+        <span className="w-2 h-2 rounded-full bg-amber-500 shrink-0" aria-hidden="true" />
         <span data-testid="sync-status">Online</span>
         <span data-testid="sync-count" className="font-semibold">
           ({summary.queued} queued)
         </span>
-      </div>
+      </button>
     );
   }
 
   return (
-    <div
+    <button
+      type="button"
       data-testid="sync-badge"
       onClick={handleClick}
-      className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-mono rounded border transition-colors cursor-pointer bg-emerald-50 text-emerald-800 border-emerald-300 hover:bg-emerald-100 ${className}`}
+      aria-label="Online: all observations synced. Click to refresh."
+      className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-mono rounded border transition-colors cursor-pointer bg-emerald-50 text-emerald-800 border-emerald-300 hover:bg-emerald-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-emerald-800 ${className}`}
       title="All observations synced. Click to refresh."
     >
-      <span className="w-2 h-2 rounded-full bg-emerald-500" />
+      <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" aria-hidden="true" />
       <span data-testid="sync-status">Online</span>
       <span data-testid="sync-count">(All synced)</span>
-    </div>
+    </button>
   );
 }

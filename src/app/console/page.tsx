@@ -4,6 +4,7 @@
 // - docs/specs/11-tasks.md T-22
 // - docs/specs/15-deployment-and-run.md §2 (http://localhost:3000/console)
 
+import React from 'react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import {
@@ -78,7 +79,7 @@ export default function ConsolePage() {
               </div>
               <Link
                 href="/simulator"
-                className="px-2 py-1 border border-[var(--rule)] bg-white hover:bg-neutral-50 text-[var(--ink)] transition-colors inline-flex items-center gap-1"
+                className="px-2 py-1 border border-[var(--rule)] bg-white hover:bg-neutral-50 text-[var(--ink)] transition-colors inline-flex items-center gap-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ink)]"
                 target="_blank"
               >
                 <span>Simulator</span>
@@ -88,13 +89,23 @@ export default function ConsolePage() {
           </div>
 
           {/* Console Section Header */}
-          <div className="flex items-center gap-2 border-b border-[var(--rule)] px-4 py-2">
-            <span className="font-mono text-xs font-semibold text-[var(--ink)] bg-[var(--ink)] text-[var(--paper)] px-3 py-1.5">
-              Project Board
-            </span>
-            <span className="font-mono text-[10px] text-[var(--ink-soft)] uppercase">
-              {ward.name} · {projectItems.length} Projects
-            </span>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[var(--rule)] px-4 py-2 bg-neutral-50/50">
+            <div className="flex items-center gap-2">
+              <span className="font-mono text-xs font-semibold text-[var(--ink)] bg-[var(--ink)] text-[var(--paper)] px-3 py-1.5">
+                Project Board
+              </span>
+              <span className="font-mono text-[10px] text-[var(--ink-soft)] uppercase">
+                {ward.name} · {projectItems.length} Projects
+              </span>
+            </div>
+            <div className="text-[11px] font-mono text-[var(--ink-soft)] flex items-center gap-1.5">
+              <span className="border border-amber-300 bg-amber-50 text-amber-900 px-1.5 py-0.5 text-[10px] font-medium uppercase">
+                Stat: Locked Funds
+              </span>
+              <span className="text-[10px] text-[var(--ink-soft)]">
+                Funds committed / held in escrow / non-disbursable pending community verification
+              </span>
+            </div>
           </div>
         </header>
 

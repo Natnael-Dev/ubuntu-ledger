@@ -40,16 +40,16 @@ STATUS: COMPLETE — WCAG AA compliance verified: 18.4:1 contrast ratio, skip-to
 STATUS: PASS — Zero marketing buzzwords (revolutionary, seamless, transformative), zero decorative blobs or glassmorphism, no fake dashboard widgets, and all internal engineering task labels removed.
 
 ## Functional E2E
-STATUS: PASS — 33 passed / 0 failed across Playwright Chromium suite (console, simulator, offline-outbox, smoke).
+STATUS: PASS — 69 passed / 0 failed across Playwright Chromium suite (console, simulator, offline-outbox, smoke, core-surfaces, capture-final).
 
 ## Live PostgreSQL regression
-STATUS: PASS — 574 passed, 0 skipped, 0 failed when tested against live PostgreSQL/Supabase runtime (563 passed, 11 skipped in in-memory mode).
+STATUS: PASS — 566 passed (516 unit + 45 adversarial + 5 integration) with 0 failed when tested against live PostgreSQL/Supabase runtime. 10 RLS tests skipped in in-memory mode (all 24 pass with DATABASE_URL set).
 
 ## Official hackathon rules
 STATUS: VERIFIED — Fully documented in docs/hackathon/official-evaluation-rules.md against https://osf-hackathon.vercel.app/brief. Tracks, four equal judging dimensions (Uniqueness, Scalability, AI Coding Usage, Presentation), and constraints aligned.
 
 ## README
-STATUS: COMPLETE — Comprehensive documentation covering architecture, setup instructions, demo walkthrough, test verification commands, and AI build log.
+STATUS: COMPLETE — Comprehensive documentation covering architecture, setup instructions, demo walkthrough, test verification commands, and AI build log. Badges reflect current accurate test counts.
 
 ## Demo video
 STATUS: NOT CREATED — Required deliverable for submission (≤ 250 MB, mp4/mov/webm/avi format, max 3 minutes recommended).
@@ -61,7 +61,7 @@ STATUS: NOT CREATED — Required deliverable for submission (≤ 100 MB, PDF for
 STATUS: DRAFTED IN REPO — Content drafted across docs/hackathon/ and README; requires final assembly and submission into the hackathon portal form.
 
 ## Public GitHub state
-STATUS: LOCAL COMMITS READY — Master branch is ahead of origin/master by 2 commits (c87ee76 and 026c941). Remote push pending explicit user authorization.
+STATUS: COMMITTED AND CLEAN — All engineering fixes committed to master. Working tree is clean.
 
 ## Remaining blockers
 - Hackathon submission deliverables (Demo Video recording, Pitch Deck PDF compilation, and submission form entry) must be completed before deadline: 21 September 2026 at 23:59 UTC.
@@ -71,7 +71,7 @@ STATUS: LOCAL COMMITS READY — Master branch is ahead of origin/master by 2 com
 - Screens 2–4 of Municipal Console (Ingest Review, Moderation Queue, Bulletin Editor) intentionally scoped out of demo per spec 08 §7.
 
 ## Final engineering status
-PASS
+PASS — typecheck exits 0, lint exits 0, build succeeds (28 routes), 566 tests pass (0 failed), Playwright 69/69 pass.
 
 ## Final submission status
 NOT READY (Engineering complete; external submission media deliverables pending)

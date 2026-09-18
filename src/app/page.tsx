@@ -153,7 +153,65 @@ export default function Home() {
           <blockquote className="mt-5 border-l-2 border-[var(--ink)] pl-4 font-mono text-sm text-[var(--ink)]">
             &ldquo;A contractor cannot close their own ticket.&rdquo;
           </blockquote>
+
+          {/* Hero Actions: Verified Public Receipt #4412 first, followed by Feature Phone Simulator */}
+          <div className="mt-6 flex flex-wrap items-center gap-3">
+            <Link
+              href="/receipt/4412"
+              className="inline-flex items-center gap-2 bg-[var(--ink)] text-[var(--paper)] px-4 py-2 font-mono text-xs font-semibold hover:bg-black transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--state-open)] focus:ring-offset-2 rounded"
+            >
+              <span>View Verified Receipt #4412</span>
+              <span aria-hidden="true">→</span>
+            </Link>
+            <Link
+              href="/simulator"
+              className="inline-flex items-center gap-2 border border-[var(--rule)] bg-white px-4 py-2 font-mono text-xs text-[var(--ink)] hover:border-[var(--ink)] transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--ink)] focus:ring-offset-1 rounded"
+            >
+              <span>Feature Phone Simulator (*890#)</span>
+              <span aria-hidden="true">→</span>
+            </Link>
+          </div>
         </header>
+
+        {/* ── Ward Snapshot & Benchmark Data (Audit #36: Honest Framing, Zero Fake Telemetry) ── */}
+        <section aria-labelledby="benchmark-heading" className="mt-8 mb-2 p-4 bg-[var(--paper-warm)] border border-[var(--rule)] font-mono text-xs">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[var(--rule)] pb-2 mb-3">
+            <div className="flex items-center gap-2">
+              <span className="text-[9px] font-bold uppercase tracking-wider text-[var(--ink)] border border-[var(--rule)] px-1.5 py-0.5 bg-white">
+                WARD SNAPSHOT
+              </span>
+              <h2 id="benchmark-heading" className="text-[11px] uppercase tracking-widest text-[var(--ink)] font-bold">
+                Woreda 09 &amp; Roy Hill Benchmark
+              </h2>
+            </div>
+            <span className="text-[9.5px] text-[var(--ink-soft)] uppercase tracking-wider">
+              BENCHMARK DATA · NOT LIVE TELEMETRY
+            </span>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div>
+              <div className="text-[10px] text-[var(--ink-soft)] uppercase">Monitored Projects</div>
+              <div className="text-base font-bold text-[var(--ink)] mt-0.5">6 Contracts</div>
+              <div className="text-[10px] text-[var(--ink-soft)]">ETB 950k committed</div>
+            </div>
+            <div>
+              <div className="text-[10px] text-[var(--ink-soft)] uppercase">Probation Lock</div>
+              <div className="text-base font-bold text-[var(--state-hold)] mt-0.5">7 Days</div>
+              <div className="text-[10px] text-[var(--ink-soft)]">Mandatory DB rule</div>
+            </div>
+            <div>
+              <div className="text-[10px] text-[var(--ink-soft)] uppercase">Sybil Defense</div>
+              <div className="text-base font-bold text-[var(--state-open)] mt-0.5">Cluster Binned</div>
+              <div className="text-[10px] text-[var(--ink-soft)]">Zero inflated witnesses</div>
+            </div>
+            <div>
+              <div className="text-[10px] text-[var(--ink-soft)] uppercase">Two-Ledger Split</div>
+              <div className="text-base font-bold text-[var(--ink)] mt-0.5">k &ge; 5 Anonymity</div>
+              <div className="text-[10px] text-[var(--ink-soft)]">Zero averaging gap</div>
+            </div>
+          </div>
+        </section>
 
         <Rule />
 
@@ -207,12 +265,12 @@ export default function Home() {
             <div className="w-full overflow-x-auto py-3">
               <div className="hidden md:flex items-start gap-0 min-w-[700px]">
                 {[
-                  { id: 'citizen', label: 'Citizen Report', sub: 'USSD *890# · PWA', n: '01', active: false },
-                  { id: 'validate', label: 'Input Validation', sub: 'Schema & Completeness', n: '02', active: false },
-                  { id: 'cluster', label: 'Cluster / Sybil', sub: 'Cell & Prefix Weighting', n: '03', active: true },
-                  { id: 'triangulate', label: 'Triangulation', sub: 'Multi-Cluster Witnesses', n: '04', active: true },
-                  { id: 'probation', label: 'Probation Gate', sub: '7-Day DB Constraint Lock', n: '05', active: true },
-                  { id: 'receipt', label: 'Public Receipt', sub: 'SHA-256 Provenance Chain', n: '06', active: true },
+                  { id: 'source', label: 'Source', sub: 'Gazette & Budget Citation', n: '01', active: false },
+                  { id: 'observation', label: 'Observation', sub: 'Citizen USSD / PWA Report', n: '02', active: false },
+                  { id: 'triangulation', label: 'Triangulation', sub: 'Multi-Cluster Sybil Defense', n: '03', active: true },
+                  { id: 'probation', label: 'Probation', sub: '7-Day DB Constraint Lock', n: '04', active: true },
+                  { id: 'two-ledger', label: 'Two-Ledger', sub: 'Statutory vs Field Split', n: '05', active: true },
+                  { id: 'public-proof', label: 'Public Proof', sub: 'SHA-256 Sealed Receipt', n: '06', active: true },
                 ].map((node, i, arr) => (
                   <div key={node.id} className="flex items-start flex-1">
                     <div className="flex flex-col items-center flex-1 min-w-0">
@@ -247,12 +305,12 @@ export default function Home() {
               {/* Mobile vertical flow */}
               <div className="md:hidden flex flex-col items-center gap-1.5">
                 {[
-                  { id: 'citizen', label: '01 · Citizen Report', sub: 'USSD *890# · PWA' },
-                  { id: 'validate', label: '02 · Input Validation', sub: 'Schema & Completeness' },
-                  { id: 'cluster', label: '03 · Cluster / Sybil', sub: 'Cell & Prefix Weighting' },
-                  { id: 'triangulate', label: '04 · Triangulation', sub: 'Multi-Cluster Witnesses' },
-                  { id: 'probation', label: '05 · Probation Gate', sub: '7-Day DB Constraint Lock' },
-                  { id: 'receipt', label: '06 · Public Receipt', sub: 'SHA-256 Provenance Chain' },
+                  { id: 'source', label: '01 · Source', sub: 'Gazette & Budget Citation' },
+                  { id: 'observation', label: '02 · Observation', sub: 'Citizen USSD / PWA Report' },
+                  { id: 'triangulation', label: '03 · Triangulation', sub: 'Multi-Cluster Sybil Defense' },
+                  { id: 'probation', label: '04 · Probation', sub: '7-Day DB Constraint Lock' },
+                  { id: 'two-ledger', label: '05 · Two-Ledger', sub: 'Statutory vs Field Split' },
+                  { id: 'public-proof', label: '06 · Public Proof', sub: 'SHA-256 Sealed Receipt' },
                 ].map((node) => (
                   <div key={node.id} className="w-full border border-[var(--rule)] bg-[var(--paper)] p-2 flex justify-between items-center text-xs font-mono">
                     <span className="font-bold text-[var(--ink)]">{node.label}</span>
@@ -308,10 +366,10 @@ export default function Home() {
 
         {/* ── Section 4: Demo Portals ──────────────────────────────────────── */}
         <section aria-labelledby="demo-heading">
-          <SectionLabel>Evaluation &amp; Live Demo Portals</SectionLabel>
+          <SectionLabel>Evaluation &amp; Interactive Demo Portals</SectionLabel>
 
           <h2 id="demo-heading" className="text-xl font-semibold text-[var(--ink)] mb-6">
-            All five surfaces are live. Click to explore.
+            All five surfaces are interactive and verifiable. Click to explore.
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -410,14 +468,19 @@ export default function Home() {
 
           <div className="flex flex-col sm:flex-row gap-8 font-mono text-xs">
             <div>
-              <p className="font-semibold text-[var(--ink)] mb-2">CI Test Results</p>
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-[9px] font-bold uppercase tracking-wider text-[var(--ink)] border border-[var(--rule)] px-1.5 py-0.5 bg-[var(--paper-warm)]">
+                  BENCHMARK DATA
+                </span>
+                <p className="font-semibold text-[var(--ink)]">CI Test Results</p>
+              </div>
               <ul className="space-y-1 text-[var(--ink-soft)]">
                 <li>Vitest unit suite: 576 passed, 0 failed</li>
                 <li>Playwright E2E: 63 passed / 63</li>
                 <li>Adversarial (fail-closed): 30 passed</li>
               </ul>
               <p className="text-[10px] text-[var(--ink-soft)] mt-2 leading-relaxed">
-                Automated suite · verified at submission build.
+                Automated suite · verified benchmark at submission build.
               </p>
 
             </div>

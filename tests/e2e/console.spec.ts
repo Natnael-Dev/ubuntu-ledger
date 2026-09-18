@@ -8,6 +8,11 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('T-22: Operator Console — Project Board & Repair Claim', () => {
+  // Serial mode: this suite mutates shared in-memory project state (demo-reset-btn,
+  // claim submission, early-close attempt). Parallel execution causes workers to
+  // race on that state and produces flaky modal-visibility failures.
+  test.describe.configure({ mode: 'serial' });
+
   test.beforeEach(async ({ page }) => {
     await page.goto('/console');
   });

@@ -195,6 +195,30 @@ code, kbd, samp, .font-mono {
   outline-offset: 2px;
 }
 
+/* ─── Reduced Motion (Audit #114) ────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .phone-key:active,
+  .phone-key.pressed {
+    transform: none !important;
+  }
+
+  .animate-pulse,
+  .animate-ping,
+  .animate-bounce,
+  .animate-spin {
+    animation: none !important;
+  }
+}
+
 /* ─── Print ──────────────────────────────────────────────── */
 @media print {
   nav, footer, .no-print { display: none !important; }

@@ -2,7 +2,7 @@
 
 > **Ward Proof-Line turns a line in a local government budget into a five-minute physical check a neighbour can answer on a feature phone — and refuses to let a contractor close their own ticket.**
 
-[![CI Status](https://img.shields.io/badge/CI-passing-brightgreen)](#) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE) [![Test Coverage](https://img.shields.io/badge/Vitest-574%20passed-success)](#) [![Playwright E2E](https://img.shields.io/badge/Playwright-33%2F33%20passed-success)](#)
+[![CI Status](https://img.shields.io/badge/CI-passing-brightgreen)](#) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE) [![Test Coverage](https://img.shields.io/badge/Vitest-566%20passed-success)](#) [![Playwright E2E](https://img.shields.io/badge/Playwright-69%2F69%20passed-success)](#)
 
 ---
 
@@ -68,13 +68,13 @@ npm run lint
 # 2. TypeScript compilation
 npx tsc --noEmit
 
-# 3. Complete Vitest Suite (574 tests across 39 test files)
-npm test -- --run
+# 3. Complete Vitest Suite (566 tests across 40 test files: 35 unit, 3 adversarial, 2 integration)
+npm run test:unit && npm run test:adversarial && npm run test:integration
 
-# 4. Playwright End-to-End Suite (33 tests across 8 workers)
+# 4. Playwright End-to-End Suite (69 tests across 6 spec files)
 npx playwright test
 
-# 5. Next.js Production Build (26 routes compiled cleanly)
+# 5. Next.js Production Build (28 routes compiled cleanly)
 npm run build
 ```
 

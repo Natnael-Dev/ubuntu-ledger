@@ -64,11 +64,18 @@ export default function SimulatorPage() {
         clusterKey: DEMO_PERSONAS.ORIGINAL_REPORTER_2.clusterKey,
         role: 'witness',
       },
+      {
+        id: 'kalinda',
+        label: 'Kalinda (Resident - Fee Verification)',
+        msisdn: '+251999000015',
+        clusterKey: 'et-aa-0919-fee',
+        role: 'resident',
+      },
     ],
   };
 
   return (
-    <div className="bg-[var(--paper)] min-h-screen">
+    <div id="simulator-container" className="bg-[var(--paper)] min-h-screen">
       <div className="max-w-7xl mx-auto p-4 md:p-8 pb-0">
         {/* USSD Orientation Banner */}
         <div className="bg-[var(--paper-warm)] border border-[var(--rule)] p-4 mb-6">
@@ -84,7 +91,7 @@ export default function SimulatorPage() {
         </div>
 
         {/* Demo Checkpoint Guide */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
           <div className="border border-[var(--rule)] p-3">
             <p className="font-mono text-[10px] uppercase tracking-widest text-[var(--state-hold)] font-bold mb-1">Step 1 · Amina</p>
             <p className="font-mono text-xs text-[var(--ink)]">Witness quorum: 2 of 3 → <strong>3 of 3</strong></p>
@@ -95,6 +102,11 @@ export default function SimulatorPage() {
             <p className="font-mono text-xs text-[var(--ink)]">Witness quorum stays at <strong>3 of 3</strong> — suppressed</p>
             <p className="text-xs text-[var(--ink-soft)] mt-1">Switch to Girma, repeat. Backend rejects duplicate cluster.</p>
           </div>
+          <div className="border border-[var(--rule)] p-3" data-testid="step-3-kalinda">
+            <p className="font-mono text-[10px] uppercase tracking-widest text-[var(--state-open)] font-bold mb-1">Step 3 · Kalinda (Audit #56)</p>
+            <p className="font-mono text-xs text-[var(--ink)]">Statutory Fee: <strong>210 ETB</strong></p>
+            <p className="text-xs text-[var(--ink-soft)] mt-1">Statutory Fee: 210 ETB | Resident reported paying: ~200 ETB (Variance within standard margin).</p>
+          </div>
         </div>
       </div>
 
@@ -102,14 +114,14 @@ export default function SimulatorPage() {
 
       <div className="max-w-7xl mx-auto p-4 md:p-8 pt-0">
         {/* Journey navigation */}
-        <div className="mt-8 pt-4 border-t border-[var(--rule)] flex justify-between items-center font-mono text-[11px] text-[var(--ink-soft)]">
-          <Link href="/" className="hover:text-[var(--ink)] transition-colors">
+        <nav aria-label="Journey navigation" className="mt-8 pt-4 border-t border-[var(--rule)] flex justify-between items-center font-mono text-[11px] text-[var(--ink-soft)]">
+          <Link href="/" className="hover:text-[var(--ink)] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ink)] rounded">
             ‹ Overview
           </Link>
-          <Link href="/console" className="hover:text-[var(--ink)] transition-colors font-semibold text-[var(--ink)]">
+          <Link href="/console" className="hover:text-[var(--ink)] transition-colors font-semibold text-[var(--ink)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ink)] rounded">
             Proof A complete — Step 2: Probation Lock ›
           </Link>
-        </div>
+        </nav>
       </div>
     </div>
   );

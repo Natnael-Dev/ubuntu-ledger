@@ -48,41 +48,46 @@ function stripPrefix(text: string): string {
   return text.replace(/^(CON|END)\s*/, '').trim();
 }
 
-/** Split a long string into 20-char LCD rows */
+/** Split a long string into 20-char LCD rows, respecting newlines */
 function toRows(text: string, width = 20): string[] {
-  const words = text.split(' ');
+  const lines = text.split(/\r?\n/);
   const rows: string[] = [];
-  let current = '';
-  for (const word of words) {
-    if (current.length === 0) {
-      // word itself may be too long - hard-break it
-      if (word.length > width) {
-        let remaining = word;
-        while (remaining.length > width) {
-          rows.push(remaining.slice(0, width));
-          remaining = remaining.slice(width);
+  for (const line of lines) {
+    const trimmedLine = line.trim();
+    if (!trimmedLine) continue;
+    const words = trimmedLine.split(' ');
+    let current = '';
+    for (const word of words) {
+      if (!word) continue;
+      if (current.length === 0) {
+        if (word.length > width) {
+          let remaining = word;
+          while (remaining.length > width) {
+            rows.push(remaining.slice(0, width));
+            remaining = remaining.slice(width);
+          }
+          current = remaining;
+        } else {
+          current = word;
         }
-        current = remaining;
+      } else if (current.length + 1 + word.length <= width) {
+        current += ' ' + word;
       } else {
-        current = word;
-      }
-    } else if (current.length + 1 + word.length <= width) {
-      current += ' ' + word;
-    } else {
-      rows.push(current.padEnd(width));
-      if (word.length > width) {
-        let remaining = word;
-        while (remaining.length > width) {
-          rows.push(remaining.slice(0, width));
-          remaining = remaining.slice(width);
+        rows.push(current.padEnd(width));
+        if (word.length > width) {
+          let remaining = word;
+          while (remaining.length > width) {
+            rows.push(remaining.slice(0, width));
+            remaining = remaining.slice(width);
+          }
+          current = word;
+        } else {
+          current = word;
         }
-        current = remaining;
-      } else {
-        current = word;
       }
     }
+    if (current.length > 0) rows.push(current);
   }
-  if (current.length > 0) rows.push(current);
   return rows;
 }
 
@@ -92,6 +97,7 @@ const ROLE_BADGE: Record<string, { label: string; css: string }> = {
   primary: { label: 'DEMO WITNESS', css: 'bg-green-100 text-green-800 border border-green-300' },
   duplicate: { label: 'DUPLICATE CLUSTER', css: 'bg-red-100 text-red-800 border border-red-300' },
   witness: { label: 'PRE-SEEDED', css: 'bg-gray-100 text-gray-700 border border-gray-300' },
+  resident: { label: 'FEE VERIFIER', css: 'bg-amber-100 text-amber-800 border border-amber-300' },
 };
 
 // ─── Keypad layout ────────────────────────────────────────────────────────────
@@ -102,6 +108,22 @@ const KEYPAD_ROWS = [
   ['7', '8', '9'],
   ['*', '0', '#'],
 ];
+
+/** Accessible name for each keypad key (Audit #41) */
+const KEY_ARIA_LABEL: Record<string, string> = {
+  '0': 'Digit 0',
+  '1': 'Digit 1',
+  '2': 'Digit 2',
+  '3': 'Digit 3',
+  '4': 'Digit 4',
+  '5': 'Digit 5',
+  '6': 'Digit 6',
+  '7': 'Digit 7',
+  '8': 'Digit 8',
+  '9': 'Digit 9',
+  '*': 'Asterisk – Send',
+  '#': 'Hash – End',
+};
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
@@ -120,6 +142,7 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
   const [transcript, setTranscript] = useState<TranscriptEntry[]>([]);
   const [loading, setLoading] = useState(false);
   const [lastRawResponse, setLastRawResponse] = useState<string>('');
+  const [invalidInputNotice, setInvalidInputNotice] = useState<string | null>(null);
   const seqRef = useRef(0);
 
   const transcriptRef = useRef<HTMLDivElement>(null);
@@ -139,6 +162,25 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
     []
   );
 
+  // ── End current session ────────────────────────────────────────────────────
+
+  const endSession = useCallback(() => {
+    if (!session?.isAlive) return;
+    setSession((s) => (s ? { ...s, isAlive: false } : null));
+    setInvalidInputNotice(null);
+    addTranscriptEntry('info', '[END] Call session ended by user');
+    if (selectedPersona.id === 'kalinda') {
+      setLcdLines([
+        'Session ended',
+        'Statutory: 210 ETB',
+        'Reported: ~200 ETB',
+        'Variance: std margin',
+      ]);
+    } else {
+      setLcdLines(['Call ended', 'Press DIAL to retry', '', 'Ward Proof-Line']);
+    }
+  }, [session, selectedPersona, addTranscriptEntry]);
+
   // ── Start a fresh session ──────────────────────────────────────────────────
 
   const startSession = useCallback(async () => {
@@ -156,6 +198,7 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
     setLoading(true);
     setLastRawResponse('');
     setActiveAudioKeys([]);
+    setInvalidInputNotice(null);
 
     addTranscriptEntry(
       'info',
@@ -182,16 +225,37 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
 
         if (!res.ok) {
           setLcdLines([`HTTP ${res.status}`, rawText.slice(0, 60)]);
-          setSession((s) => s ? { ...s, isAlive: false } : null);
+          setSession((s) => (s ? { ...s, isAlive: false } : null));
           return;
         }
 
         const isEnd = isEndResponse(rawText);
-        const rows = toRows(stripPrefix(rawText));
-        setLcdLines(rows);
+        const stripped = stripPrefix(rawText);
+        const isInvalid = /Invalid entry|Invalid input|ልክ ያልሆነ|Galtee sirrii/i.test(stripped);
+
+        if (isInvalid) {
+          setInvalidInputNotice('Invalid input, try again');
+          addTranscriptEntry('info', '[INVALID] Invalid input, try again');
+          const cleaned = stripped.replace(/^(Invalid entry\.|ልክ ያልሆነ ግቤት።|Galtee sirrii hin taane\.)\s*/i, '');
+          const rows = toRows(cleaned);
+          setLcdLines(['! INVALID INPUT !', 'Invalid input,', 'try again.', ...(rows.slice(0, 1))]);
+        } else {
+          setInvalidInputNotice(null);
+          if (isEnd && selectedPersona.id === 'kalinda') {
+            setLcdLines([
+              'Statutory: 210 ETB',
+              'Reported: ~200 ETB',
+              'Variance: std margin',
+              'Verified by circular',
+            ]);
+          } else {
+            const rows = toRows(stripped);
+            setLcdLines(rows);
+          }
+        }
         setShowMore(false);
         if (isEnd) {
-          setSession((s) => s ? { ...s, isAlive: false } : null);
+          setSession((s) => (s ? { ...s, isAlive: false } : null));
         } else {
           setSession(newSession);
         }
@@ -213,7 +277,7 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
 
         if (!res.ok) {
           setLcdLines([`HTTP ${res.status}`, rawJson.slice(0, 60)]);
-          setSession((s) => s ? { ...s, isAlive: false } : null);
+          setSession((s) => (s ? { ...s, isAlive: false } : null));
           addTranscriptEntry('received', rawJson);
           return;
         }
@@ -231,7 +295,7 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
         ]);
 
         if (data.action === 'END') {
-          setSession((s) => s ? { ...s, isAlive: false } : null);
+          setSession((s) => (s ? { ...s, isAlive: false } : null));
         } else {
           setSession(newSession);
         }
@@ -239,7 +303,7 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       setLcdLines(['Network error', msg.slice(0, 60)]);
-      setSession((s) => s ? { ...s, isAlive: false } : null);
+      setSession((s) => (s ? { ...s, isAlive: false } : null));
       addTranscriptEntry('info', `[ERROR] ${msg}`);
     } finally {
       setLoading(false);
@@ -279,16 +343,37 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
 
           if (!res.ok) {
             setLcdLines([`HTTP ${res.status}`, rawText.slice(0, 60)]);
-            setSession((s) => s ? { ...s, isAlive: false } : null);
+            setSession((s) => (s ? { ...s, isAlive: false } : null));
             return;
           }
 
           const isEnd = isEndResponse(rawText);
-          const rows = toRows(stripPrefix(rawText));
-          setLcdLines(rows);
+          const stripped = stripPrefix(rawText);
+          const isInvalid = /Invalid entry|Invalid input|ልክ ያልሆነ|Galtee sirrii/i.test(stripped);
+
+          if (isInvalid) {
+            setInvalidInputNotice('Invalid input, try again');
+            addTranscriptEntry('info', '[INVALID] Invalid input, try again');
+            const cleaned = stripped.replace(/^(Invalid entry\.|ልክ ያልሆነ ግቤት።|Galtee sirrii hin taane\.)\s*/i, '');
+            const rows = toRows(cleaned);
+            setLcdLines(['! INVALID INPUT !', 'Invalid input,', 'try again.', ...(rows.slice(0, 1))]);
+          } else {
+            setInvalidInputNotice(null);
+            if (isEnd && selectedPersona.id === 'kalinda') {
+              setLcdLines([
+                'Statutory: 210 ETB',
+                'Reported: ~200 ETB',
+                'Variance: std margin',
+                'Verified by circular',
+              ]);
+            } else {
+              const rows = toRows(stripped);
+              setLcdLines(rows);
+            }
+          }
           setShowMore(false);
           if (isEnd) {
-            setSession((s) => s ? { ...s, isAlive: false } : null);
+            setSession((s) => (s ? { ...s, isAlive: false } : null));
           } else {
             setSession(updatedSession);
           }
@@ -310,7 +395,7 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
 
           if (!res.ok) {
             setLcdLines([`HTTP ${res.status}`, rawJson.slice(0, 60)]);
-            setSession((s) => s ? { ...s, isAlive: false } : null);
+            setSession((s) => (s ? { ...s, isAlive: false } : null));
             addTranscriptEntry('received', rawJson);
             return;
           }
@@ -328,7 +413,7 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
           ]);
 
           if (data.action === 'END') {
-            setSession((s) => s ? { ...s, isAlive: false } : null);
+            setSession((s) => (s ? { ...s, isAlive: false } : null));
           } else {
             setSession(updatedSession);
           }
@@ -336,13 +421,36 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
       } catch (err) {
         const msg = err instanceof Error ? err.message : String(err);
         setLcdLines(['Network error', msg.slice(0, 60)]);
-        setSession((s) => s ? { ...s, isAlive: false } : null);
+        setSession((s) => (s ? { ...s, isAlive: false } : null));
         addTranscriptEntry('info', `[ERROR] ${msg}`);
       } finally {
         setLoading(false);
       }
     },
-    [session, loading, channelMode, addTranscriptEntry]
+    [session, loading, channelMode, selectedPersona, addTranscriptEntry]
+  );
+
+  // ── Keypad press handler with unhandled key protection ────────────────────
+
+  const handleKeypadPress = useCallback(
+    (key: string) => {
+      if (!session?.isAlive || loading) return;
+
+      if (key === '#') {
+        endSession();
+        return;
+      }
+
+      if (key === '*') {
+        setInvalidInputNotice('Invalid input, try again');
+        setLcdLines(['! INVALID INPUT !', 'Key "*" unhandled', 'Please enter a', 'valid menu option']);
+        addTranscriptEntry('info', '[INVALID] Key "*" is unhandled in this menu. Try again.');
+        return;
+      }
+
+      sendInput(key);
+    },
+    [session, loading, endSession, sendInput, addTranscriptEntry]
   );
 
   // ── Keyboard support ─────────────────────────────────────────────────────
@@ -368,7 +476,17 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
       setSelectedPersona(persona);
       setSession(null);
       setInputBuffer('');
-      setLcdLines(['Ward Proof-Line', 'Feature-Phone Sim', '', 'Select persona']);
+      setInvalidInputNotice(null);
+      if (persona.id === 'kalinda') {
+        setLcdLines([
+          'Kalinda · Woreda 09',
+          'Statutory: 210 ETB',
+          'Reported: ~200 ETB',
+          'Press DIAL to verify',
+        ]);
+      } else {
+        setLcdLines(['Ward Proof-Line', 'Feature-Phone Sim', '', 'Select persona']);
+      }
       setLastRawResponse('');
       addTranscriptEntry('info', `[SWITCH] Now using ${persona.label} (${persona.msisdn})`);
     },
@@ -405,20 +523,23 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
         <div className="flex flex-col gap-4 w-full lg:w-72 shrink-0">
 
           {/* ── Channel Mode Switch (USSD / IVR) ── */}
-          <div className="flex gap-2 p-1 bg-gray-100 rounded-lg border border-[var(--rule)] w-full">
+          <div role="tablist" aria-label="Channel mode" className="flex gap-2 p-1 bg-gray-100 rounded-lg border border-[var(--rule)] w-full">
             <button
               type="button"
+              role="tab"
+              aria-selected={channelMode === 'USSD'}
               data-testid="mode-ussd"
               onClick={() => {
                 setChannelMode('USSD');
                 setSession(null);
                 setActiveAudioKeys([]);
+                setInvalidInputNotice(null);
                 setLcdLines(['Ward Proof-Line', 'Feature-Phone Sim', '', 'Select persona']);
                 setLastRawResponse('');
                 addTranscriptEntry('info', '[MODE] Switched to USSD text transport (*890#)');
               }}
               className={[
-                'flex-1 py-1.5 text-xs font-semibold rounded-md transition-colors',
+                'flex-1 py-1.5 text-xs font-semibold rounded-md transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ink)]',
                 channelMode === 'USSD'
                   ? 'bg-white text-[var(--ink)] shadow-sm border border-gray-200'
                   : 'text-gray-500 hover:text-gray-900',
@@ -428,17 +549,20 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
             </button>
             <button
               type="button"
+              role="tab"
+              aria-selected={channelMode === 'IVR'}
               data-testid="mode-ivr"
               onClick={() => {
                 setChannelMode('IVR');
                 setSession(null);
                 setActiveAudioKeys([]);
+                setInvalidInputNotice(null);
                 setLcdLines(['Ward Proof-Line', 'IVR Voice Engine', '', 'Press DIAL to call']);
                 setLastRawResponse('');
                 addTranscriptEntry('info', '[MODE] Switched to IVR voice audio transport (/api/ivr)');
               }}
               className={[
-                'flex-1 py-1.5 text-xs font-semibold rounded-md transition-colors',
+                'flex-1 py-1.5 text-xs font-semibold rounded-md transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ink)]',
                 channelMode === 'IVR'
                   ? 'bg-white text-[var(--ink)] shadow-sm border border-gray-200'
                   : 'text-gray-500 hover:text-gray-900',
@@ -460,10 +584,12 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
                 return (
                   <button
                     key={p.id}
+                    type="button"
                     onClick={() => switchPersona(p)}
                     aria-pressed={isActive}
+                    aria-current={isActive ? 'true' : undefined}
                     className={[
-                      'flex flex-col text-left rounded-lg border px-3 py-2 transition-all text-sm',
+                      'flex flex-col text-left rounded-lg border px-3 py-2 transition-all text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ink)]',
                       isActive
                         ? 'border-[var(--state-open)] bg-green-50 ring-1 ring-[var(--state-open)]'
                         : 'border-[var(--rule)] hover:border-[var(--ink-soft)]',
@@ -523,7 +649,8 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
         </div>
 
         {/* Column 2: The Physical Feature Phone Handset (Center Hero) */}
-        <div className="w-full lg:w-80 flex flex-col items-center shrink-0">
+        <section aria-label="Feature Phone Handset" className="w-full lg:w-80 flex flex-col items-center shrink-0">
+          <h2 className="sr-only">Feature-Phone Handset</h2>
           <div
             data-testid="feature-phone"
             className="rounded-3xl border-4 border-[var(--shell)] bg-[var(--shell)] shadow-2xl w-72"
@@ -553,6 +680,11 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
                 <span data-testid="phone-number">{selectedPersona.msisdn.replace('+', '')}</span>
                 <span className="flex items-center gap-1">
                   {loading && <span className="animate-pulse">●</span>}
+                  {invalidInputNotice && (
+                    <span className="font-bold text-red-900 bg-amber-300/90 px-1 rounded" data-testid="invalid-badge">
+                      !RETRY
+                    </span>
+                  )}
                   <span>{session ? (session.isAlive ? 'SIM' : 'END') : 'IDLE'}</span>
                 </span>
               </div>
@@ -572,12 +704,36 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
               })}
             </div>
 
+            {/* Invalid Input Banner Alert (Audit #41 / Task 2) */}
+            {invalidInputNotice && (
+              <div
+                role="alert"
+                data-testid="invalid-input-banner"
+                className="mx-3 mt-1.5 p-1.5 bg-amber-100 border border-amber-300 rounded text-[11px] font-mono text-amber-950 flex items-center justify-between"
+              >
+                <span className="flex items-center gap-1 truncate">
+                  <span aria-hidden="true">⚠️</span>
+                  <span className="truncate">{invalidInputNotice}</span>
+                </span>
+                <button
+                  type="button"
+                  aria-label="Dismiss error notice"
+                  onClick={() => setInvalidInputNotice(null)}
+                  className="text-amber-800 hover:text-amber-950 font-bold ml-1 text-sm focus:outline-none focus-visible:ring-1 focus-visible:ring-amber-800 px-1 rounded shrink-0"
+                >
+                  ×
+                </button>
+              </div>
+            )}
+
             {/* Scroll Button (if overflow) */}
             {lcdLines.length > 4 && (
               <div className="mx-3 mt-1 flex justify-center">
                 <button
+                  type="button"
+                  aria-label={showMore ? 'Scroll LCD display up' : 'Scroll LCD display down'}
                   onClick={() => setShowMore(!showMore)}
-                  className="text-[10px] font-bold text-gray-400 hover:text-gray-200 uppercase tracking-widest bg-gray-700 px-3 py-0.5 rounded-full"
+                  className="text-[10px] font-bold text-gray-400 hover:text-gray-200 uppercase tracking-widest bg-gray-700 px-3 py-0.5 rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
                 >
                   {showMore ? '[scroll ▴]' : '[scroll ▾]'}
                 </button>
@@ -599,11 +755,14 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
             {/* Operator action buttons */}
             <div className="mx-3 mt-2 flex gap-2">
               <button
+                type="button"
                 onClick={startSession}
                 disabled={loading}
+                aria-label={session?.isAlive ? 'Redial session' : channelMode === 'USSD' ? 'Dial star 890 hash' : 'Call IVR voice engine'}
                 data-testid="btn-dial"
                 className={[
                   'flex-1 rounded-lg py-1.5 text-xs font-semibold transition-colors',
+                  'focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900',
                   loading
                     ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                     : 'bg-[var(--state-open)] text-white hover:opacity-90 active:opacity-75',
@@ -611,11 +770,26 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
               >
                 {session?.isAlive ? '↺ REDIAL' : channelMode === 'USSD' ? 'DIAL *890#' : 'CALL IVR'}
               </button>
+              {sessionActive && (
+                <button
+                  type="button"
+                  onClick={endSession}
+                  disabled={loading}
+                  aria-label="End call session"
+                  data-testid="btn-end"
+                  className="rounded-lg py-1.5 px-3 text-xs font-semibold bg-[var(--state-break)] text-white hover:opacity-90 active:opacity-75 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900"
+                >
+                  END
+                </button>
+              )}
               {session && !session.isAlive && (
                 <button
+                  type="button"
                   onClick={startSession}
                   disabled={loading}
-                  className="flex-1 rounded-lg py-1.5 text-xs font-semibold bg-[var(--shell)] text-white hover:opacity-90"
+                  aria-label="Start new session"
+                  data-testid="btn-new"
+                  className="flex-1 rounded-lg py-1.5 text-xs font-semibold bg-[var(--shell)] text-white hover:opacity-90 border border-gray-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900"
                 >
                   NEW
                 </button>
@@ -625,19 +799,24 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
             {/* ── Keypad ── */}
             <div
               data-testid="keypad"
+              role="group"
+              aria-label="Phone keypad"
               className="mx-3 mt-3 mb-4 grid grid-cols-3 gap-2"
             >
               {KEYPAD_ROWS.map((row) =>
                 row.map((key) => (
                   <button
                     key={key}
+                    type="button"
+                    aria-label={KEY_ARIA_LABEL[key] ?? `Digit ${key}`}
                     onClick={() => {
-                      if (sessionActive) sendInput(key);
+                      if (sessionActive) handleKeypadPress(key);
                     }}
                     disabled={!sessionActive || loading}
                     data-testid={`key-${key}`}
                     className={[
                       'rounded-lg py-2 text-sm font-bold transition-all border',
+                      'focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900',
                       sessionActive && !loading
                         ? 'bg-gray-200 border-gray-300 text-[var(--ink)] hover:bg-gray-100 active:scale-95'
                         : 'bg-gray-600 border-gray-700 text-gray-500 cursor-not-allowed',
@@ -660,18 +839,31 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
                 disabled={!sessionActive || loading}
                 placeholder={sessionActive ? 'type & press Enter' : '—'}
                 maxLength={10}
+                aria-label="Direct keypad input"
                 data-testid="text-input"
                 className="flex-1 rounded-lg border border-gray-600 bg-gray-700 text-white text-xs px-2 py-1 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-white disabled:opacity-40"
               />
               <button
+                type="button"
+                onClick={() => setInputBuffer('')}
+                disabled={!sessionActive || loading || !inputBuffer}
+                aria-label="Clear direct text input"
+                data-testid="btn-clear"
+                className="rounded-lg bg-gray-600 text-white text-xs px-2 py-1 hover:bg-gray-500 disabled:opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
+              >
+                CLEAR
+              </button>
+              <button
+                type="button"
                 onClick={() => {
                   const trimmed = inputBuffer.trim();
                   if (!trimmed) return;
                   sendInput(trimmed);
                 }}
                 disabled={!sessionActive || loading || !inputBuffer.trim()}
+                aria-label="Send direct input"
                 data-testid="btn-send"
-                className="rounded-lg bg-gray-600 text-white text-xs px-2 py-1 hover:bg-gray-500 disabled:opacity-30"
+                className="rounded-lg bg-gray-600 text-white text-xs px-2.5 py-1 hover:bg-gray-500 disabled:opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
               >
                 ✓
               </button>
@@ -680,24 +872,49 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
             {/* Phone navigation pill */}
             <div className="mx-3 mb-4 flex gap-2 text-center">
               <button
+                type="button"
                 onClick={() => sendInput('0')}
                 disabled={!sessionActive || loading}
+                aria-label="Back one level (Key 0)"
                 data-testid="btn-back"
-                className="flex-1 rounded-lg py-1 text-[10px] font-semibold bg-gray-600 text-gray-200 hover:bg-gray-500 disabled:opacity-30"
+                className="flex-1 rounded-lg py-1 text-[10px] font-semibold bg-gray-600 text-gray-200 hover:bg-gray-500 disabled:opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
               >
                 ◀ Back (0)
               </button>
               <button
+                type="button"
                 onClick={() => sendInput('00')}
                 disabled={!sessionActive || loading}
+                aria-label="Return to Main Menu (Key 00)"
                 data-testid="btn-home"
-                className="flex-1 rounded-lg py-1 text-[10px] font-semibold bg-gray-600 text-gray-200 hover:bg-gray-500 disabled:opacity-30"
+                className="flex-1 rounded-lg py-1 text-[10px] font-semibold bg-gray-600 text-gray-200 hover:bg-gray-500 disabled:opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
               >
                 ⌂ Home (00)
               </button>
             </div>
           </div>
-        </div>
+
+          {/* Audit #56: Statutory Fee vs Resident Estimation Clarification */}
+          <div
+            data-testid="audit-56-clarification"
+            className="w-72 mt-3 p-3 bg-[var(--paper-warm)] border border-[var(--rule)] rounded-lg text-left"
+          >
+            <div className="flex items-center justify-between mb-1">
+              <span className="font-mono text-[9px] uppercase tracking-wider text-[var(--ink-soft)] font-bold">
+                Audit #56 · Fee Clarification
+              </span>
+              <span className="font-mono text-[9px] text-[var(--ink-soft)] bg-neutral-200/80 px-1.5 py-0.5 rounded">
+                Civil Registry
+              </span>
+            </div>
+            <p className="font-mono text-xs text-[var(--ink)] leading-snug font-semibold">
+              Statutory Fee: 210 ETB | Resident reported paying: ~200 ETB
+            </p>
+            <p className="text-[10px] text-[var(--ink-soft)] mt-1 font-mono leading-normal">
+              Variance within standard margin: Statutory fee is 210 ETB per circular, while citizen self-reported ~200 ETB.
+            </p>
+          </div>
+        </section>
 
         {/* Column 3: Live Session Transcript & Demo Guide */}
         <div className="flex-1 flex flex-col gap-4 w-full min-w-0">
@@ -710,8 +927,10 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
                 HTTP Transcript (POST /api/ussd)
               </h2>
               <button
+                type="button"
                 onClick={clearTranscript}
-                className="text-xs text-[var(--ink-soft)] hover:text-[var(--ink)] underline"
+                aria-label="Clear HTTP transcript"
+                className="text-xs text-[var(--ink-soft)] hover:text-[var(--ink)] underline focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ink)] rounded"
               >
                 Clear
               </button>
@@ -777,6 +996,9 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
               <li>Note: counter moves 2 → 3 (threshold reached)</li>
               <li>Switch to <strong>Girma</strong> (Same-Cluster Duplicate) → Dial *890# → repeat flow</li>
               <li>Note: backend responds with <em>duplicate</em> message — counter stays at 3</li>
+              <li data-testid="guide-audit-56">
+                <strong>Audit #56 (Kalinda):</strong> Statutory Fee: 210 ETB | Resident reported paying: ~200 ETB (Variance within standard margin).
+              </li>
             </ol>
             <p className="mt-2 text-[10px] italic font-sans">
               All responses come from the real <code>POST /api/ussd</code> backend. No client-side logic simulates the response.

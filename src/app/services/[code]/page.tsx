@@ -7,11 +7,35 @@
 
 import React from 'react';
 import Link from 'next/link';
+import type { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 import { getStatutoryService } from '@/app-services/statutory.service';
 import { DivergenceCard } from '@/components/DivergenceCard';
 
 interface PageProps {
   params: Promise<{ code: string }>;
+}
+
+export async function generateMetadata(props: PageProps): Promise<Metadata> {
+  const unwrappedParams = await props.params;
+  const code = unwrappedParams?.code || '';
+  const card = code ? await getStatutoryService().getStatutoryCard(code).catch(() => null) : null;
+  if (!card) {
+    return {
+      title: 'Service Not Found',
+      description: `Service code "${code}" was not recognized in the statutory gazette.`,
+    };
+  }
+
+  return {
+    title: `Divergence Ledger: ${card.serviceCode}`,
+    description: `Official statutory ceiling vs citizen observations for office ${card.officeCode}. k-anonymity verified.`,
+    openGraph: {
+      type: 'article',
+      title: `Statutory Divergence Card: ${card.serviceCode} · Ward Proof-Line`,
+      description: `Official statutory ceiling vs citizen observations for office ${card.officeCode}.`,
+    },
+  };
 }
 
 export default async function ServiceCardPage(props: PageProps) {
@@ -30,29 +54,11 @@ export default async function ServiceCardPage(props: PageProps) {
   }
 
   if (!card) {
-    return (
-      <main className="min-h-screen bg-[var(--paper)] text-[var(--ink)] flex items-center justify-center p-4">
-        <div className="max-w-md w-full border border-[var(--rule)] bg-[var(--paper)] p-6 text-center space-y-4">
-          <div className="text-xs font-mono uppercase tracking-widest text-[var(--ink-soft)]">
-            Service Not Found
-          </div>
-          <p className="font-mono text-sm text-[var(--ink)]">
-            Service code &ldquo;{code || 'UNKNOWN'}&rdquo; was not recognized in
-            the statutory gazette.
-          </p>
-          <Link
-            href="/"
-            className="inline-block font-mono text-xs text-[var(--ink)] underline hover:opacity-80"
-          >
-            ← Return to index
-          </Link>
-        </div>
-      </main>
-    );
+    notFound();
   }
 
   return (
-    <main className="min-h-screen bg-[var(--paper)] text-[var(--ink)] py-10 px-4">
+    <div className="min-h-screen bg-[var(--paper)] text-[var(--ink)] py-10 px-4">
       <div className="max-w-2xl mx-auto mb-4">
         <Link
           href="/"
@@ -62,7 +68,18 @@ export default async function ServiceCardPage(props: PageProps) {
         </Link>
       </div>
 
+      <h1 className="sr-only">Public Service Fee Divergence Card for {card.serviceCode}</h1>
       <DivergenceCard card={card} />
-    </main>
+
+      {/* Journey navigation */}
+      <div className="mt-8 pt-4 border-t border-[var(--rule)] flex justify-between items-center font-mono text-[11px] text-[var(--ink-soft)]">
+        <Link href="/receipt/4412" className="hover:text-[var(--ink)] transition-colors">
+          ‹ Step 3: Receipt
+        </Link>
+        <Link href="/pwa" className="hover:text-[var(--ink)] transition-colors">
+          Step 5: Offline PWA ›
+        </Link>
+      </div>
+    </div>
   );
 }

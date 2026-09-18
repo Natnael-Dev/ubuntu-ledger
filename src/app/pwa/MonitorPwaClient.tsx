@@ -15,6 +15,9 @@ const DEFAULT_TASK_ID = '00000000-0000-4000-a000-000000000300'; // TASK_4412
 // Amina's canonical phone hash from demo-scenario
 const DEFAULT_PHONE_HASH = '435eef566c8beff9f57f26e9072010466319187fa2f673b636e44084e913ef65';
 
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const HASH_64_REGEX = /^[0-9a-f]{64}$/i;
+
 export function MonitorPwaClient() {
   const [taskId, setTaskId] = useState(DEFAULT_TASK_ID);
   const [phoneHash, setPhoneHash] = useState(DEFAULT_PHONE_HASH);
@@ -25,6 +28,10 @@ export function MonitorPwaClient() {
   const [outboxItems, setOutboxItems] = useState<OfflineObservationRecord[]>([]);
   const [lastSubmissionNotice, setLastSubmissionNotice] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const isTaskIdValid = !taskId || UUID_REGEX.test(taskId.trim());
+  const isPhoneRawNumber = /^\+?\d{9,15}$/.test(phoneHash.trim());
+  const isPhoneHashValid = !phoneHash || (HASH_64_REGEX.test(phoneHash.trim()) && !isPhoneRawNumber);
 
   const loadItems = async () => {
     const store = getOutboxStore();
@@ -53,6 +60,27 @@ export function MonitorPwaClient() {
     setIsSubmitting(true);
     setLastSubmissionNotice(null);
 
+    const trimmedTaskId = taskId.trim();
+    const trimmedPhoneHash = phoneHash.trim();
+
+    if (!UUID_REGEX.test(trimmedTaskId)) {
+      setLastSubmissionNotice('Validation Error: Task ID must be a valid UUID v4.');
+      setIsSubmitting(false);
+      return;
+    }
+
+    if (isPhoneRawNumber) {
+      setLastSubmissionNotice('Zero-PII Error: Raw phone numbers are strictly forbidden. Enter a 64-character SHA-256 hex hash.');
+      setIsSubmitting(false);
+      return;
+    }
+
+    if (!HASH_64_REGEX.test(trimmedPhoneHash)) {
+      setLastSubmissionNotice('Validation Error: Phone hash must be exactly 64 hexadecimal characters.');
+      setIsSubmitting(false);
+      return;
+    }
+
     const clock = new SystemClock();
     const idempotencyKey = typeof crypto !== 'undefined' && crypto.randomUUID
       ? crypto.randomUUID()
@@ -62,8 +90,8 @@ export function MonitorPwaClient() {
     try {
       await engine.enqueue({
         clientIdempotencyKey: idempotencyKey,
-        taskId,
-        phoneHash,
+        taskId: trimmedTaskId,
+        phoneHash: trimmedPhoneHash,
         channel: 'PWA',
         answers: { q1, q2, q3 },
         geoCell: 'et-aa-0917',
@@ -88,6 +116,12 @@ export function MonitorPwaClient() {
   const handleManualSync = async () => {
     const engine = getSyncEngine();
     await engine.flush();
+    await loadItems();
+  };
+
+  const handleRetryItem = async (clientIdempotencyKey: string) => {
+    const engine = getSyncEngine();
+    await engine.retryFailed(clientIdempotencyKey);
     await loadItems();
   };
 
@@ -121,7 +155,7 @@ export function MonitorPwaClient() {
               type="button"
               data-testid="airplane-mode-toggle"
               onClick={handleToggleAirplane}
-              className={`px-3 py-1.5 text-xs font-mono border transition-colors ${
+              className={`px-3 py-2.5 min-h-[44px] text-xs font-mono border transition-colors ${
                 isAirplaneMode
                   ? 'bg-amber-600 text-white border-amber-700 font-semibold'
                   : 'bg-white text-[var(--ink-soft)] border-[var(--rule)] hover:bg-neutral-50 hover:text-[var(--ink)]'
@@ -134,7 +168,20 @@ export function MonitorPwaClient() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6">
+        {/* Context Banner */}
+        <div className="border border-[var(--rule)] bg-[var(--paper-warm)] p-4 mb-6">
+          <p className="font-mono text-[10px] uppercase tracking-widest text-[var(--ink-soft)] font-bold mb-2">Field Monitor Outbox</p>
+          <p className="text-sm text-[var(--ink)] leading-relaxed mb-2">
+            Field monitors inspect public infrastructure in areas without cellular coverage. This outbox queues observations locally and syncs automatically when connectivity returns — with zero duplicate submissions.
+          </p>
+          <div className="flex flex-col gap-1 font-mono text-[11px] text-[var(--ink-soft)]">
+            <span>1. Enable <strong className="text-[var(--ink)]">Airplane Mode</strong> to simulate a coverage dead zone.</span>
+            <span>2. Complete the inspection checklist and submit an observation.</span>
+            <span>3. Disable Airplane Mode — the outbox auto-syncs with zero duplicates.</span>
+          </div>
+        </div>
+
         {/* Notice Banner */}
         {lastSubmissionNotice && (
           <div
@@ -159,29 +206,55 @@ export function MonitorPwaClient() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-[11px] font-mono text-[var(--ink-soft)] uppercase tracking-wider mb-1">
+                <label htmlFor="task-id-input" className="block text-[11px] font-mono text-[var(--ink-soft)] uppercase tracking-wider mb-1">
                   Inspection Task ID
                 </label>
                 <input
+                  id="task-id-input"
                   type="text"
                   value={taskId}
                   onChange={(e) => setTaskId(e.target.value)}
-                  className="w-full text-xs font-mono p-2.5 border border-[var(--rule)] bg-[var(--paper)] text-[var(--ink)] focus:outline-none focus:border-[var(--ink)]"
+                  aria-invalid={taskId.length > 0 ? !isTaskIdValid : undefined}
+                  aria-describedby="task-id-hint"
+                  className={`w-full text-xs font-mono p-2.5 border bg-[var(--paper)] text-[var(--ink)] focus:outline-none ${
+                    taskId.length > 0 && !isTaskIdValid
+                      ? 'border-red-500 ring-1 ring-red-300'
+                      : 'border-[var(--rule)] focus:border-[var(--ink)]'
+                  }`}
                   required
                 />
+                <p id="task-id-hint" className={`text-[10px] mt-1 font-mono ${taskId.length > 0 && !isTaskIdValid ? 'text-red-600' : 'text-[var(--ink-soft)]'}`}>
+                  {taskId.length > 0 && !isTaskIdValid
+                    ? '✗ Must be a valid UUID v4 (e.g. 00000000-0000-4000-a000-...)'
+                    : 'UUID v4 task identifier from the inspection ledger'}
+                </p>
               </div>
 
               <div>
-                <label className="block text-[11px] font-mono text-[var(--ink-soft)] uppercase tracking-wider mb-1">
+                <label htmlFor="phone-hash-input" className="block text-[11px] font-mono text-[var(--ink-soft)] uppercase tracking-wider mb-1">
                   Monitor Phone Hash
                 </label>
                 <input
+                  id="phone-hash-input"
                   type="text"
                   value={phoneHash}
                   onChange={(e) => setPhoneHash(e.target.value)}
-                  className="w-full text-xs font-mono p-2.5 border border-[var(--rule)] bg-[var(--paper)] text-[var(--ink)] focus:outline-none focus:border-[var(--ink)]"
+                  aria-invalid={phoneHash.length > 0 ? (!isPhoneHashValid || isPhoneRawNumber) : undefined}
+                  aria-describedby="phone-hash-hint"
+                  className={`w-full text-xs font-mono p-2.5 border bg-[var(--paper)] text-[var(--ink)] focus:outline-none ${
+                    phoneHash.length > 0 && (!isPhoneHashValid || isPhoneRawNumber)
+                      ? 'border-red-500 ring-1 ring-red-300'
+                      : 'border-[var(--rule)] focus:border-[var(--ink)]'
+                  }`}
                   required
                 />
+                <p id="phone-hash-hint" className={`text-[10px] mt-1 font-mono ${phoneHash.length > 0 && (!isPhoneHashValid || isPhoneRawNumber) ? 'text-red-600' : 'text-[var(--ink-soft)]'}`}>
+                  {isPhoneRawNumber
+                    ? '✗ ZERO-PII: Raw phone numbers are strictly rejected. Use SHA-256 hash.'
+                    : phoneHash.length > 0 && !isPhoneHashValid
+                    ? '✗ Must be exactly 64 hexadecimal characters (SHA-256 hex digest)'
+                    : '64-character SHA-256 hex hash of the monitor MSISDN (zero raw phone numbers)'}
+                </p>
               </div>
             </div>
 
@@ -191,7 +264,7 @@ export function MonitorPwaClient() {
                 Physical Verification Questions
               </div>
 
-              <label className="flex items-center gap-2.5 cursor-pointer text-xs sm:text-sm text-[var(--ink)]">
+              <label className="flex items-center gap-2.5 cursor-pointer text-xs sm:text-sm text-[var(--ink)] py-2">
                 <input
                   type="checkbox"
                   checked={q1}
@@ -201,7 +274,7 @@ export function MonitorPwaClient() {
                 <span>Q1: Generator installed and physically present?</span>
               </label>
 
-              <label className="flex items-center gap-2.5 cursor-pointer text-xs sm:text-sm text-[var(--ink)]">
+              <label className="flex items-center gap-2.5 cursor-pointer text-xs sm:text-sm text-[var(--ink)] py-2">
                 <input
                   type="checkbox"
                   checked={q2}
@@ -211,7 +284,7 @@ export function MonitorPwaClient() {
                 <span>Q2: Asset nameplate and municipal serial tag verified?</span>
               </label>
 
-              <label className="flex items-center gap-2.5 cursor-pointer text-xs sm:text-sm text-[var(--ink)]">
+              <label className="flex items-center gap-2.5 cursor-pointer text-xs sm:text-sm text-[var(--ink)] py-2">
                 <input
                   type="checkbox"
                   checked={q3}
@@ -228,7 +301,7 @@ export function MonitorPwaClient() {
                 type="submit"
                 disabled={isSubmitting}
                 data-testid="btn-submit-observation"
-                className="px-4 py-2 bg-[var(--ink)] text-[var(--paper)] text-xs font-mono uppercase tracking-wider hover:bg-neutral-800 transition-colors disabled:opacity-50"
+                className="px-4 py-2.5 min-h-[44px] bg-[var(--ink)] text-[var(--paper)] text-xs font-mono uppercase tracking-wider hover:bg-neutral-800 transition-colors disabled:opacity-50"
               >
                 {isSubmitting ? 'Recording...' : 'Submit Field Observation'}
               </button>
@@ -238,7 +311,7 @@ export function MonitorPwaClient() {
                   type="button"
                   data-testid="btn-sync-now"
                   onClick={handleManualSync}
-                  className="px-3 py-1.5 text-xs font-mono border border-[var(--rule)] bg-white text-[var(--ink)] hover:bg-neutral-50 transition-colors"
+                  className="px-3 py-2.5 min-h-[44px] text-xs font-mono border border-[var(--rule)] bg-white text-[var(--ink)] hover:bg-neutral-50 transition-colors"
                 >
                   Sync Now
                 </button>
@@ -246,7 +319,7 @@ export function MonitorPwaClient() {
                   type="button"
                   data-testid="btn-clear-outbox"
                   onClick={handleClearOutbox}
-                  className="px-3 py-1.5 text-xs font-mono border border-red-300 text-red-700 bg-red-50 hover:bg-red-100 transition-colors"
+                  className="px-3 py-2.5 min-h-[44px] text-xs font-mono border border-red-300 text-red-700 bg-red-50 hover:bg-red-100 transition-colors"
                 >
                   Clear Queue
                 </button>
@@ -280,6 +353,7 @@ export function MonitorPwaClient() {
                     <th className="py-2 px-2">Status</th>
                     <th className="py-2 px-2">Answers</th>
                     <th className="py-2 px-2">Result / Detail</th>
+                    <th className="py-2 px-2">Action</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[var(--rule)]">
@@ -308,12 +382,28 @@ export function MonitorPwaClient() {
                         </span>
                       </td>
                       <td className="py-2.5 px-2 text-[var(--ink-soft)]">
-                        {JSON.stringify(item.answers)}
+                        {(() => {
+                          const total = Object.keys(item.answers).length;
+                          const passed = Object.values(item.answers).filter(Boolean).length;
+                          return `${passed}/${total} ✓`;
+                        })()}
                       </td>
                       <td className="py-2.5 px-2 max-w-xs truncate text-[var(--ink-soft)]">
                         {item.serverResponse
                           ? `Witnesses: ${item.serverResponse.witnessCount}/${item.serverResponse.witnessTarget}`
                           : item.lastError || (item.status === 'QUEUED' ? 'Pending flush' : '-')}
+                      </td>
+                      <td className="py-2.5 px-2">
+                        {item.status === 'FAILED' && (
+                          <button
+                            type="button"
+                            onClick={() => void handleRetryItem(item.clientIdempotencyKey)}
+                            className="px-3 py-1.5 min-h-[32px] text-xs font-mono border border-amber-400 text-amber-800 bg-amber-50 hover:bg-amber-100 transition-colors"
+                            title="Retry this failed observation"
+                          >
+                            Retry
+                          </button>
+                        )}
                       </td>
                     </tr>
                   ))}
@@ -322,7 +412,7 @@ export function MonitorPwaClient() {
             </div>
           )}
         </section>
-      </main>
+      </div>
     </div>
   );
 }

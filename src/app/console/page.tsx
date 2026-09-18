@@ -16,8 +16,12 @@ import {
 import { ProjectBoard, type ProjectBoardItem } from './ProjectBoard';
 
 export const metadata: Metadata = {
-  title: 'Operator Console — Ward Proof-Line',
+  title: 'Municipal Operator Console',
   description: 'Municipal operator console for witness triangulation and repair probation',
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 export default function ConsolePage() {
@@ -50,7 +54,7 @@ export default function ConsolePage() {
   });
 
   return (
-    <main className="min-h-screen bg-[var(--paper)] text-[var(--ink)] font-sans antialiased p-4 sm:p-6 lg:p-8">
+    <div className="min-h-screen bg-[var(--paper)] text-[var(--ink)] font-sans antialiased p-4 sm:p-6 lg:p-8">
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Top Operational Bar (Plain System Style per 08 §7) */}
         <header className="border border-[var(--rule)] bg-white p-4 space-y-3">
@@ -83,30 +87,15 @@ export default function ConsolePage() {
             </div>
           </div>
 
-          {/* Console 4-Screen Navigation (08-ui-ux-design.md §7) */}
-          <nav className="flex items-center gap-1 text-xs font-mono">
-            <span className="px-3 py-1.5 bg-[var(--ink)] text-[var(--paper)] font-semibold">
-              1. Project Board
+          {/* Console Section Header */}
+          <div className="flex items-center gap-2 border-b border-[var(--rule)] px-4 py-2">
+            <span className="font-mono text-xs font-semibold text-[var(--ink)] bg-[var(--ink)] text-[var(--paper)] px-3 py-1.5">
+              Project Board
             </span>
-            <span
-              className="px-3 py-1.5 text-[var(--ink-soft)] border border-transparent hover:border-[var(--rule)] cursor-not-allowed opacity-60"
-              title="Screen 2: Ingest Review (T-23)"
-            >
-              2. Ingest Review
+            <span className="font-mono text-[10px] text-[var(--ink-soft)] uppercase">
+              {ward.name} · {projectItems.length} Projects
             </span>
-            <span
-              className="px-3 py-1.5 text-[var(--ink-soft)] border border-transparent hover:border-[var(--rule)] cursor-not-allowed opacity-60"
-              title="Screen 3: Moderation Queue"
-            >
-              3. Moderation Queue
-            </span>
-            <span
-              className="px-3 py-1.5 text-[var(--ink-soft)] border border-transparent hover:border-[var(--rule)] cursor-not-allowed opacity-60"
-              title="Screen 4: Bulletin Editor"
-            >
-              4. Bulletin Editor
-            </span>
-          </nav>
+          </div>
         </header>
 
         {/* Primary Project Board */}
@@ -119,6 +108,6 @@ export default function ConsolePage() {
           />
         </section>
       </div>
-    </main>
+    </div>
   );
 }

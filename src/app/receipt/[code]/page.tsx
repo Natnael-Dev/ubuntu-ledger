@@ -6,6 +6,8 @@
 
 import React from 'react';
 import Link from 'next/link';
+import type { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 import {
   getProjectReceipt,
   formatCurrency,
@@ -24,21 +26,34 @@ interface PageProps {
   params: Promise<{ code: string }>;
 }
 
+export async function generateMetadata(props: PageProps): Promise<Metadata> {
+  const unwrappedParams = await props.params;
+  const code = unwrappedParams?.code || '';
+  const receipt = code ? getProjectReceipt(code) : null;
+  if (!receipt) {
+    return {
+      title: 'Receipt Not Found',
+      description: `Project code ${code} was not recognised in this ledger node.`,
+    };
+  }
+
+  const formattedAmount = `${receipt.currency} ${(receipt.amountMinor / 100).toLocaleString()}`;
+  return {
+    title: `Receipt #${receipt.projectCode}: ${receipt.title}`,
+    description: `${receipt.witness.count} neighbours checked this. Verified evidence trail for ${receipt.contractor} (${formattedAmount}).`,
+    openGraph: {
+      type: 'article',
+      title: `Civic Spending Receipt #${receipt.projectCode} · Ward Proof-Line`,
+      description: `${receipt.witness.count} community witnesses verified this repair. Contract: ${formattedAmount} paid to ${receipt.contractor}.`,
+    },
+  };
+}
+
 function resolveProvenanceSentence(receipt: ProjectReceiptDto): string {
-  // If specific project 4412, use canonical 08 §5 provenance sentence
-  if (receipt.projectCode === '4412') {
-    return 'Nine neighbours checked this on Tuesday. Two said it runs; seven said it does not.';
-  }
-  if (receipt.confidence === 'UNOFFICIAL_ESTIMATE') {
-    return 'No neighbours have checked this project yet. Awaiting inspection task dispatch.';
-  }
-  if (receipt.narrative.state === 'FIELD_DISCREPANCY') {
-    return 'Four neighbours checked this on Friday. Two said yes; two said no. Discrepancy flagged.';
-  }
-  if (receipt.narrative.state === 'PHYSICALLY_CONFIRMED' || receipt.narrative.state === 'VERIFIED_SUSTAINED') {
-    return 'Three neighbours checked this on Tuesday. Three said it runs; zero said it does not. Physically confirmed.';
-  }
-  return `${receipt.witness.count} neighbours checked this on Tuesday. Observations recorded.`;
+  const { count, target } = receipt.witness;
+  if (count === 0) return 'No community checks recorded yet.';
+  if (count >= target) return `${count} of ${target} community checks confirmed.`;
+  return `${count} of ${target} community checks recorded. Verification in progress.`;
 }
 
 export default async function ReceiptPage(props: PageProps) {
@@ -54,27 +69,7 @@ export default async function ReceiptPage(props: PageProps) {
   };
 
   if (!receipt) {
-    return (
-      <main className="min-h-screen bg-[var(--paper)] text-[var(--ink)] flex items-center justify-center p-4">
-        <div className="receipt-container max-w-[440px] w-full border border-[var(--rule)] bg-[var(--paper)] p-6 text-center space-y-4 shadow-sm">
-          <div className="text-xs font-mono uppercase tracking-widest text-[var(--ink-soft)]">
-            Receipt Not Found
-          </div>
-          <h1 className="text-base font-semibold">
-            Project code <span className="font-mono">{code}</span> was not recognised.
-          </h1>
-          <p className="text-xs text-[var(--ink-soft)] leading-relaxed">
-            Project codes are printed on official project boards posted at the physical site.
-          </p>
-          <a
-            href="/simulator"
-            className="inline-block mt-4 text-xs font-mono text-[var(--ink)] underline hover:text-black"
-          >
-            Go to simulator
-          </a>
-        </div>
-      </main>
-    );
+    notFound();
   }
 
   const isUnofficial =
@@ -138,7 +133,7 @@ export default async function ReceiptPage(props: PageProps) {
           `,
         }}
       />
-      <main className="min-h-screen bg-[var(--paper)] text-[var(--ink)] py-8 px-4 flex flex-col items-center justify-start">
+      <div className="min-h-screen bg-[var(--paper)] text-[var(--ink)] py-8 px-4 flex flex-col items-center justify-start">
         {/* Print trigger bar for demo */}
         <div className="print-hide w-full max-w-[440px] mb-3 flex justify-between items-center text-xs text-[var(--ink-soft)] font-mono">
           <Link
@@ -149,29 +144,55 @@ export default async function ReceiptPage(props: PageProps) {
           </Link>
           <div className="flex items-center gap-3">
             <Link
-              href="/simulator"
-              className="hover:text-[var(--ink)] hover:underline"
+              href="/services/ET-ID-REPLACE"
+              className="inline-flex items-center gap-1 font-mono text-[11px] text-[var(--ink-soft)] hover:text-[var(--ink)] transition-colors"
             >
-              Simulator →
+              Step 4: Divergence
+              <span aria-hidden="true">›</span>
             </Link>
             <ReceiptPrintButton />
           </div>
         </div>
 
         {/* The Receipt Card Layout (08 §5) */}
-        <article className="receipt-container max-w-[440px] w-full border border-[var(--rule)] bg-[var(--paper)] p-6 shadow-sm font-sans transition-all">
+        <article className="receipt-container max-w-[440px] w-full border border-[var(--rule)] bg-[var(--paper)] p-6 shadow-sm font-sans transition-all relative">
+          {/* Perforation top edge */}
+          <div className="perf-bold -mx-6 -mt-6 mb-5" />
+
           {/* Header */}
-          <header className="pb-4 border-b border-[var(--rule)]">
-            <div className="flex justify-between items-baseline font-mono">
-              <span className="font-bold tracking-wider text-sm text-[var(--ink)]">
-                {ward.name}
-              </span>
-              <span className="text-xs text-[var(--ink-soft)] tracking-wider">
-                {ward.code}
-              </span>
-            </div>
-            <div className="mt-1 text-xs text-[var(--ink-soft)] font-mono">
-              Public spending receipt
+          <header className="pb-4 border-b border-[var(--rule)] relative">
+            <div className="flex justify-between items-start">
+              <div>
+                <div className="flex items-center gap-1.5 mb-1">
+                  <div className="w-3 h-3 border border-[var(--ink)] flex items-center justify-center">
+                    <div className="w-1 h-1 bg-[var(--state-open)]" />
+                  </div>
+                  <span className="font-mono text-[10px] font-bold text-[var(--ink)] uppercase tracking-widest">
+                    Ubuntu Ledger
+                  </span>
+                </div>
+                <div className="font-mono font-bold tracking-wider text-sm text-[var(--ink)]">
+                  {ward.name}
+                </div>
+                <div className="text-xs text-[var(--ink-soft)] font-mono">
+                  {ward.code} · Public spending receipt
+                </div>
+              </div>
+
+              {/* Official circular verification stamp */}
+              <div className="shrink-0 opacity-80" title="Ubuntu Ledger Cryptographic Verification Seal">
+                <svg width="52" height="52" viewBox="0 0 52 52" fill="none" className="text-[var(--state-open)]">
+                  <circle cx="26" cy="26" r="24" stroke="currentColor" strokeWidth="1.5" strokeDasharray="3 2" />
+                  <circle cx="26" cy="26" r="19" stroke="currentColor" strokeWidth="0.75" />
+                  <path id={`seal-txt-${receipt.projectCode}`} d="M 26,26 m -15,0 a 15,15 0 1,1 30,0 a 15,15 0 1,1 -30,0" fill="none" />
+                  <text fontSize="4.5" fontFamily="monospace" fill="currentColor" letterSpacing="0.1em">
+                    <textPath href={`#seal-txt-${receipt.projectCode}`} startOffset="50%" textAnchor="middle">
+                      UBUNTU LEDGER · VERIFIED
+                    </textPath>
+                  </text>
+                  <circle cx="26" cy="26" r="3" fill="currentColor" />
+                </svg>
+              </div>
             </div>
           </header>
 
@@ -294,13 +315,16 @@ export default async function ReceiptPage(props: PageProps) {
                   prove it
                 </span>
                 <span className="text-[var(--ink-soft)]">
-                  source page + hash + full event history
+                  view source record
                 </span>
               </a>
             </div>
           </section>
+
+          {/* Bottom perforation edge */}
+          <div className="perf -mx-6 -mb-6 mt-6" />
         </article>
-      </main>
+      </div>
     </>
   );
 }

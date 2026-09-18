@@ -5,6 +5,7 @@
 :root {
   /* Ink on paper — the receipt metaphor (08-ui-ux-design.md §2) */
   --paper: #FBFAF7;
+  --paper-warm: #F3F1EB;   /* Warm off-white for metadata blocks, skeletons, statutory cards */
   --ink: #14150F;
   --ink-soft: #55564C;
   --rule: #D9D7CC;
@@ -25,9 +26,183 @@ body {
   color: var(--ink);
   background: var(--paper);
   font-family: var(--font-sans), 'IBM Plex Sans', system-ui, sans-serif;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 code, kbd, samp, .font-mono {
   font-family: var(--font-mono), 'IBM Plex Mono', 'Courier New', monospace;
+}
+
+/* ─── Typography & Helpers ───────────────────────────────── */
+.f-mono { font-family: var(--font-mono), 'IBM Plex Mono', monospace; }
+.f-sans { font-family: var(--font-sans), 'IBM Plex Sans', sans-serif; }
+
+/* ─── Status badges ──────────────────────────────────────── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-mono), monospace;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border: 1px solid currentColor;
+  white-space: nowrap;
+  line-height: 1.5;
+}
+.badge-v  { color: var(--state-open);  border-color: var(--state-open);  background: #E6F0EB; }
+.badge-p  { color: var(--state-hold);  border-color: var(--state-hold);  background: #F7EDDB; }
+.badge-d  { color: var(--state-break); border-color: var(--state-break); background: #F5E8E8; }
+.badge-n  { color: var(--ink-soft);    border-color: var(--rule);        background: transparent; }
+.badge-on { color: var(--state-open);  border-color: var(--state-open);  background: #E6F0EB; }
+.badge-off{ color: var(--state-break); border-color: var(--state-break); background: #F5E8E8; }
+
+/* ─── Receipt Perforation Motif ──────────────────────────── */
+.perf {
+  height: 1px;
+  background-image: repeating-linear-gradient(
+    90deg,
+    transparent 0, transparent 5px,
+    var(--rule) 5px, var(--rule) 6px
+  );
+}
+.perf-bold {
+  height: 1px;
+  background-image: repeating-linear-gradient(
+    90deg,
+    transparent 0, transparent 4px,
+    var(--ink-soft) 4px, var(--ink-soft) 5.5px
+  );
+}
+
+/* ─── Dense Audit Tables ─────────────────────────────────── */
+.dt { width: 100%; border-collapse: collapse; }
+.dt thead th {
+  font-family: var(--font-mono), monospace;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  text-align: left;
+  padding: 8px 12px;
+  border-bottom: 2px solid var(--ink);
+  white-space: nowrap;
+  background: var(--paper);
+}
+.dt tbody td {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--rule);
+  font-size: 12.5px;
+  vertical-align: middle;
+}
+.dt tbody tr:last-child td { border-bottom: 0; }
+.dt tbody tr { transition: background 0.1s; }
+.dt tbody tr:hover td { background: rgba(217, 215, 204, 0.25); }
+
+/* ─── Feature Phone Chassis (Tactile & Clean - Zero AI Glare) ─── */
+.phone-shell {
+  background: var(--shell);
+  border-radius: 24px 24px 28px 28px;
+  border: 1px solid #111;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+  position: relative;
+}
+.phone-screen-wrap {
+  background: #181818;
+  border-radius: 4px;
+  padding: 3px;
+  border: 1px solid #000;
+}
+.phone-lcd {
+  background: var(--lcd-bg);
+  color: var(--lcd-ink);
+  font-family: var(--font-mono), monospace;
+  line-height: 1.4;
+  position: relative;
+  overflow: hidden;
+}
+.phone-key {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #383836;
+  border: 1px solid #222;
+  border-bottom: 2px solid #151515;
+  color: #DDD;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.08s, transform 0.06s;
+  border-radius: 4px;
+}
+.phone-key:active,
+.phone-key.pressed {
+  background: #484846;
+  transform: translateY(1px);
+  border-bottom-width: 1px;
+}
+.phone-key.highlight {
+  background: #2E4E28;
+  border-color: #1A3010;
+  color: #B2D8A0;
+}
+.phone-key.call-k {
+  background: #1F3C18;
+  color: #8FD870;
+  border-color: #0F200A;
+}
+.phone-key.end-k {
+  background: #4A1515;
+  color: #D87070;
+  border-color: #200808;
+}
+
+/* ─── Terminal / Evidence Pipeline ───────────────────────── */
+.terminal {
+  background: #0E0E0C;
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  line-height: 1.55;
+  color: #A8A49A;
+  padding: 16px;
+  overflow-y: auto;
+}
+.t-ok   { color: #6EC88A; }
+.t-warn { color: #D4A84B; }
+.t-err  { color: #CC6B6B; }
+.t-dim  { color: #55564C; }
+.t-num  { color: #82B8D8; }
+
+/* ─── Receipt Document Metaphor ──────────────────────────── */
+.receipt-doc {
+  background: var(--paper);
+  border: 1px solid var(--rule);
+}
+
+/* ─── Scrollable table wrapper ───────────────────────────── */
+.tscroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ─── Focus Visible ──────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--state-open);
+  outline-offset: 2px;
+}
+
+/* ─── Print ──────────────────────────────────────────────── */
+@media print {
+  nav, footer, .no-print { display: none !important; }
+  body { background: white; color: black; font-size: 10pt; }
+  .receipt-doc {
+    box-shadow: none;
+    border: 1px solid #888;
+    break-inside: avoid;
+  }
 }
 

@@ -1,5 +1,3 @@
-'use client';
-
 // Two-Ledger Divergence Card Component (T-27)
 // Authoritative sources:
 // - docs/specs/05-api-contracts.md §6
@@ -17,6 +15,28 @@
 import React from 'react';
 import type { StatutoryCardResponseDto } from '@/domain/divergence';
 import { RefusalScript } from './RefusalScript';
+
+const SERVICE_NAMES: Record<string, { name: string; amharic?: string; office: string }> = {
+  'ET-ID-REPLACE': {
+    name: 'Kebele Resident ID Card Replacement',
+    amharic: 'የቀበሌ ነዋሪነት መታወቂያ ካርድ እድሳት',
+    office: 'Woreda 09 Civil Registry',
+  },
+};
+
+const DOC_LABELS: Record<string, string> = {
+  'doc.birth_certificate_copy': 'Original Birth Certificate + 1 Copy',
+  'doc.two_witnesses_id': 'National ID of Two Kebele Witnesses',
+  'doc.passport_photo_2x': '2 Recent Passport Photos',
+  'doc.utility_bill': 'Recent Utility Bill (Water/Electric)',
+  'doc.previous_id': 'Previous Kebele ID Card (if available)',
+  'appeal.woreda_ombudsman': 'Woreda 09 Ombudsman Desk — Window 4',
+  'appeal.zonal_court': 'Zonal Court Civil Division',
+};
+
+function translateKey(key: string): string {
+  return DOC_LABELS[key] ?? key;
+}
 
 export interface DivergenceCardProps {
   card: StatutoryCardResponseDto;
@@ -47,12 +67,24 @@ export function DivergenceCard({ card, className = '' }: DivergenceCardProps) {
       {/* Header Bar */}
       <div className="border-b border-[var(--rule)] p-4 bg-neutral-50 flex flex-wrap items-baseline justify-between">
         <div>
-          <span className="font-mono text-xs text-[var(--ink-soft)] uppercase tracking-wider block">
+          <span className="font-mono text-xs text-[var(--ink-soft)] uppercase tracking-wider block mb-1">
             Public Service Fee Ledger
           </span>
-          <h2 className="text-xl font-bold font-mono tracking-tight text-[var(--ink)]">
-            {serviceCode}
-          </h2>
+          {SERVICE_NAMES[serviceCode] && (
+            <div className="mb-2">
+              <h2 className="font-sans text-lg font-semibold text-[var(--ink)]">
+                {SERVICE_NAMES[serviceCode].name}
+              </h2>
+              {SERVICE_NAMES[serviceCode].amharic && (
+                <p className="font-mono text-xs text-[var(--ink-soft)] mt-0.5">
+                  {SERVICE_NAMES[serviceCode].amharic}
+                </p>
+              )}
+            </div>
+          )}
+          <span className="font-mono text-[10px] text-[var(--ink-soft)] bg-neutral-100 border border-[var(--rule)] px-1.5 py-0.5">
+            GAZETTE CODE: {serviceCode}
+          </span>
         </div>
         <div className="font-mono text-xs text-[var(--ink-soft)] text-right">
           <span>Office: {officeCode}</span>
@@ -110,8 +142,8 @@ export function DivergenceCard({ card, className = '' }: DivergenceCardProps) {
                 </span>
                 <ul className="list-disc list-inside space-y-1 font-mono text-xs">
                   {statutory.requiredDocuments.map((doc, idx) => (
-                    <li key={idx} className="truncate">
-                      {doc}
+                    <li key={idx} className="truncate" title={translateKey(doc)}>
+                      {translateKey(doc)}
                     </li>
                   ))}
                 </ul>
@@ -123,7 +155,7 @@ export function DivergenceCard({ card, className = '' }: DivergenceCardProps) {
                     Appeal Route
                   </span>
                   <span className="font-mono text-xs">
-                    {statutory.appealRouteKey}
+                    {translateKey(statutory.appealRouteKey)}
                   </span>
                 </div>
               )}

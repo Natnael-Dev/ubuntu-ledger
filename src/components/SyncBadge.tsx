@@ -46,7 +46,11 @@ export function SyncBadge({ className = '', onSyncTrigger }: SyncBadgeProps) {
 
   const handleClick = () => {
     const engine = getSyncEngine();
-    void engine.flush();
+    if (summary.failed > 0) {
+      void engine.retryFailed();
+    } else {
+      void engine.flush();
+    }
     if (onSyncTrigger) onSyncTrigger();
   };
 

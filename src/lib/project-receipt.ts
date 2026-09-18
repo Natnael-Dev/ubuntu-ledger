@@ -231,7 +231,7 @@ export function getProjectReceipt(
     if (ticket.probationEndsAt) {
       const endMs = new Date(ticket.probationEndsAt).getTime();
       const nowMs = systemClock.nowMs();
-      const diff = Math.round((endMs - nowMs) / (24 * 60 * 60 * 1000));
+      const diff = Math.ceil((endMs - nowMs) / (24 * 60 * 60 * 1000));
       daysLeft = diff > 0 ? diff : 5;
     }
     slots = { days: String(daysLeft) };

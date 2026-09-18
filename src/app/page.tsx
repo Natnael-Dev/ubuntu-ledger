@@ -14,7 +14,7 @@ import React from 'react';
 import Link from 'next/link';
 
 export const metadata = {
-  title: 'Ward Proof-Line · Ubuntu Ledger — Civic Evidence System',
+  title: 'Civic Evidence System & Public Verification',
   description:
     'A public evidence system for ward-level infrastructure accountability. Citizens verify repairs via feature phone. Contractors cannot close their own tickets.',
 };
@@ -132,7 +132,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-[var(--paper)] text-[var(--ink)] py-10 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-[var(--paper)] text-[var(--ink)] py-10 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto">
 
         {/* ── Section 1: Identity ──────────────────────────────────────────── */}
@@ -192,45 +192,78 @@ export default function Home() {
             Three enforced proofs. Each independently testable.
           </h2>
 
-          {/* Architectural Proof-Line Schematic (Step 9) */}
-          <div className="mb-8 p-4 bg-white border border-[var(--rule)]">
-            <p className="text-[10px] font-mono uppercase tracking-widest text-[var(--ink-soft)] mb-3">
-              The Closed-Loop Proof-Line Architecture
-            </p>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 text-center text-xs font-mono">
-              <div className="p-2.5 border border-[var(--rule)] bg-neutral-50 flex flex-col justify-between">
-                <span className="text-[9px] text-[var(--ink-soft)] font-bold uppercase">1. Source</span>
-                <span className="font-semibold text-[var(--ink)] my-1 text-[11px]">Gazette / Law</span>
-                <span className="text-[10px] text-[var(--ink-soft)]">SHA-256 citation</span>
+          {/* Architectural Proof-Line Schematic */}
+          <div className="mb-8 p-5 bg-white border border-[var(--rule)]">
+            <div className="flex items-center justify-between mb-3 border-b border-[var(--rule)] pb-2">
+              <span className="text-[10px] font-mono uppercase tracking-widest text-[var(--ink-soft)] font-bold">
+                The Closed-Loop Proof-Line Architecture
+              </span>
+              <span className="text-[9px] font-mono text-[var(--ink-soft)] border border-[var(--rule)] px-1.5 py-0.5 uppercase tracking-wider">
+                Architecture Overview
+              </span>
+            </div>
+
+            {/* Responsive 6-stage Proof-Line Flow Diagram from Figma */}
+            <div className="w-full overflow-x-auto py-3">
+              <div className="hidden md:flex items-start gap-0 min-w-[700px]">
+                {[
+                  { id: 'citizen', label: 'Citizen Report', sub: 'USSD *890# · PWA', n: '01', active: false },
+                  { id: 'validate', label: 'Input Validation', sub: 'Schema & Completeness', n: '02', active: false },
+                  { id: 'cluster', label: 'Cluster / Sybil', sub: 'Cell & Prefix Weighting', n: '03', active: true },
+                  { id: 'triangulate', label: 'Triangulation', sub: 'Multi-Cluster Witnesses', n: '04', active: true },
+                  { id: 'probation', label: 'Probation Gate', sub: '7-Day DB Constraint Lock', n: '05', active: true },
+                  { id: 'receipt', label: 'Public Receipt', sub: 'SHA-256 Provenance Chain', n: '06', active: true },
+                ].map((node, i, arr) => (
+                  <div key={node.id} className="flex items-start flex-1">
+                    <div className="flex flex-col items-center flex-1 min-w-0">
+                      <span className={`font-mono text-[9px] font-bold mb-1.5 ${node.active ? 'text-[var(--state-open)]' : 'text-[var(--ink-soft)]'}`}>
+                        {node.n}
+                      </span>
+                      <div
+                        className={`w-full border py-2 px-1.5 text-center ${
+                          node.active
+                            ? 'border-[var(--state-open)] bg-[#E6F0EB]'
+                            : 'border-[var(--rule)] bg-[var(--paper)]'
+                        }`}
+                      >
+                        <div className={`font-mono text-[10px] font-bold leading-tight ${node.active ? 'text-[var(--state-open)]' : 'text-[var(--ink)]'}`}>
+                          {node.label}
+                        </div>
+                        <div className="font-mono text-[8.5px] text-[var(--ink-soft)] mt-0.5 leading-tight">{node.sub}</div>
+                      </div>
+                    </div>
+                    {i < arr.length - 1 && (
+                      <div className="flex items-center justify-center w-5 pt-6 flex-shrink-0">
+                        <svg width="16" height="8" viewBox="0 0 16 8" fill="none">
+                          <line x1="0" y1="4" x2="11" y2="4" stroke="var(--rule)" strokeWidth="1" />
+                          <path d="M11 1L15 4L11 7" stroke="var(--rule)" strokeWidth="1" />
+                        </svg>
+                      </div>
+                    )}
+                  </div>
+                ))}
               </div>
-              <div className="p-2.5 border border-[var(--rule)] bg-neutral-50 flex flex-col justify-between">
-                <span className="text-[9px] text-[var(--ink-soft)] font-bold uppercase">2. Observation</span>
-                <span className="font-semibold text-[var(--ink)] my-1 text-[11px]">Citizen Input</span>
-                <span className="text-[10px] text-[var(--ink-soft)]">USSD *890# / PWA</span>
-              </div>
-              <div className="p-2.5 border border-[var(--rule)] bg-neutral-50 flex flex-col justify-between">
-                <span className="text-[9px] text-[var(--state-hold)] font-bold uppercase">3. Cluster</span>
-                <span className="font-semibold text-[var(--ink)] my-1 text-[11px]">Triangulation</span>
-                <span className="text-[10px] text-[var(--ink-soft)]">Sybil deduplication</span>
-              </div>
-              <div className="p-2.5 border border-[var(--rule)] bg-neutral-50 flex flex-col justify-between">
-                <span className="text-[9px] text-[var(--state-break)] font-bold uppercase">4. Probation</span>
-                <span className="font-semibold text-[var(--ink)] my-1 text-[11px]">7-Day Gate</span>
-                <span className="text-[10px] text-[var(--ink-soft)]">DB constraint lock</span>
-              </div>
-              <div className="p-2.5 border border-[var(--rule)] bg-neutral-50 flex flex-col justify-between">
-                <span className="text-[9px] text-[var(--state-open)] font-bold uppercase">5. Two-Ledger</span>
-                <span className="font-semibold text-[var(--ink)] my-1 text-[11px]">Dual Ledgers</span>
-                <span className="text-[10px] text-[var(--ink-soft)]">Zero averaging (k≥5)</span>
-              </div>
-              <div className="p-2.5 border border-[var(--rule)] bg-neutral-50 flex flex-col justify-between">
-                <span className="text-[9px] text-[var(--state-open)] font-bold uppercase">6. Proof</span>
-                <span className="font-semibold text-[var(--ink)] my-1 text-[11px]">Public Receipt</span>
-                <span className="text-[10px] text-[var(--ink-soft)]">Audit trail receipt</span>
+
+              {/* Mobile vertical flow */}
+              <div className="md:hidden flex flex-col items-center gap-1.5">
+                {[
+                  { id: 'citizen', label: '01 · Citizen Report', sub: 'USSD *890# · PWA' },
+                  { id: 'validate', label: '02 · Input Validation', sub: 'Schema & Completeness' },
+                  { id: 'cluster', label: '03 · Cluster / Sybil', sub: 'Cell & Prefix Weighting' },
+                  { id: 'triangulate', label: '04 · Triangulation', sub: 'Multi-Cluster Witnesses' },
+                  { id: 'probation', label: '05 · Probation Gate', sub: '7-Day DB Constraint Lock' },
+                  { id: 'receipt', label: '06 · Public Receipt', sub: 'SHA-256 Provenance Chain' },
+                ].map((node) => (
+                  <div key={node.id} className="w-full border border-[var(--rule)] bg-[var(--paper)] p-2 flex justify-between items-center text-xs font-mono">
+                    <span className="font-bold text-[var(--ink)]">{node.label}</span>
+                    <span className="text-[10px] text-[var(--ink-soft)]">{node.sub}</span>
+                  </div>
+                ))}
               </div>
             </div>
-            <div className="mt-2 text-center text-[10px] font-mono text-[var(--ink-soft)] hidden sm:block">
-              Closed-loop verification pipeline · Every state transition is cryptographically verifiable &amp; sealed
+
+            <div className="mt-3 pt-2.5 border-t border-[var(--rule)] text-center text-[10px] font-mono text-[var(--ink-soft)]">
+              Closed-loop verification pipeline · Every state transition is cryptographically verifiable and sealed
             </div>
           </div>
 
@@ -377,12 +410,16 @@ export default function Home() {
 
           <div className="flex flex-col sm:flex-row gap-8 font-mono text-xs">
             <div>
-              <p className="font-semibold text-[var(--ink)] mb-2">Test Results</p>
+              <p className="font-semibold text-[var(--ink)] mb-2">CI Test Results</p>
               <ul className="space-y-1 text-[var(--ink-soft)]">
-                <li>Vitest unit suite: 574 passed, 0 failed</li>
-                <li>Playwright E2E: 33 passed / 33</li>
+                <li>Vitest unit suite: 576 passed, 0 failed</li>
+                <li>Playwright E2E: 63 passed / 63</li>
                 <li>Adversarial (fail-closed): 30 passed</li>
               </ul>
+              <p className="text-[10px] text-[var(--ink-soft)] mt-2 leading-relaxed">
+                Automated suite · verified at submission build.
+              </p>
+
             </div>
             <div>
               <p className="font-semibold text-[var(--ink)] mb-2">Architectural Invariants</p>
@@ -447,8 +484,8 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ── Footer ───────────────────────────────────────────────────────── */}
-        <footer className="mt-10 pt-6 border-t border-[var(--rule)] font-mono text-[10px] text-[var(--ink-soft)] flex flex-col sm:flex-row justify-between gap-3">
+        {/* ── Footer Link Bar ────────────────────────────────────────────── */}
+        <div className="mt-10 pt-6 border-t border-[var(--rule)] font-mono text-[10px] text-[var(--ink-soft)] flex flex-col sm:flex-row justify-between gap-3">
           <div>Ward Proof-Line · Ubuntu Ledger · OSF × Andela Hackathon 2026</div>
           <div className="flex gap-4">
             <Link
@@ -467,9 +504,9 @@ export default function Home() {
               Start demo
             </Link>
           </div>
-        </footer>
+        </div>
 
       </div>
-    </main>
+    </div>
   );
 }

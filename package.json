@@ -11,13 +11,13 @@
     "test": "vitest run",
     "test:unit": "vitest run tests/unit",
     "test:adversarial": "vitest run tests/adversarial",
+    "test:integration": "vitest run tests/integration",
     "test:e2e": "playwright test",
     "dev:full": "next dev",
     "seed:demo": "tsx scripts/seed-demo.ts"
   },
   "dependencies": {
     "clsx": "^2.1.1",
-    "lucide-react": "^0.468.0",
     "next": "^15.1.0",
     "pg": "^8.23.0",
     "react": "^19.0.0",

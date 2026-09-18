@@ -14,6 +14,7 @@ import type { FiscalState, AuditState, ProbationState } from '@/domain/types';
 import { NarrativeState } from '@/components/NarrativeState';
 import { WitnessCounter } from '@/components/WitnessCounter';
 import { ProbationCountdown } from '@/components/ProbationCountdown';
+import { EmptyState } from '@/components/ui/EmptyState';
 import { systemClock } from '@/infra/clock';
 
 export interface ProjectBoardItem {
@@ -75,10 +76,12 @@ export function ProjectBoard({
 
   // Banner / Feedback States
   const [alertBanner, setAlertBanner] = useState<{
-    type: 'notice' | 'error' | 'success';
+    type: 'notice' | 'error' | 'success' | 'refusal';
     title: string;
     message: string;
     code?: string;
+    probationEndsAt?: string | null;
+    auditSeq?: string | null;
   } | null>(null);
 
   // Close attempt state
@@ -245,14 +248,17 @@ export function ProjectBoard({
       const body = await res.json();
 
       if (res.status === 409) {
-        // Expected canonical refusal
+        // Expected canonical refusal — INV-01 cryptographic enforcement
+        const probationTarget = projects.find(p => p.projectCode === projectCode);
         setAlertBanner({
-          type: 'error',
+          type: 'refusal',
           title: '409 E_PROBATION_LOCKED — Early Close Refused',
           message:
             body.detail ||
             'Ticket cannot be closed before probation window ends. The closing key is held by time and community, never by an admin claim.',
           code: body.code,
+          probationEndsAt: probationTarget?.probationEndsAt ?? null,
+          auditSeq: body.auditSeq ?? null,
         });
       } else if (!res.ok) {
         setAlertBanner({
@@ -315,7 +321,7 @@ export function ProjectBoard({
         </div>
 
         {/* Demo Trigger */}
-        <div className="flex items-center gap-2">
+        <div className="flex flex-col items-end gap-2">
           <button
             type="button"
             data-testid="demo-reset-btn"
@@ -325,11 +331,76 @@ export function ProjectBoard({
           >
             [demo: simulate breakage on 4412]
           </button>
+          
+          {/* Journey nav - shown after demo */}
+          <div className="text-right font-mono text-[11px] text-[var(--ink-soft)]">
+            After testing the probation lock:
+            {' '}
+            <Link href="/receipt/4412" className="text-[var(--ink)] hover:underline">Step 3: Public Receipt ›</Link>
+          </div>
         </div>
       </div>
 
       {/* Alert / Notice Banner */}
       {alertBanner && (
+        alertBanner.type === 'refusal' ? (
+          /* Statutory Refusal Card — INV-01 cryptographic enforcement (409 E_PROBATION_LOCKED) */
+          <div
+            data-testid="console-alert-banner"
+            role="alert"
+            className="border-2 border-[var(--ink)] bg-[var(--paper)] p-4 text-xs font-mono"
+          >
+            <div className="flex items-start justify-between gap-3">
+              <div className="space-y-2 flex-1">
+                <div className="flex items-center gap-2 text-amber-800 font-bold text-[11px] uppercase tracking-wider">
+                  <span className="w-2.5 h-2.5 bg-amber-600 inline-block" />
+                  STATUTORY REFUSAL — PROBATION ACTIVE
+                </div>
+                <div className="font-bold text-[var(--ink)]">{alertBanner.title}</div>
+                <p className="text-[11px] leading-relaxed text-[var(--ink)] opacity-90">{alertBanner.message}</p>
+                <div className="bg-[var(--paper-warm)] border border-amber-200 p-2.5 space-y-1 text-[10px]">
+                  <div className="flex gap-3">
+                    <span className="text-[var(--ink-soft)] w-32 flex-shrink-0">Domain Invariant:</span>
+                    <span className="font-semibold text-amber-900">INV-01 — Cryptographically Enforced</span>
+                  </div>
+                  <div className="flex gap-3">
+                    <span className="text-[var(--ink-soft)] w-32 flex-shrink-0">Status Code:</span>
+                    <span className="font-semibold">{alertBanner.code ?? 'E_PROBATION_LOCKED'}</span>
+                  </div>
+                  {alertBanner.probationEndsAt && (
+                    <div className="flex gap-3">
+                      <span className="text-[var(--ink-soft)] w-32 flex-shrink-0">Probation Ends:</span>
+                      <span className="font-semibold">{new Date(alertBanner.probationEndsAt).toLocaleDateString('en-GB', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' })}</span>
+                    </div>
+                  )}
+                  <div className="flex gap-3">
+                    <span className="text-[var(--ink-soft)] w-32 flex-shrink-0">Audit Record:</span>
+                    <span className="font-semibold">Attempt logged to tamper-evident hash chain</span>
+                  </div>
+                </div>
+                <p className="text-[10px] text-[var(--ink-soft)] italic">
+                  This refusal is evidence the system is working as designed. No role — not ADMIN, not MODERATOR — may bypass INV-01.
+                </p>
+                <div className="mt-4 pt-3 border-t border-[var(--rule)] flex items-center justify-between">
+                  <span className="font-mono text-[10px] text-[var(--ink-soft)]">Proof B verified — probation lock active</span>
+                  <Link
+                    href="/receipt/4412"
+                    className="font-mono text-[11px] text-[var(--ink)] hover:underline transition-colors"
+                  >
+                    Step 3: Public Receipt ›
+                  </Link>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setAlertBanner(null)}
+                className="text-neutral-500 hover:text-black font-mono font-bold px-1 flex-shrink-0"
+              >
+                ✕
+              </button>
+            </div>
+          </div>
+        ) : (
         <div
           data-testid="console-alert-banner"
           className={`p-3 border text-xs font-mono flex items-start justify-between gap-3 ${
@@ -362,19 +433,20 @@ export function ProjectBoard({
             ✕
           </button>
         </div>
+        )
       )}
 
       {/* Table Filters & Search */}
-      <div className="flex flex-wrap items-center justify-between gap-3 py-1">
+        <div className="flex flex-wrap items-center justify-between gap-3 py-1">
         {/* Filter Pills */}
         <div className="flex items-center gap-1 text-xs font-mono">
           <span className="text-[var(--ink-soft)] mr-1">Filter:</span>
           {(
             [
-              ['all', 'All (6)'],
-              ['probation', 'Under Probation'],
-              ['broken', 'Broken / Failed'],
-              ['discrepancy', 'Discrepancy'],
+              ['all', `All (${projects.length})`],
+              ['probation', `Under Probation (${projects.filter(p => p.probationState === 'REPAIR_CLAIMED' || p.probationState === 'PROBATION_ACTIVE' || p.probationState === 'PROBATION_DAY_0').length})`],
+              ['broken', `Broken / Failed (${projects.filter(p => p.probationState === 'REPORTED_BROKEN' || p.probationState === 'PROBATION_FAILED').length})`],
+              ['discrepancy', `Discrepancy (${projects.filter(p => p.audit === 'DISCREPANCY_FLAGGED').length})`],
             ] as const
           ).map(([key, label]) => (
             <button
@@ -520,7 +592,11 @@ export function ProjectBoard({
 
                   {/* Witnesses n of target */}
                   <td className="py-2.5 px-3 text-center whitespace-nowrap">
-                    <WitnessCounter count={p.witnessCount} target={p.witnessTarget} />
+                    <WitnessCounter 
+                      count={p.witnessCount} 
+                      target={p.witnessTarget} 
+                      className={p.audit === 'DISCREPANCY_FLAGGED' ? '!text-[var(--ink)]' : ''} 
+                    />
                   </td>
 
                   {/* Probation Status / Countdown */}
@@ -591,8 +667,17 @@ export function ProjectBoard({
 
             {sortedProjects.length === 0 && (
               <tr>
-                <td colSpan={8} className="py-8 text-center text-xs font-mono text-[var(--ink-soft)]">
-                  No projects matching filter criteria.
+                <td colSpan={8}>
+                  <EmptyState
+                    title="No Projects Found"
+                    description={searchQuery
+                      ? `No projects match "${searchQuery}" in this woreda ledger.`
+                      : `No projects match the current filter.`}
+                    query={searchQuery || undefined}
+                    filterLabel={filter !== 'all' ? filter : undefined}
+                    actionLabel="Reset Filters & Search"
+                    onAction={() => { setSearchQuery(''); setFilter('all'); }}
+                  />
                 </td>
               </tr>
             )}

@@ -38,8 +38,8 @@ export function ReceiptAudioButton({ sentence }: ReceiptAudioButtonProps) {
       setIsPlaying(true);
       window.speechSynthesis.speak(utterance);
     } else {
-      setIsPlaying(true);
-      setTimeout(() => setIsPlaying(false), 3000);
+      // speechSynthesis unavailable — show browser hint, do not fake playback
+      alert('Audio read-aloud requires a browser with Web Speech API support (Chrome or Firefox recommended).');
     }
   };
 

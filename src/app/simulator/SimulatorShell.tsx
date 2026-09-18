@@ -49,18 +49,40 @@ function stripPrefix(text: string): string {
 }
 
 /** Split a long string into 20-char LCD rows */
-function toRows(text: string, cols = 20): string[] {
-  const lines = text.split('\n');
+function toRows(text: string, width = 20): string[] {
+  const words = text.split(' ');
   const rows: string[] = [];
-  for (const line of lines) {
-    if (line.length === 0) {
-      rows.push('');
-      continue;
-    }
-    for (let i = 0; i < line.length; i += cols) {
-      rows.push(line.slice(i, i + cols));
+  let current = '';
+  for (const word of words) {
+    if (current.length === 0) {
+      // word itself may be too long - hard-break it
+      if (word.length > width) {
+        let remaining = word;
+        while (remaining.length > width) {
+          rows.push(remaining.slice(0, width));
+          remaining = remaining.slice(width);
+        }
+        current = remaining;
+      } else {
+        current = word;
+      }
+    } else if (current.length + 1 + word.length <= width) {
+      current += ' ' + word;
+    } else {
+      rows.push(current.padEnd(width));
+      if (word.length > width) {
+        let remaining = word;
+        while (remaining.length > width) {
+          rows.push(remaining.slice(0, width));
+          remaining = remaining.slice(width);
+        }
+        current = remaining;
+      } else {
+        current = word;
+      }
     }
   }
+  if (current.length > 0) rows.push(current);
   return rows;
 }
 
@@ -93,6 +115,7 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
   const [activeAudioKeys, setActiveAudioKeys] = useState<string[]>([]);
   const [session, setSession] = useState<UssdSession | null>(null);
   const [lcdLines, setLcdLines] = useState<string[]>(['Ward Proof-Line', 'Feature-Phone Sim', '', 'Select persona']);
+  const [showMore, setShowMore] = useState(false);
   const [inputBuffer, setInputBuffer] = useState('');
   const [transcript, setTranscript] = useState<TranscriptEntry[]>([]);
   const [loading, setLoading] = useState(false);
@@ -164,7 +187,9 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
         }
 
         const isEnd = isEndResponse(rawText);
-        setLcdLines(toRows(stripPrefix(rawText)).slice(0, 4));
+        const rows = toRows(stripPrefix(rawText));
+        setLcdLines(rows);
+        setShowMore(false);
         if (isEnd) {
           setSession((s) => s ? { ...s, isAlive: false } : null);
         } else {
@@ -259,7 +284,9 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
           }
 
           const isEnd = isEndResponse(rawText);
-          setLcdLines(toRows(stripPrefix(rawText)).slice(0, 4));
+          const rows = toRows(stripPrefix(rawText));
+          setLcdLines(rows);
+          setShowMore(false);
           if (isEnd) {
             setSession((s) => s ? { ...s, isAlive: false } : null);
           } else {
@@ -530,17 +557,32 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
                 </span>
               </div>
               {/* 4 × 20 LCD lines */}
-              {Array.from({ length: 4 }).map((_, i) => (
-                <div
-                  key={i}
-                  className="text-[var(--lcd-ink)] overflow-hidden whitespace-nowrap text-ellipsis"
-                  style={{ maxWidth: '20ch' }}
-                  data-testid={`lcd-line-${i}`}
-                >
-                  {lcdLines[i] ?? ''}
-                </div>
-              ))}
+              {Array.from({ length: 4 }).map((_, i) => {
+                const lineIndex = showMore ? i + 4 : i;
+                return (
+                  <div
+                    key={lineIndex}
+                    className="text-[var(--lcd-ink)] overflow-hidden whitespace-nowrap text-ellipsis"
+                    style={{ maxWidth: '20ch' }}
+                    data-testid={`lcd-line-${i}`}
+                  >
+                    {lcdLines[lineIndex] ?? ''}
+                  </div>
+                );
+              })}
             </div>
+
+            {/* Scroll Button (if overflow) */}
+            {lcdLines.length > 4 && (
+              <div className="mx-3 mt-1 flex justify-center">
+                <button
+                  onClick={() => setShowMore(!showMore)}
+                  className="text-[10px] font-bold text-gray-400 hover:text-gray-200 uppercase tracking-widest bg-gray-700 px-3 py-0.5 rounded-full"
+                >
+                  {showMore ? '[scroll ▴]' : '[scroll ▾]'}
+                </button>
+              </div>
+            )}
 
             {/* Active session info */}
             <div className="mx-3 mt-1 text-[9px] font-mono text-gray-400 flex items-center gap-2">

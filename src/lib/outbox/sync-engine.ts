@@ -219,6 +219,31 @@ export class SyncEngine {
 
     return { processed, synced, failed, paused };
   }
+
+  /**
+   * Resets FAILED item(s) back to QUEUED and triggers an immediate flush,
+   * enabling recovery from transient client/network error states.
+   */
+  public async retryFailed(clientIdempotencyKey?: string): Promise<{
+    processed: number;
+    synced: number;
+    failed: number;
+    paused: boolean;
+  }> {
+    const all = await this.store.getAll();
+    for (const item of all) {
+      if (item.status === 'FAILED') {
+        if (!clientIdempotencyKey || item.clientIdempotencyKey === clientIdempotencyKey) {
+          await this.store.updateStatus(item.clientIdempotencyKey, 'QUEUED', {
+            retryCount: 0,
+            lastError: null,
+          });
+        }
+      }
+    }
+    await this.notifyListeners();
+    return this.flush();
+  }
 }
 
 let globalSyncEngine: SyncEngine | null = null;

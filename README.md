@@ -6,6 +6,36 @@
 
 ---
 
+## 🏛 For Hackathon Judges
+
+Welcome to the **Ward Proof-Line (Ubuntu Ledger)** submission for the Open Society Foundations × Andela Hackathon (*"Information you can trust"*).
+
+### The 5 Core Pillars
+1. **Proof of Task:** Turning opaque municipal capital budgets into five-minute physical verification checklists that any citizen can answer on a basic feature phone.
+2. **Open Voice:** Interactive Voice Response (IVR) telephony and local FM radio bulletins in local languages (Amharic, Afaan Oromo, Swahili, English) for citizens across all literacy levels.
+3. **Ward Receipt:** Cryptographically verified public spending receipts with direct citations, page numbers, and SHA-256 hashes linking back to official government gazettes.
+4. **Bribe-Resistant Checklist:** Side-by-side two-ledger separation contrasting statutory fee ceilings against counter realities, accompanied by plain-language citizen refusal scripts.
+5. **Proof-of-Fix (Probation Lock):** A mandatory 7-day citizen verification probation window before any repair ticket can be signed off. A contractor cannot close their own ticket.
+
+### How to Evaluate the 6 Surfaces
+We invite judges to explore the 6 verified demonstration portals in order:
+
+| Surface | URL | What Invariant It Proves |
+|---|---|---|
+| **1. Overview & Thesis** | [`/`](http://localhost:3000/) | The institutional thesis, closed-loop 6-stage Proof-Line pipeline schematic, and architecture. |
+| **2. Feature-Phone Simulator** | [`/simulator`](http://localhost:3000/simulator) | **Proof A (Sybil Resistance):** Dial `*890#`. Amina moves quorum $2 \to 3$. Switching to Girma (same cell cluster) is suppressed: witness count stays at 3. |
+| **3. Municipal Console** | [`/console`](http://localhost:3000/console) | **Proof B (INV-01 Probation Lock):** Recording a contractor claim turns amber (`REPAIR_CLAIMED`), never green. Attempting early close returns `409 E_PROBATION_LOCKED`. |
+| **4. Civic Spending Receipt** | [`/receipt/4412`](http://localhost:3000/receipt/4412) | **Cryptographic Provenance:** Itemized budget card with official gazette citation (Vol 14, Page 88), SHA-256 hash, and trilingual audio readout. |
+| **5. Service Divergence Card** | [`/services/ET-ID-REPLACE`](http://localhost:3000/services/ET-ID-REPLACE) | **Proof C (Two-Ledger Separation & k-Anonymity):** Official ceiling (ETB 50) vs community reality (ETB 120). Reports below $k=5$ are strictly suppressed. Citizen refusal script included. |
+| **6. Field Monitor PWA** | [`/pwa`](http://localhost:3000/pwa) | **Offline-First Resilience:** Toggle Airplane Mode to test client-side IndexedDB outbox queueing and automatic idempotent background sync on reconnect. |
+
+### Local Setup for Judges (Full 574-Test Suite)
+The repository runs out-of-the-box in memory (`npm run dev` / `npm test`), passing 565 tests (with 11 multi-connection database tests skipped).  
+To run the full **574-test live PostgreSQL & RLS concurrency suite**, please refer to our step-by-step guide:  
+👉 **[docs/hackathon/ci-notes.md](file:///docs/hackathon/ci-notes.md)**
+
+---
+
 ## Quick Links
 
 - **Feature-Phone Simulator:** [`/simulator`](http://localhost:3000/simulator) — *USSD and IVR audio verification*

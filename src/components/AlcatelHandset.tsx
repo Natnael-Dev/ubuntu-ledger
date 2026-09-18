@@ -77,69 +77,78 @@ export function AlcatelHandset({
   const sessionActive = Boolean(session?.isAlive);
 
   return (
-    <div className="flex flex-col items-center select-none w-full max-w-[310px] mx-auto">
-      {/* ─── Outer Physical Chassis (Authentic Alcatel 1066 Matte Slate-Teal) ─── */}
+    <div className="flex flex-col items-center select-none w-full max-w-[320px] mx-auto">
+      {/* ─── Outer Physical Chassis (Alcatel 1066 Handset Styling) ─── */}
       <div
         data-testid="feature-phone"
-        className="w-full bg-[#22333A] rounded-[38px] p-3.5 pt-3 pb-5 shadow-2xl shadow-slate-900/40 border border-[#2D424B] relative flex flex-col items-center transition-transform"
+        className="w-full bg-[#1C282E] rounded-[42px] p-4 pt-3.5 pb-6 shadow-2xl shadow-slate-950/50 border-2 border-[#26373F] relative flex flex-col items-center transition-all"
+        style={{
+          boxShadow:
+            '0 25px 50px -12px rgba(0, 0, 0, 0.45), inset 0 1px 1px rgba(255, 255, 255, 0.15), inset 0 -2px 4px rgba(0, 0, 0, 0.6)',
+        }}
       >
-        {/* Subtle molded plastic chamfer highlight */}
-        <div className="absolute inset-x-8 top-1 h-[1.5px] bg-white/10 rounded-full pointer-events-none" />
+        {/* Chamfered highlight on top edge */}
+        <div className="w-28 h-1 bg-white/10 rounded-full mb-2 pointer-events-none" />
 
-        {/* Earpiece slit */}
-        <div className="w-12 h-1.5 rounded-full bg-[#111A1D] mb-2.5 border-b border-white/5 flex items-center justify-center">
-          <div className="w-7 h-0.5 rounded-full bg-[#202E34]" />
+        {/* Earpiece Speaker Slit */}
+        <div className="w-14 h-2 rounded-full bg-[#0D1417] mb-3 border-b border-white/10 flex items-center justify-center shadow-inner">
+          <div className="w-8 h-0.5 rounded-full bg-[#1F2E35]" />
         </div>
 
         {/* ─── Screen Bezel & LCD Display Frame ─── */}
-        <div className="w-full bg-[#0E1619] rounded-2xl p-2.5 border border-[#162227] shadow-inner mb-2.5">
+        <div className="w-full bg-[#0A1013] rounded-2xl p-3 border border-[#182328] shadow-inner mb-3">
           {/* Inset Retro Olive LCD Screen */}
           <div
             data-testid="lcd-display"
             aria-label="LCD display"
-            className="w-full bg-[#C8D9A2] text-[#142010] rounded-md p-2.5 font-mono text-xs shadow-inner relative overflow-hidden flex flex-col justify-between border border-[#A4B57D]"
-            style={{ minHeight: '135px' }}
+            className="w-full bg-[#C6D79E] text-[#12200E] rounded-md p-2.5 font-mono text-xs shadow-inner relative overflow-hidden flex flex-col justify-between border border-[#9FB07A]"
+            style={{
+              minHeight: '138px',
+              boxShadow: 'inset 0 2px 4px rgba(0, 0, 0, 0.25)',
+            }}
           >
             {/* Subtle retro LCD scanlines */}
             <div
-              className="absolute inset-0 pointer-events-none opacity-10"
+              className="absolute inset-0 pointer-events-none opacity-15"
               style={{
                 backgroundImage:
-                  'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.2) 3px)',
+                  'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(18, 32, 14, 0.2) 3px)',
               }}
             />
 
             {/* Top LCD Status Bar */}
-            <div className="flex items-center justify-between text-[9px] font-bold tracking-tight opacity-80 border-b border-[#142010]/20 pb-1 mb-1">
-              <div className="flex items-center gap-1">
-                {/* Signal bars */}
-                <span className="flex items-end gap-0.5 h-2.5" title="Signal">
-                  <span className="w-0.5 h-1 bg-[#142010]" />
-                  <span className="w-0.5 h-1.5 bg-[#142010]" />
-                  <span className="w-0.5 h-2 bg-[#142010]" />
-                  <span className="w-0.5 h-2.5 bg-[#142010]" />
-                </span>
-                <span>Safaricom {channelMode === 'IVR' ? '• IVR' : ''}</span>
-              </div>
+            <div className="flex items-center justify-between text-[10px] font-bold tracking-tight opacity-85 border-b border-[#12200E]/25 pb-1 mb-1 relative z-10">
               <div className="flex items-center gap-1.5">
-                <span data-testid="phone-number">
+                {/* 4 Signal bars */}
+                <span className="flex items-end gap-0.5 h-3" title="Signal strength">
+                  <span className="w-0.5 h-1 bg-[#12200E]" />
+                  <span className="w-0.5 h-1.5 bg-[#12200E]" />
+                  <span className="w-0.5 h-2 bg-[#12200E]" />
+                  <span className="w-0.5 h-2.5 bg-[#12200E]" />
+                </span>
+                <span className="font-sans font-extrabold text-[9px] uppercase tracking-wider">
+                  Safaricom {channelMode === 'IVR' ? '• Voice' : ''}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span data-testid="phone-number" className="font-mono text-[9.5px]">
                   {selectedPersona.msisdn.replace('+', '')}
                 </span>
-                <span>10:24</span>
-                {/* Battery icon */}
-                <div className="w-3.5 h-2 border border-[#142010] rounded-xs p-0.5 flex items-center">
-                  <div className="w-full h-full bg-[#142010]" />
+                <span className="font-sans text-[9px]">10:24</span>
+                {/* Battery icon with charging bar */}
+                <div className="w-4 h-2.5 border border-[#12200E] rounded-xs p-0.5 flex items-center">
+                  <div className="w-full h-full bg-[#12200E]" />
                 </div>
               </div>
             </div>
 
-            {/* 4 × 20 USSD Text Lines */}
-            <div className="flex-1 flex flex-col justify-center space-y-0.5 py-0.5 font-mono">
+            {/* 4 × 20 USSD Text Lines (Sacred DOM Contract) */}
+            <div className="flex-1 flex flex-col justify-center space-y-0.5 py-1 font-mono relative z-10">
               {Array.from({ length: 4 }).map((_, i) => (
                 <div
                   key={i}
                   data-testid={`lcd-line-${i}`}
-                  className="leading-snug truncate whitespace-pre text-[12px] font-medium tracking-tight"
+                  className="leading-snug truncate whitespace-pre text-[12.5px] font-bold tracking-tight"
                 >
                   {lcdLines[i] ?? ''}
                 </div>
@@ -147,24 +156,24 @@ export function AlcatelHandset({
             </div>
 
             {/* Bottom LCD Softkey Labels */}
-            <div className="flex items-center justify-between text-[9px] font-bold uppercase tracking-wider opacity-75 pt-1 border-t border-[#142010]/20 mt-1">
+            <div className="flex items-center justify-between text-[9.5px] font-extrabold uppercase tracking-wider opacity-80 pt-1 border-t border-[#12200E]/20 mt-1 relative z-10">
               <span>Select</span>
               <span>Back</span>
             </div>
           </div>
 
           {/* Alcatel Logo Chin (White, signature lowercase wordmark) */}
-          <div className="text-center mt-1.5">
-            <span className="font-sans font-extrabold text-[10px] tracking-[0.25em] text-white/90 lowercase">
+          <div className="text-center mt-2">
+            <span className="font-sans font-extrabold text-[11px] tracking-[0.28em] text-slate-100 lowercase">
               alcatel
             </span>
           </div>
         </div>
 
         {/* ─── Control Key Cluster: Softkeys, D-Pad, Call & End ─── */}
-        <div className="w-full px-0.5 mb-2.5">
+        <div className="w-full px-0.5 mb-3">
           {/* Row 1: Softkeys & Circular 5-Way D-Pad */}
-          <div className="grid grid-cols-3 gap-1.5 items-center mb-2">
+          <div className="grid grid-cols-3 gap-2 items-center mb-2.5">
             {/* Left Softkey */}
             <button
               type="button"
@@ -172,19 +181,19 @@ export function AlcatelHandset({
               onClick={() => {
                 if (sessionActive) onKeypadPress('1');
               }}
-              className="h-7 bg-[#202E34] hover:bg-[#2A3C43] active:bg-[#152024] active:translate-y-0.5 text-slate-300 text-[11px] font-bold rounded-lg border-t border-white/10 shadow-xs flex items-center justify-center transition-all"
+              className="h-8 bg-[#23333B] hover:bg-[#2C3F48] active:bg-[#182328] active:translate-y-0.5 text-slate-200 text-sm font-bold rounded-xl border-t border-white/15 shadow-sm flex items-center justify-center transition-all cursor-pointer"
             >
               —
             </button>
 
             {/* 5-Way Circular D-Pad */}
-            <div className="w-16 h-14 mx-auto relative bg-[#172327] rounded-full border border-slate-600/50 shadow flex items-center justify-center p-1">
+            <div className="w-18 h-16 mx-auto relative bg-[#131D21] rounded-full border border-slate-600/60 shadow-lg flex items-center justify-center p-1">
               {/* Up arrow */}
               <button
                 type="button"
                 aria-label="D-Pad Up"
                 onClick={() => {}}
-                className="absolute top-0.5 left-1/2 -translate-x-1/2 text-slate-400 text-[8px] hover:text-white"
+                className="absolute top-1 left-1/2 -translate-x-1/2 text-slate-400 text-[9px] hover:text-white"
               >
                 ▲
               </button>
@@ -193,7 +202,7 @@ export function AlcatelHandset({
                 type="button"
                 aria-label="D-Pad Down"
                 onClick={() => {}}
-                className="absolute bottom-0.5 left-1/2 -translate-x-1/2 text-slate-400 text-[8px] hover:text-white"
+                className="absolute bottom-1 left-1/2 -translate-x-1/2 text-slate-400 text-[9px] hover:text-white"
               >
                 ▼
               </button>
@@ -202,7 +211,7 @@ export function AlcatelHandset({
                 type="button"
                 aria-label="D-Pad Left"
                 onClick={() => {}}
-                className="absolute left-1 top-1/2 -translate-y-1/2 text-slate-400 text-[8px] hover:text-white"
+                className="absolute left-1.5 top-1/2 -translate-y-1/2 text-slate-400 text-[9px] hover:text-white"
               >
                 ◀
               </button>
@@ -211,7 +220,7 @@ export function AlcatelHandset({
                 type="button"
                 aria-label="D-Pad Right"
                 onClick={() => {}}
-                className="absolute right-1 top-1/2 -translate-y-1/2 text-slate-400 text-[8px] hover:text-white"
+                className="absolute right-1.5 top-1/2 -translate-y-1/2 text-slate-400 text-[9px] hover:text-white"
               >
                 ▶
               </button>
@@ -222,7 +231,7 @@ export function AlcatelHandset({
                 onClick={() => {
                   if (!sessionActive) onDial();
                 }}
-                className="w-7 h-7 bg-[#2A3C43] hover:bg-[#344B53] active:bg-[#182327] active:scale-95 rounded-full border border-slate-500/40 flex items-center justify-center text-[9px] font-bold text-white shadow-inner"
+                className="w-8 h-8 bg-[#2B3E46] hover:bg-[#364C56] active:bg-[#182327] active:scale-95 rounded-full border border-slate-400/30 flex items-center justify-center text-[10px] font-bold text-white shadow-inner"
               >
                 OK
               </button>
@@ -234,14 +243,14 @@ export function AlcatelHandset({
               data-testid="btn-back"
               aria-label="Back button"
               onClick={onBack}
-              className="h-7 bg-[#202E34] hover:bg-[#2A3C43] active:bg-[#152024] active:translate-y-0.5 text-slate-300 text-[11px] font-bold rounded-lg border-t border-white/10 shadow-xs flex items-center justify-center transition-all"
+              className="h-8 bg-[#23333B] hover:bg-[#2C3F48] active:bg-[#182328] active:translate-y-0.5 text-slate-200 text-sm font-bold rounded-xl border-t border-white/15 shadow-sm flex items-center justify-center transition-all cursor-pointer"
             >
               —
             </button>
           </div>
 
           {/* Row 2: Call Key (Green) & End Key (Red) */}
-          <div className="grid grid-cols-2 gap-2.5 px-0.5">
+          <div className="grid grid-cols-2 gap-3 px-0.5">
             {/* Green Call / Dial Key */}
             <button
               type="button"
@@ -249,12 +258,12 @@ export function AlcatelHandset({
               aria-label={sessionActive ? 'Redial session' : 'Dial star 890 hash'}
               onClick={onDial}
               disabled={loading}
-              className="h-8 rounded-xl bg-[#1A2E2A] hover:bg-[#223D38] active:translate-y-0.5 text-emerald-400 font-bold flex items-center justify-center border border-emerald-500/40 shadow-xs transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 disabled:opacity-50"
+              className="h-9 rounded-xl bg-gradient-to-b from-[#1E3B33] to-[#142621] hover:from-[#254A40] hover:to-[#19302A] active:translate-y-0.5 text-emerald-300 font-bold flex items-center justify-center border border-emerald-500/50 shadow-sm transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 disabled:opacity-50 cursor-pointer"
             >
-              <svg className="w-3.5 h-3.5 mr-1" fill="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 mr-1.5" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M6.62 10.79a15.053 15.053 0 006.59 6.59l2.2-2.2a1 1 0 011.02-.24c1.12.37 2.33.57 3.57.57a1 1 0 011 1v3.5a1 1 0 01-1 1C10.61 21 3 13.39 3 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.45.57 3.57a1 1 0 01-.25 1.02l-2.2 2.2z" />
               </svg>
-              <span className="text-[11px] tracking-tight">{sessionActive ? 'REDIAL' : 'DIAL'}</span>
+              <span className="text-xs tracking-wider">{sessionActive ? 'REDIAL' : 'DIAL'}</span>
             </button>
 
             {/* Red End Key */}
@@ -264,12 +273,12 @@ export function AlcatelHandset({
               aria-label="End call session"
               onClick={onEnd}
               disabled={loading || !sessionActive}
-              className="h-8 rounded-xl bg-[#331D22] hover:bg-[#42252B] active:translate-y-0.5 text-rose-400 font-bold flex items-center justify-center border border-rose-500/40 shadow-xs transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-400 disabled:opacity-40"
+              className="h-9 rounded-xl bg-gradient-to-b from-[#3D1E24] to-[#261317] hover:from-[#4D262E] hover:to-[#31181D] active:translate-y-0.5 text-rose-300 font-bold flex items-center justify-center border border-rose-500/50 shadow-sm transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-400 disabled:opacity-40 cursor-pointer"
             >
-              <svg className="w-3.5 h-3.5 mr-1" fill="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 mr-1.5" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M12 9c-1.6 0-3.15.25-4.6.72a1 1 0 00-.73.97v3.2a1 1 0 00.6.92 11.96 11.96 0 007.46 0 1 1 0 00.6-.92v-3.2a1 1 0 00-.73-.97A14.86 14.86 0 0012 9z" />
               </svg>
-              <span className="text-[11px] tracking-tight">END</span>
+              <span className="text-xs tracking-wider">END</span>
             </button>
           </div>
         </div>
@@ -279,7 +288,7 @@ export function AlcatelHandset({
           data-testid="keypad"
           role="group"
           aria-label="Phone keypad"
-          className="w-full grid grid-cols-3 gap-1.5 px-0.5 mb-2"
+          className="w-full grid grid-cols-3 gap-2 px-0.5 mb-2.5"
         >
           {KEYPAD_KEYS.map(({ key, letters, ariaLabel }) => (
             <button
@@ -291,14 +300,14 @@ export function AlcatelHandset({
                 if (sessionActive) onKeypadPress(key);
               }}
               disabled={!sessionActive || loading}
-              className={`h-10 rounded-xl flex flex-col items-center justify-center transition-all border-t border-white/10 shadow-2xs ${
+              className={`h-11 rounded-xl flex flex-col items-center justify-center transition-all border-t border-white/15 shadow-sm ${
                 sessionActive && !loading
-                  ? 'bg-[#2A3C43] hover:bg-[#344B53] active:bg-[#1A252A] active:translate-y-0.5 text-white cursor-pointer'
-                  : 'bg-[#1E2B30] text-slate-500 cursor-not-allowed border-transparent'
+                  ? 'bg-[#2A3C44] hover:bg-[#354C57] active:bg-[#1A252A] active:translate-y-0.5 text-white cursor-pointer'
+                  : 'bg-[#1D292F] text-slate-500 cursor-not-allowed border-transparent'
               }`}
             >
-              <span className="text-xs font-bold leading-none">{key}</span>
-              <span className="text-[7.5px] text-slate-400 font-medium leading-none mt-0.5 tracking-wider">
+              <span className="text-sm font-bold leading-none">{key}</span>
+              <span className="text-[8px] text-slate-300 font-semibold leading-none mt-1 tracking-wider">
                 {letters}
               </span>
             </button>
@@ -306,7 +315,7 @@ export function AlcatelHandset({
         </div>
 
         {/* ─── Direct Text Input Row ─── */}
-        <div className="w-full px-0.5 flex gap-1 mb-2">
+        <div className="w-full px-0.5 flex gap-1.5 mb-2.5">
           <input
             ref={inputRef}
             type="text"
@@ -318,7 +327,7 @@ export function AlcatelHandset({
             maxLength={10}
             aria-label="Direct keypad input"
             data-testid="text-input"
-            className="flex-1 bg-[#141E22] border border-slate-700 rounded-lg text-white text-xs px-2 py-1 placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-blue-400 disabled:opacity-40 font-mono"
+            className="flex-1 bg-[#121A1E] border border-slate-700 rounded-lg text-white text-xs px-2.5 py-1.5 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-400 disabled:opacity-40 font-mono"
           />
           <button
             type="button"
@@ -326,7 +335,7 @@ export function AlcatelHandset({
             aria-label="Clear direct text input"
             onClick={onClearInput}
             disabled={!sessionActive || loading || !inputBuffer}
-            className="px-2 py-1 bg-slate-700 hover:bg-slate-600 disabled:opacity-30 text-white text-[10px] font-semibold rounded-lg transition-colors"
+            className="px-2.5 py-1.5 bg-slate-700 hover:bg-slate-600 disabled:opacity-30 text-white text-[11px] font-semibold rounded-lg transition-colors cursor-pointer"
           >
             Clear
           </button>
@@ -336,7 +345,7 @@ export function AlcatelHandset({
             aria-label="Send direct input"
             onClick={onDirectSend}
             disabled={!sessionActive || loading || !inputBuffer}
-            className="px-2 py-1 bg-blue-600 hover:bg-blue-500 disabled:opacity-30 text-white text-[10px] font-semibold rounded-lg transition-colors"
+            className="px-2.5 py-1.5 bg-blue-600 hover:bg-blue-500 disabled:opacity-30 text-white text-[11px] font-semibold rounded-lg transition-colors cursor-pointer"
           >
             Send
           </button>
@@ -346,18 +355,18 @@ export function AlcatelHandset({
             aria-label="Home button"
             onClick={onHome}
             disabled={!sessionActive || loading}
-            className="px-2 py-1 bg-slate-700 hover:bg-slate-600 disabled:opacity-30 text-white text-[10px] font-semibold rounded-lg transition-colors"
+            className="px-2.5 py-1.5 bg-slate-700 hover:bg-slate-600 disabled:opacity-30 text-white text-[11px] font-semibold rounded-lg transition-colors cursor-pointer"
           >
             Home
           </button>
         </div>
 
         {/* Session Telemetry Status */}
-        <div className="w-full px-1 flex items-center justify-between text-[9px] font-mono text-slate-400">
-          <span data-testid="session-state">
+        <div className="w-full px-1 flex items-center justify-between text-[10px] font-mono text-slate-400 border-t border-slate-800/80 pt-1.5">
+          <span data-testid="session-state" className="font-bold">
             {session ? (session.isAlive ? '● ACTIVE' : '◉ ENDED') : '○ IDLE'}
           </span>
-          <span data-testid="session-accumulator" className="truncate max-w-[140px]">
+          <span data-testid="session-accumulator" className="truncate max-w-[150px]">
             [{session?.textAccumulator || '—'}]
           </span>
         </div>
@@ -367,13 +376,13 @@ export function AlcatelHandset({
           <div
             role="alert"
             data-testid="invalid-input-banner"
-            className="w-full mt-2 p-2 bg-amber-400/90 text-amber-950 text-xs font-semibold rounded-lg flex items-center justify-between"
+            className="w-full mt-2.5 p-2.5 bg-amber-400 text-amber-950 text-xs font-bold rounded-xl flex items-center justify-between shadow-sm"
           >
             <span className="truncate">{invalidInputNotice}</span>
             <button
               type="button"
               onClick={onDismissInvalid}
-              className="ml-2 font-bold hover:opacity-75"
+              className="ml-2 font-extrabold hover:opacity-75"
             >
               ×
             </button>
@@ -381,33 +390,42 @@ export function AlcatelHandset({
         )}
       </div>
 
-      {/* ─── Current Action Card below Handset (Matches Reference 2) ─── */}
-      <div className="w-full mt-3 bg-white border border-slate-200/80 rounded-2xl p-3.5 shadow-sm flex flex-col gap-2">
-        <div className="flex items-center gap-1.5 text-xs">
-          <span className="text-blue-600 font-bold">📲</span>
-          <span className="font-bold text-slate-900">Current Action</span>
+      {/* ─── Redesigned High-Visibility "Current Action" Card (Agent 3 & 4) ─── */}
+      <div className="w-full mt-4 bg-white border-2 border-blue-600/30 rounded-2xl p-4 shadow-sm flex flex-col gap-2.5">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="w-2.5 h-2.5 rounded-full bg-blue-600 animate-ping" />
+            <span className="font-mono text-xs font-extrabold uppercase tracking-wider text-blue-700">
+              Current Action
+            </span>
+          </div>
+          <span className="text-[11px] font-mono text-slate-500">
+            {sessionActive ? 'Session in progress' : 'Ready to dial'}
+          </span>
         </div>
-        <p className="text-xs text-slate-600">
+
+        <p className="text-sm font-semibold text-slate-900 leading-snug">
           {sessionActive
-            ? 'Follow prompt on LCD or press numbers on keypad.'
-            : 'Dial *890# to open the USSD menu'}
+            ? 'Follow instructions on phone LCD or press digits on the keypad.'
+            : 'Dial *890# to open the Ubuntu Ledger menu.'}
         </p>
-        <div className="flex gap-2 mt-1">
+
+        <div className="flex items-center gap-3 pt-1">
           <button
             type="button"
             onClick={onDial}
             disabled={loading}
-            className="flex-1 py-2 rounded-xl text-xs font-semibold bg-blue-600 hover:bg-blue-700 active:scale-95 text-white flex items-center justify-center gap-1 transition-all shadow-sm"
+            className="flex-1 py-3 px-4 rounded-xl text-sm font-bold bg-blue-600 hover:bg-blue-700 active:scale-98 text-white flex items-center justify-center gap-1.5 transition-all shadow-sm shadow-blue-500/25 cursor-pointer"
           >
             <span>Dial *890#</span>
-            <span>›</span>
+            <span className="text-base">›</span>
           </button>
           <button
             type="button"
             data-testid="btn-new"
             aria-label="Start new session"
             onClick={onStartNew || onDial}
-            className="px-3 py-2 rounded-xl text-xs font-semibold bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 transition-colors"
+            className="py-3 px-4 rounded-xl text-sm font-semibold bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-300 transition-colors cursor-pointer"
           >
             Reset
           </button>

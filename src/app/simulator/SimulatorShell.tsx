@@ -100,6 +100,7 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
   const [activeRightTab, setActiveRightTab] = useState<'live' | 'walkthrough'>('live');
   const [showTechnicalDetails, setShowTechnicalDetails] = useState(false);
   const [scenarioExpanded, setScenarioExpanded] = useState(false);
+  const sessionActive = Boolean(session?.isAlive);
 
   const seqRef = useRef(0);
   const transcriptRef = useRef<HTMLDivElement>(null);
@@ -552,7 +553,7 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
               data-testid="persona-selector"
               role="radiogroup"
               aria-label="Select demo persona"
-              className="space-y-2.5"
+              className="space-y-3"
             >
               {config.personas.map((p) => {
                 const isSelected = selectedPersona.id === p.id;
@@ -566,89 +567,81 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
                     type="button"
                     aria-pressed={isSelected}
                     onClick={() => handleSelectPersona(p)}
-                    className={`w-full text-left p-3.5 rounded-2xl border transition-all flex flex-col gap-2.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 ${
+                    className={`w-full text-left p-4 rounded-2xl border-2 transition-all flex flex-col gap-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 cursor-pointer ${
                       isSelected
-                        ? 'border-blue-600 bg-blue-50/30 shadow-xs ring-1 ring-blue-600'
-                        : 'border-slate-200/80 bg-white hover:border-slate-300 hover:bg-slate-50/50'
+                        ? 'border-blue-600 bg-blue-50/40 shadow-sm ring-1 ring-blue-600'
+                        : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/70'
                     }`}
                   >
                     <div className="flex items-start justify-between w-full">
-                      <div className="flex items-center gap-3">
-                        {/* Realistic Circular Portrait Avatar */}
-                        {isAmina ? (
-                          <div className="w-10 h-10 rounded-full bg-[#E07A5F] overflow-hidden shrink-0 border border-slate-200/60 shadow-2xs flex items-center justify-center">
-                            <svg className="w-8 h-8 text-white/90 translate-y-1" viewBox="0 0 24 24" fill="currentColor">
-                              <path d="M12 2C8.5 2 6 4.5 6 8c0 2.5 1.5 4.5 3.5 5.5-3.5 1.5-5.5 4.5-5.5 8.5h16c0-4-2-7-5.5-8.5 2-1 3.5-3 3.5-5.5 0-3.5-2.5-6-6-6z" />
-                            </svg>
-                          </div>
-                        ) : isGirma ? (
-                          <div className="w-10 h-10 rounded-full bg-[#3D405B] overflow-hidden shrink-0 border border-slate-200/60 shadow-2xs flex items-center justify-center">
-                            <svg className="w-8 h-8 text-white/90 translate-y-1" viewBox="0 0 24 24" fill="currentColor">
-                              <path d="M12 2C9.5 2 7.5 4 7.5 6.5c0 2 1.2 3.8 3 4.5-3.5 1.5-5.5 4.5-5.5 8.5h14c0-4-2-7-5.5-8.5 1.8-.7 3-2.5 3-4.5 0-2.5-2-4.5-4.5-4.5z" />
-                            </svg>
-                          </div>
-                        ) : (
-                          <div className="w-10 h-10 rounded-full bg-[#2A4365] overflow-hidden shrink-0 border border-slate-200/60 shadow-2xs flex items-center justify-center">
-                            <svg className="w-8 h-8 text-white/90 translate-y-1" viewBox="0 0 24 24" fill="currentColor">
-                              <path d="M12 2C8.5 2 6 4.5 6 8c0 2.5 1.5 4.5 3.5 5.5-3.5 1.5-5.5 4.5-5.5 8.5h16c0-4-2-7-5.5-8.5 2-1 3.5-3 3.5-5.5 0-3.5-2.5-6-6-6z" />
-                            </svg>
-                          </div>
-                        )}
+                      <div className="flex items-center gap-3.5">
+                        {/* High-Contrast Civic Identity Avatar Badge */}
+                        <div
+                          className={`w-12 h-12 rounded-full overflow-hidden shrink-0 border-2 flex items-center justify-center font-bold text-sm shadow-xs ${
+                            isAmina
+                              ? 'bg-[#E07A5F] text-white border-amber-200'
+                              : isGirma
+                              ? 'bg-[#3D405B] text-white border-slate-300'
+                              : 'bg-[#2A4365] text-white border-blue-200'
+                          }`}
+                        >
+                          <span>{isAmina ? 'AM' : isGirma ? 'GI' : 'KA'}</span>
+                        </div>
 
                         <div>
-                          <div className="font-bold text-sm text-[#0F172A] leading-tight">
-                            {isAmina ? 'Amina' : isGirma ? 'Girma' : 'Kalinda'}
+                          <div className="font-bold text-base text-[#0F172A] leading-tight flex items-center gap-1.5">
+                            <span>{isAmina ? 'Amina' : isGirma ? 'Girma' : 'Kalinda'}</span>
                             {/* Hidden/accessible full persona label for strict test contracts */}
                             <span className="sr-only"> {p.label}</span>
                           </div>
-                          <p className="text-xs text-slate-500 mt-0.5">
-                            {isKalinda ? 'Kebele 09' : 'Kebele 08'}
+                          <p className="text-xs text-slate-500 font-medium mt-0.5">
+                            {isKalinda ? 'Woreda 09 · Kebele 09' : 'Woreda 09 · Kebele 08'}
                           </p>
-                          <p className="text-[11px] font-mono text-slate-500 mt-0.5 flex items-center gap-1">
+                          <p className="text-xs font-mono text-slate-600 mt-1 flex items-center gap-1.5">
                             <span>📞</span>
-                            <span>{p.msisdn}</span>
+                            <span className="font-semibold">{p.msisdn}</span>
                           </p>
                         </div>
                       </div>
 
-                      {/* Selected check circle badge (Matches Reference 2) */}
+                      {/* Prominent Selection Indicator Radio/Check */}
                       {isSelected ? (
-                        <div className="w-5 h-5 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs shadow-xs shrink-0 mt-0.5">
+                        <div className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-bold shadow-xs shrink-0 mt-1">
                           ✓
                         </div>
                       ) : (
-                        <div className="w-5 h-5 rounded-full border-2 border-slate-300 shrink-0 mt-0.5" />
+                        <div className="w-6 h-6 rounded-full border-2 border-slate-300 shrink-0 mt-1 hover:border-slate-400" />
                       )}
                     </div>
 
-                    {/* Badge Pills Row (Matches Reference 2) */}
-                    <div className="flex items-center gap-2 pt-1.5 border-t border-slate-100">
+                    {/* Badge Pills Row */}
+                    <div className="flex items-center gap-2 pt-2 border-t border-slate-100">
                       {isAmina && (
                         <>
-                          <span className="text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                          <span className="text-xs font-bold px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-300">
                             DEMO WITNESS
                           </span>
-                          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+                          <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-900">
                             Active
                           </span>
                         </>
                       )}
                       {isGirma && (
                         <>
-                          <span className="text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200 font-bold">
+                          <span className="text-xs font-bold px-3 py-1 rounded-full bg-amber-50 text-amber-900 border border-amber-300">
                             DUPLICATE CLUSTER
                           </span>
-                          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
+                          <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-100 text-slate-700">
                             Ready
                           </span>
                         </>
                       )}
                       {isKalinda && (
                         <>
-                          <span className="text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
+                          <span className="text-xs font-bold px-3 py-1 rounded-full bg-blue-50 text-blue-800 border border-blue-300">
                             Independent Witness
                           </span>
-                          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
+                          <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-100 text-slate-700">
                             Ready
                           </span>
                         </>
@@ -660,21 +653,21 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
             </div>
 
             {/* Persona Section Footer showing active cluster key */}
-            <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] font-mono text-slate-600">
+            <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-mono text-slate-600">
               <span>Cluster key: <strong className="text-slate-900 font-bold">{selectedPersona.clusterKey}</strong></span>
-              <span className="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded">Cell: et-aa-0917</span>
+              <span className="text-[11px] bg-slate-100 text-slate-700 font-semibold px-2.5 py-0.5 rounded">Cell: et-aa-0917</span>
             </div>
 
             {/* Channel Toggle (USSD vs IVR) */}
             <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
-              <span className="text-xs text-slate-600 font-medium">Channel Protocol:</span>
-              <div className="inline-flex rounded-lg border border-slate-200 p-0.5 bg-slate-50">
+              <span className="text-xs text-slate-700 font-semibold">Channel Protocol:</span>
+              <div className="inline-flex rounded-xl border border-slate-200 p-0.5 bg-slate-50">
                 <button
                   type="button"
                   onClick={() => setChannelMode('USSD')}
-                  className={`px-2.5 py-1 text-xs font-semibold rounded-md transition-all ${
+                  className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer ${
                     channelMode === 'USSD'
-                      ? 'bg-white text-blue-600 shadow-xs'
+                      ? 'bg-white text-blue-700 shadow-xs'
                       : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
@@ -683,9 +676,9 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
                 <button
                   type="button"
                   onClick={() => setChannelMode('IVR')}
-                  className={`px-2.5 py-1 text-xs font-semibold rounded-md transition-all ${
+                  className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer ${
                     channelMode === 'IVR'
-                      ? 'bg-white text-blue-600 shadow-xs'
+                      ? 'bg-white text-blue-700 shadow-xs'
                       : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
@@ -696,29 +689,37 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
           </div>
 
           {/* Key Scenario Collapsible Card */}
-          <div className="bg-white border border-slate-200/80 rounded-2xl p-4 shadow-sm">
+          <div className="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-sm">
             <button
               type="button"
               onClick={() => setScenarioExpanded(!scenarioExpanded)}
-              className="w-full flex items-center justify-between text-left focus:outline-none"
+              className="w-full flex items-center justify-between text-left focus:outline-none cursor-pointer"
             >
-              <div className="flex items-center gap-2">
-                <span className="text-blue-600 text-sm">ⓘ</span>
-                <span className="font-bold text-xs text-slate-900">Key Scenario</span>
+              <div className="flex items-center gap-2.5">
+                <span className="text-blue-600 font-bold text-base">ⓘ</span>
+                <span className="font-bold text-sm text-slate-900">Key Scenario Walkthrough</span>
               </div>
-              <span className="text-xs text-slate-400 font-mono">
-                {scenarioExpanded ? '▲' : '▼'}
+              <span className="text-xs font-mono font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded">
+                {scenarioExpanded ? 'Hide ▲' : 'Open ▼'}
               </span>
             </button>
             {scenarioExpanded ? (
-              <p className="text-xs text-slate-600 mt-2 leading-relaxed">
-                Amina submits an observation for generator #4412. Girma (sharing her telecom cell tower)
-                is recognized by Sybil protection as a duplicate cluster report. Kalinda independently
-                confirms statutory civil registration fee ceilings.
-              </p>
+              <div className="text-xs text-slate-600 mt-3 pt-3 border-t border-slate-100 space-y-2 leading-relaxed">
+                <p>
+                  <strong>1. Amina (Demo Witness):</strong> Submits inspection observation for Generator #4412.
+                  Independent confirmation recorded (quorum 1/3).
+                </p>
+                <p>
+                  <strong>2. Girma (Duplicate Cluster):</strong> Dials from the same telecom tower.
+                  Sybil protection recognizes the duplicate cluster key and suppresses inflation.
+                </p>
+                <p>
+                  <strong>3. Kalinda (Independent Witness):</strong> Dials from Kebele 09 to complete multi-witness quorum.
+                </p>
+              </div>
             ) : (
-              <p className="text-xs text-slate-500 mt-1 line-clamp-2">
-                Amina completes witness 3 of 3. Girma dials to show Sybil protection.
+              <p className="text-xs text-slate-500 mt-2 line-clamp-2">
+                Amina submits verification. Girma attempts duplicate report. Kalinda provides independent confirmation.
               </p>
             )}
           </div>
@@ -762,24 +763,24 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
           className="lg:col-span-5 space-y-4"
         >
           {/* Segmented Control Tabs */}
-          <div className="bg-slate-100 p-1 rounded-xl flex items-center border border-slate-200">
+          <div className="bg-slate-100 p-1.5 rounded-2xl flex items-center border border-slate-200">
             <button
               type="button"
               onClick={() => setActiveRightTab('live')}
-              className={`flex-1 py-1.5 text-xs font-semibold rounded-lg transition-all ${
+              className={`flex-1 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer ${
                 activeRightTab === 'live'
-                  ? 'bg-white text-slate-900 shadow-sm'
+                  ? 'bg-white text-blue-700 shadow-sm'
                   : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              Live Transaction
+              Live Transaction &amp; Trace
             </button>
             <button
               type="button"
               onClick={() => setActiveRightTab('walkthrough')}
-              className={`flex-1 py-1.5 text-xs font-semibold rounded-lg transition-all ${
+              className={`flex-1 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer ${
                 activeRightTab === 'walkthrough'
-                  ? 'bg-white text-slate-900 shadow-sm'
+                  ? 'bg-white text-blue-700 shadow-sm'
                   : 'text-slate-600 hover:text-slate-900'
               }`}
             >
@@ -788,173 +789,261 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
           </div>
 
           {/* Status Alert Badge */}
-          <div className="bg-emerald-50 border border-emerald-200/80 rounded-xl p-3 flex items-center gap-2.5">
-            <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
-            <div className="text-xs text-emerald-900">
-              <strong className="font-semibold">
-                {session?.isAlive ? 'Session Active' : 'Waiting for user input'}
+          <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 flex items-center gap-3">
+            <div className="w-3 h-3 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+            <div className="text-xs text-emerald-950">
+              <strong className="font-bold text-sm block text-emerald-900">
+                {session?.isAlive ? 'Session Active (Connected)' : 'Waiting for user input'}
               </strong>
-              <p className="text-[11px] text-emerald-700/90 mt-0.5">
+              <p className="text-xs text-emerald-800 mt-0.5">
                 {session?.isAlive
-                  ? 'Review prompt on screen and submit next answer.'
-                  : 'The phone is ready. Press the DIAL button to begin verification.'}
+                  ? 'Review prompt on phone LCD screen and press corresponding number.'
+                  : 'Handset ready. Click "Dial *890#" or press the green DIAL key to begin.'}
               </p>
             </div>
           </div>
 
-          {/* 1. Human Summary Card (Reference 2 §15) */}
-          <div className="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-sm">
-            <div className="flex items-center gap-2 mb-3">
-              <span className="text-blue-600 text-base">👥</span>
-              <h4 className="font-bold text-sm text-slate-900">Human Summary</h4>
+          {/* 1. Human Summary Card */}
+          <div className="bg-white border border-slate-200/80 rounded-2xl p-5 sm:p-6 shadow-sm">
+            <div className="flex items-center gap-2 mb-3.5">
+              <span className="text-blue-600 text-lg">👥</span>
+              <h4 className="font-bold text-base text-slate-900">Human Summary</h4>
             </div>
-            <div className="grid grid-cols-2 gap-y-2.5 gap-x-4 text-xs border-t border-slate-100 pt-3">
+            <div className="grid grid-cols-2 gap-y-3 gap-x-4 text-xs border-t border-slate-100 pt-3.5">
               <div>
-                <span className="text-slate-500 block text-[11px]">Who</span>
-                <span className="font-semibold text-slate-900">{selectedPersona.label}</span>
+                <span className="text-slate-500 block text-xs font-medium">Who</span>
+                <span className="font-bold text-sm text-slate-900">{selectedPersona.label}</span>
               </div>
               <div>
-                <span className="text-slate-500 block text-[11px]">What</span>
-                <span className="font-semibold text-slate-900">
+                <span className="text-slate-500 block text-xs font-medium">What</span>
+                <span className="font-bold text-sm text-slate-900">
                   {selectedPersona.id === 'kalinda'
                     ? 'Statutory fee audit'
                     : 'Submitting repair observation'}
                 </span>
               </div>
               <div>
-                <span className="text-slate-500 block text-[11px]">Project</span>
+                <span className="text-slate-500 block text-xs font-medium">Project</span>
                 <span className="font-semibold text-slate-900">
                   Health Post Generator (#4412)
                 </span>
               </div>
               <div>
-                <span className="text-slate-500 block text-[11px]">Location</span>
+                <span className="text-slate-500 block text-xs font-medium">Location</span>
                 <span className="font-semibold text-slate-900">
                   Woreda 09 · Kebele 08
                 </span>
               </div>
               <div>
-                <span className="text-slate-500 block text-[11px]">Cluster</span>
-                <span className="font-mono text-[11px] text-slate-700">
+                <span className="text-slate-500 block text-xs font-medium">Cluster</span>
+                <span className="font-mono text-xs text-slate-700 font-semibold">
                   {selectedPersona.clusterKey}
                 </span>
               </div>
               <div>
-                <span className="text-slate-500 block text-[11px]">Status</span>
-                <span className="inline-flex items-center gap-1 font-semibold text-emerald-700">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
+                <span className="text-slate-500 block text-xs font-medium">Status</span>
+                <span className="inline-flex items-center gap-1.5 font-bold text-xs text-emerald-700">
+                  <span className="w-2 h-2 rounded-full bg-emerald-600" />
                   {session?.isAlive ? 'In Call' : 'Ready'}
                 </span>
               </div>
             </div>
           </div>
 
-          {/* 2. HTTP / API Trace Card (Live GSM Telemetry) */}
-          <div className="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-sm">
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-2">
-                <span className="text-slate-600 text-sm">⚙</span>
-                <h4 className="font-bold text-sm text-slate-900">HTTP / API Trace</h4>
-              </div>
-              <div className="flex items-center gap-2">
-                {activeAudioKeys.length > 0 && (
-                  <span className="text-[10px] font-mono text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200">
-                    Audio: {activeAudioKeys.length} clip(s)
-                  </span>
-                )}
-                <span className="text-[10px] font-mono text-slate-500">
-                  {channelMode === 'USSD' ? 'POST /api/ussd' : 'POST /api/ivr'}
+          {/* Render Mode: GUIDED WALKTHROUGH vs LIVE TELEMETRY TRACE */}
+          {activeRightTab === 'walkthrough' ? (
+            /* ─── Guided Walkthrough Panel (Agent 5) ─── */
+            <div className="bg-white border border-blue-200 rounded-2xl p-5 sm:p-6 shadow-sm space-y-4">
+              <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                <div className="flex items-center gap-2">
+                  <span className="text-blue-600 font-bold">📋</span>
+                  <h4 className="font-bold text-base text-slate-900">Step-by-Step Walkthrough</h4>
+                </div>
+                <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
+                  Interactive Guide
                 </span>
               </div>
-            </div>
 
-            {/* Verbatim raw backend response container (SACRED TEST CONTRACT) */}
-            <div className="mb-3">
-              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">
-                Latest Backend Response (Verbatim)
-              </p>
-              <pre
-                data-testid="raw-response"
-                className="text-[11px] font-mono bg-slate-50 text-slate-800 p-2.5 rounded-xl border border-slate-200 whitespace-pre-wrap break-words leading-relaxed max-h-24 overflow-y-auto"
-              >
-                {lastRawResponse || 'No response received yet. Dial to initiate session.'}
-              </pre>
-            </div>
-
-            {/* Session Transcript Panel (SACRED TEST CONTRACT) */}
-            <div>
-              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">
-                Real-Time Session Log
-              </p>
-              <div
-                ref={transcriptRef}
-                data-testid="transcript-panel"
-                className="bg-[#0F172A] text-slate-200 p-3 rounded-xl font-mono text-[11px] h-32 overflow-y-auto space-y-1.5 border border-slate-800"
-              >
-                {transcript.length === 0 ? (
-                  <p className="text-slate-500 italic">Session idle. Logs will stream here.</p>
-                ) : (
-                  transcript.map((item) => (
-                    <div
-                      key={item.id}
-                      data-direction={item.direction}
-                      className={
-                        item.direction === 'sent'
-                          ? 'text-sky-300'
-                          : item.direction === 'received'
-                          ? 'text-emerald-300'
-                          : 'text-slate-400'
-                      }
-                    >
-                      <span className="opacity-50 mr-1.5">[{item.seq}]</span>
-                      <span>{item.text}</span>
-                    </div>
-                  ))
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* 3. Evidence & Next Steps Card */}
-          <div className="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-sm">
-            <h4 className="font-bold text-xs text-slate-900 uppercase tracking-wider mb-3">
-              Evidence &amp; Next Steps
-            </h4>
-            <div className="space-y-2 text-xs text-slate-600">
-              <div className="flex items-start gap-2">
-                <span className="text-emerald-600 font-bold mt-0.5">✓</span>
-                <span>Observation verified by geographic cluster protection.</span>
-              </div>
-              <div className="flex items-start gap-2">
-                <span className="text-blue-600 font-bold mt-0.5">ℹ</span>
-                <span>Multi-witness confirmation enforces 2-of-3 independent quorum.</span>
-              </div>
-              <div className="flex items-start gap-2">
-                <span className="text-amber-600 font-bold mt-0.5">⏳</span>
-                <span>7-day probation period holds funds until sustained operation is verified.</span>
-              </div>
-            </div>
-
-            {/* Technical Details toggle */}
-            <div className="mt-4 pt-3 border-t border-slate-100">
-              <button
-                type="button"
-                onClick={() => setShowTechnicalDetails(!showTechnicalDetails)}
-                className="text-xs font-semibold text-blue-600 hover:text-blue-700 flex items-center justify-between w-full"
-              >
-                <span>Technical Details (k-anonymity &amp; hashing)</span>
-                <span>{showTechnicalDetails ? '▲' : '▼'}</span>
-              </button>
-              {showTechnicalDetails && (
-                <div className="mt-2.5 p-2.5 bg-slate-50 rounded-xl text-[11px] font-mono text-slate-600 space-y-1 border border-slate-200/60">
-                  <div>Prefix Bucket: {selectedPersona.msisdn.slice(0, 7)}</div>
-                  <div>Cluster ID: {selectedPersona.clusterKey}</div>
-                  <div>Zero-PII Phone Hash: HMAC-SHA256</div>
-                  <div>Session State: {session ? 'LIVE_GSM_CON' : 'IDLE'}</div>
+              <div className="space-y-3.5">
+                {/* Step 1 */}
+                <div className={`p-3.5 rounded-xl border transition-all ${
+                  !sessionActive && selectedPersona.role === 'primary'
+                    ? 'border-blue-500 bg-blue-50/50'
+                    : 'border-slate-100 bg-slate-50/40'
+                }`}>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="w-5 h-5 rounded-full bg-blue-600 text-white flex items-center justify-center text-[10px] font-bold">1</span>
+                    <span className="text-xs font-bold text-slate-900">Select Primary Witness (Amina)</span>
+                  </div>
+                  <p className="text-xs text-slate-600 pl-7 leading-relaxed">
+                    Select Amina on the left. She represents a genuine community monitor in Kebele 08 verifying Generator #4412.
+                  </p>
                 </div>
-              )}
+
+                {/* Step 2 */}
+                <div className={`p-3.5 rounded-xl border transition-all ${
+                  !sessionActive && selectedPersona.role === 'primary'
+                    ? 'border-blue-500 bg-blue-50/50'
+                    : 'border-slate-100 bg-slate-50/40'
+                }`}>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="w-5 h-5 rounded-full bg-blue-600 text-white flex items-center justify-center text-[10px] font-bold">2</span>
+                    <span className="text-xs font-bold text-slate-900">Dial *890# on Handset</span>
+                  </div>
+                  <p className="text-xs text-slate-600 pl-7 leading-relaxed">
+                    Click the <strong>Dial *890#</strong> button or press the green call key to open the live USSD session.
+                  </p>
+                </div>
+
+                {/* Step 3 */}
+                <div className={`p-3.5 rounded-xl border transition-all ${
+                  sessionActive
+                    ? 'border-emerald-500 bg-emerald-50/50'
+                    : 'border-slate-100 bg-slate-50/40'
+                }`}>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[10px] font-bold">3</span>
+                    <span className="text-xs font-bold text-slate-900">Answer 3-Step Verification Checklist</span>
+                  </div>
+                  <p className="text-xs text-slate-600 pl-7 leading-relaxed">
+                    Use keypad numbers to verify: 1 = Generator operating, 1 = Operating within hours, 1 = Confirm submission.
+                  </p>
+                </div>
+
+                {/* Step 4 */}
+                <div className="p-3.5 rounded-xl border border-slate-100 bg-slate-50/40">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="w-5 h-5 rounded-full bg-amber-500 text-white flex items-center justify-center text-[10px] font-bold">4</span>
+                    <span className="text-xs font-bold text-slate-900">Test Sybil Deduplication (Girma)</span>
+                  </div>
+                  <p className="text-xs text-slate-600 pl-7 leading-relaxed">
+                    Switch to Girma on the left and dial *890#. Because Girma shares Amina's cell tower, the system recognizes the duplicate cluster key and refuses duplicate inflation.
+                  </p>
+                </div>
+
+                {/* Step 5 */}
+                <div className="p-3.5 rounded-xl border border-slate-100 bg-slate-50/40">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="w-5 h-5 rounded-full bg-indigo-600 text-white flex items-center justify-center text-[10px] font-bold">5</span>
+                    <span className="text-xs font-bold text-slate-900">Confirm Independent Quorum (Kalinda)</span>
+                  </div>
+                  <p className="text-xs text-slate-600 pl-7 leading-relaxed">
+                    Switch to Kalinda (Kebele 09). Independent location quorum is satisfied, progressing the audit towards verified receipt.
+                  </p>
+                </div>
+              </div>
             </div>
-          </div>
+          ) : (
+            /* ─── Live Transaction & Charcoal Telemetry Trace ─── */
+            <>
+              {/* 2. HTTP / API Trace Card (Restrained Charcoal Styling) */}
+              <div className="bg-[#0B0F17] text-white border border-slate-800 rounded-2xl p-5 sm:p-6 shadow-sm">
+                <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-800">
+                  <div className="flex items-center gap-2.5">
+                    <span className="text-emerald-400 text-sm">⚙</span>
+                    <h4 className="font-bold text-sm text-white">HTTP / API Trace</h4>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {activeAudioKeys.length > 0 && (
+                      <span className="text-xs font-mono text-blue-400 bg-blue-950 px-2 py-0.5 rounded border border-blue-800">
+                        Audio: {activeAudioKeys.length} clip(s)
+                      </span>
+                    )}
+                    <span className="text-xs font-mono text-slate-400 font-semibold">
+                      {channelMode === 'USSD' ? 'POST /api/ussd' : 'POST /api/ivr'}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Verbatim raw backend response container (SACRED TEST CONTRACT) */}
+                <div className="mb-4">
+                  <p className="text-xs font-mono font-bold text-slate-400 uppercase tracking-wider mb-1.5">
+                    Latest Backend Response (Verbatim)
+                  </p>
+                  <pre
+                    data-testid="raw-response"
+                    className="text-xs font-mono bg-[#141B27] text-slate-200 p-3 rounded-xl border border-slate-800 whitespace-pre-wrap break-words leading-relaxed max-h-28 overflow-y-auto"
+                  >
+                    {lastRawResponse || 'No response received yet. Dial to initiate session.'}
+                  </pre>
+                </div>
+
+                {/* Session Transcript Panel (SACRED TEST CONTRACT) */}
+                <div>
+                  <p className="text-xs font-mono font-bold text-slate-400 uppercase tracking-wider mb-1.5">
+                    Real-Time Session Log
+                  </p>
+                  <div
+                    ref={transcriptRef}
+                    data-testid="transcript-panel"
+                    className="bg-[#080B11] text-slate-200 p-3.5 rounded-xl font-mono text-xs h-36 overflow-y-auto space-y-2 border border-slate-800/80"
+                  >
+                    {transcript.length === 0 ? (
+                      <p className="text-slate-500 italic">Session idle. GSM frames will stream here.</p>
+                    ) : (
+                      transcript.map((item) => (
+                        <div
+                          key={item.id}
+                          data-direction={item.direction}
+                          className={
+                            item.direction === 'sent'
+                              ? 'text-sky-300'
+                              : item.direction === 'received'
+                              ? 'text-emerald-300'
+                              : 'text-slate-400'
+                          }
+                        >
+                          <span className="opacity-50 mr-2">[{item.seq}]</span>
+                          <span>{item.text}</span>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* 3. Evidence & Next Steps Card */}
+              <div className="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-sm">
+                <h4 className="font-bold text-xs text-slate-900 uppercase tracking-wider mb-3">
+                  Evidence &amp; Next Steps
+                </h4>
+                <div className="space-y-2 text-xs text-slate-600">
+                  <div className="flex items-start gap-2">
+                    <span className="text-emerald-600 font-bold mt-0.5">✓</span>
+                    <span>Observation verified by geographic cluster protection.</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="text-blue-600 font-bold mt-0.5">ℹ</span>
+                    <span>Multi-witness confirmation enforces 2-of-3 independent quorum.</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="text-amber-600 font-bold mt-0.5">⏳</span>
+                    <span>7-day probation period holds funds until sustained operation is verified.</span>
+                  </div>
+                </div>
+
+                {/* Technical Details toggle */}
+                <div className="mt-4 pt-3 border-t border-slate-100">
+                  <button
+                    type="button"
+                    onClick={() => setShowTechnicalDetails(!showTechnicalDetails)}
+                    className="text-xs font-semibold text-blue-600 hover:text-blue-700 flex items-center justify-between w-full cursor-pointer"
+                  >
+                    <span>Technical Details (k-anonymity &amp; hashing)</span>
+                    <span>{showTechnicalDetails ? '▲' : '▼'}</span>
+                  </button>
+                  {showTechnicalDetails && (
+                    <div className="mt-2.5 p-3 bg-slate-50 rounded-xl text-xs font-mono text-slate-700 space-y-1.5 border border-slate-200">
+                      <div>Prefix Bucket: {selectedPersona.msisdn.slice(0, 7)}</div>
+                      <div>Cluster ID: {selectedPersona.clusterKey}</div>
+                      <div>Zero-PII Phone Hash: HMAC-SHA256</div>
+                      <div>Session State: {session ? 'LIVE_GSM_CON' : 'IDLE'}</div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </>
+          )}
         </section>
       </div>
 

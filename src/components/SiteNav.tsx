@@ -26,19 +26,23 @@ export function SiteNav() {
           {/* Left: Ubuntu Ledger Brand Identity */}
           <Link
             href="/"
-            className="flex items-center gap-3 group focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 rounded-lg p-1"
+            className="flex items-center gap-2.5 group focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 rounded-lg p-1"
             aria-label="Ubuntu Ledger — Evidence. Accountability. Better Public Services."
           >
-            {/* Logo mark — Ubuntu leaf / interconnected civic circle */}
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-white shadow-sm shadow-blue-500/20 group-hover:scale-105 transition-transform shrink-0">
-              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9 9 0 100-18 9 9 0 000 18z" />
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 3c4.97 0 9 4.03 9 9-4.97 0-9-4.03-9-9z" />
-                <circle cx="12" cy="12" r="3" fill="currentColor" />
+            {/* Green organic double-leaf / sprout brand mark */}
+            <div className="flex items-center justify-center shrink-0">
+              <svg
+                className="w-7 h-7 text-[#16A34A] group-hover:scale-105 transition-transform"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                aria-hidden="true"
+              >
+                <path d="M12 3C8.5 3 5 6.5 5 11c0 3.5 2.5 6 6.5 6.8-.2-1.5-.2-3.1.2-4.5.8-2.8 2.8-5.2 5.5-6.5C15.8 4.6 13.9 3 12 3z" />
+                <path d="M12.5 10c-1.8 1.5-2.8 3.8-2.5 6.2.2 1.8 1.2 3.4 2.8 4.2 1.6.8 3.5.7 4.9-.3 2.1-1.5 3.3-4 3.3-6.6 0-3.3-2.7-5.5-5.5-5.5-1.1 0-2.1.7-3 2z" opacity="0.85" />
               </svg>
             </div>
             <div className="flex flex-col">
-              <span className="font-bold text-base tracking-tight text-slate-900 leading-tight">
+              <span className="font-bold text-base tracking-tight text-[#0F172A] leading-tight font-sans">
                 Ubuntu Ledger
               </span>
               <span className="text-[11px] text-slate-500 font-medium tracking-normal hidden sm:inline">
@@ -47,10 +51,10 @@ export function SiteNav() {
             </div>
           </Link>
 
-          {/* Center: Desktop Navigation Links */}
+          {/* Center: Desktop Navigation Links (Breathable, bold deep-blue active link with anchored underline) */}
           <nav
             aria-label="Main Navigation"
-            className="hidden md:flex items-center gap-1"
+            className="hidden md:flex items-center gap-7 lg:gap-9"
           >
             {NAV_LINKS.map(({ href, label }) => {
               const isActive =
@@ -63,40 +67,26 @@ export function SiteNav() {
                   key={href}
                   href={href}
                   aria-current={isActive ? 'page' : undefined}
-                  className={`relative px-3.5 py-2 text-sm font-medium rounded-lg transition-all ${
+                  className={`relative py-5 text-sm transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 rounded-sm ${
                     isActive
-                      ? 'text-blue-600 bg-blue-50/80 font-semibold'
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                      ? 'text-blue-600 font-bold'
+                      : 'text-slate-600 hover:text-slate-900 font-medium'
                   }`}
                 >
                   {label}
                   {isActive && (
-                    <span className="absolute bottom-0 left-3.5 right-3.5 h-0.5 bg-blue-600 rounded-full" />
+                    <span className="absolute bottom-0 inset-x-0 h-[2.5px] bg-blue-600 rounded-full" />
                   )}
                 </Link>
               );
             })}
           </nav>
 
-          {/* Right: Hackathon Badge + User Profile Utility */}
-          <div className="flex items-center gap-3">
-            <div
-              className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-700 border border-slate-200/80"
-              aria-label="OSF Hackathon submission — Transparency and Accountability track"
-            >
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span>OSF Hackathon × T&amp;A</span>
-            </div>
-
-            <div
-              className="w-8 h-8 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-200 transition-colors cursor-pointer"
-              title="Civic Auditor Profile"
-              aria-label="Civic Auditor Profile"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-              </svg>
-            </div>
+          {/* Right: Clean right-hand area (uncluttered, visually dominant navigation) */}
+          <div className="hidden sm:flex items-center">
+            <span className="text-xs font-mono text-slate-500 px-2.5 py-1 rounded-full bg-slate-50 border border-slate-200">
+              Ward 09 // Genesis
+            </span>
           </div>
         </div>
       </div>

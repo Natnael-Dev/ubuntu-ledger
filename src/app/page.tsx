@@ -97,17 +97,17 @@ export default function HomePage() {
       <section className="relative overflow-hidden border-b border-slate-200/80 bg-white pt-12 pb-16 md:pt-20 md:pb-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
-            {/* Restrained Eyebrow */}
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200/60 mb-6">
+            {/* Tracked Uppercase Eyebrow */}
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-mono font-bold tracking-widest uppercase bg-blue-50 text-blue-700 border border-blue-200/60 mb-5">
               <span className="w-1.5 h-1.5 rounded-full bg-blue-600" />
-              <span>Civic Evidence System · Open Society Foundation Track</span>
+              <span>CIVIC EVIDENCE SYSTEM // OSF TRACK</span>
             </div>
 
-            {/* Primary Brand Heading — contains "Ward Proof-Line" for test contract */}
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900 leading-[1.15] mb-2">
+            {/* Primary Brand Heading — Dark Navy Language */}
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-[#0F172A] leading-[1.1] mb-2 font-sans">
               Ward Proof-Line
             </h1>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl text-blue-600 font-bold mb-6">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl text-blue-600 font-bold mb-6 font-sans">
               Citizens verify repairs. Contractors cannot self-close.
             </h2>
 
@@ -120,7 +120,7 @@ export default function HomePage() {
 
             {/* Core Principle Banner */}
             <div className="border-l-4 border-blue-600 bg-blue-50/50 p-4 rounded-r-xl mb-8">
-              <p className="text-sm sm:text-base font-semibold text-slate-900">
+              <p className="text-sm sm:text-base font-semibold text-[#0F172A]">
                 Core Architectural Rule: <span className="text-blue-700">A contractor cannot close their own ticket.</span>
               </p>
               <p className="text-xs sm:text-sm text-slate-600 mt-1">
@@ -132,13 +132,13 @@ export default function HomePage() {
             <div className="flex flex-wrap items-center gap-4">
               <Link
                 href="/receipt/4412"
-                className="inline-flex items-center justify-center px-6 py-3 rounded-xl text-sm font-semibold bg-blue-600 text-white hover:bg-blue-700 active:scale-95 shadow-sm shadow-blue-500/20 transition-all"
+                className="inline-flex items-center justify-center px-7 py-3.5 rounded-xl text-sm font-semibold bg-blue-600 text-white hover:bg-blue-700 active:scale-95 shadow-sm shadow-blue-500/25 transition-all"
               >
                 View Verified Receipt
               </Link>
               <Link
                 href="/simulator"
-                className="inline-flex items-center justify-center px-6 py-3 rounded-xl text-sm font-semibold bg-white text-slate-700 hover:bg-slate-50 border border-slate-300 hover:border-slate-400 active:scale-95 transition-all"
+                className="inline-flex items-center justify-center px-7 py-3.5 rounded-xl text-sm font-semibold bg-white text-slate-700 hover:bg-slate-50 border border-slate-300 hover:border-slate-400 active:scale-95 transition-all shadow-xs"
               >
                 Feature Phone Simulator
               </Link>

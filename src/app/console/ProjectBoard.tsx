@@ -443,23 +443,25 @@ export function ProjectBoard({
           </p>
         </div>
 
-        {/* Demo Trigger */}
-        <div className="flex flex-col items-end gap-2">
+        {/* Demo Trigger — Prominent Interactive Action Button (Agent 6) */}
+        <div className="flex flex-col items-end gap-2.5">
           <button
             type="button"
             data-testid="demo-reset-btn"
             onClick={resetProject4412ToBroken}
-            className="px-2 py-1 text-xs font-mono border border-[var(--rule)] bg-white hover:bg-neutral-50 text-[var(--ink-soft)] hover:text-[var(--ink)] transition-colors"
-            title="Reset Project 4412 to REPORTED_BROKEN to demonstrate the claim"
+            className="px-4 py-2 text-xs font-bold font-sans rounded-xl border border-amber-300 bg-amber-50 hover:bg-amber-100 text-amber-900 transition-all flex items-center gap-2 shadow-xs cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
+            title="Reset Project 4412 to REPORTED_BROKEN to demonstrate the claim and 7-day probation lock"
           >
-            [demo: simulate breakage on 4412]
+            <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+            <span>Demo: Simulate Breakage on #4412</span>
+            <span className="text-amber-700 font-mono text-[11px]">›</span>
           </button>
           
           {/* Journey nav - shown after demo */}
-          <div className="text-right font-mono text-[11px] text-[var(--ink-soft)]">
+          <div className="text-right font-mono text-xs text-slate-500">
             After testing the probation lock:
             {' '}
-            <Link href="/receipt/4412" className="text-[var(--ink)] hover:underline">Step 3: Public Receipt ›</Link>
+            <Link href="/receipt/4412" className="text-blue-700 font-bold hover:underline">Step 3: Public Receipt ›</Link>
           </div>
         </div>
       </div>
@@ -850,9 +852,9 @@ export function ProjectBoard({
                           setClaimModalProject(p);
                           setClaimedByInput(p.contractorName || 'AfroTech Infra');
                         }}
-                        className="px-2 py-1 text-xs font-mono font-medium border border-amber-600 bg-amber-50 text-amber-900 hover:bg-amber-100 transition-colors focus-visible:ring-2 focus-visible:ring-[var(--ink)] focus:outline-none"
+                        className="px-3 py-1.5 text-xs font-bold font-sans rounded-lg border border-amber-600 bg-amber-600 text-white hover:bg-amber-700 transition-all shadow-xs cursor-pointer focus-visible:ring-2 focus-visible:ring-amber-500"
                       >
-                        [Record Claim]
+                        Record Claim
                       </button>
                     )}
 
@@ -866,13 +868,13 @@ export function ProjectBoard({
                             refusalTriggerRef.current = e.currentTarget;
                             attemptEarlyClose(p.ticketId!, p.projectCode);
                           }}
-                          className="px-2 py-1 text-[11px] font-mono border border-[var(--rule)] bg-white hover:bg-red-50 text-[var(--ink-soft)] hover:text-red-800 transition-colors disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-[var(--ink)] focus:outline-none"
+                          className="px-2.5 py-1.5 text-xs font-semibold font-sans rounded-lg border border-slate-300 bg-white hover:bg-red-50 text-slate-700 hover:text-red-700 hover:border-red-300 transition-all disabled:opacity-50 cursor-pointer focus-visible:ring-2 focus-visible:ring-red-500 shadow-2xs"
                           title="Attempt to close probation early (will demonstrate 409 lock)"
                         >
-                          {isAttemptingClose === p.ticketId ? 'Checking...' : '[Attempt Close]'}
+                          {isAttemptingClose === p.ticketId ? 'Checking...' : 'Attempt Close'}
                         </button>
                         <span
-                          className="text-[10px] font-mono text-[var(--state-hold)] border border-amber-300 px-1 py-0.5 bg-amber-50"
+                          className="text-[11px] font-mono font-bold text-amber-800 border border-amber-300 px-2 py-0.5 bg-amber-50 rounded-md"
                           title="Repair claim recorded; waiting for time + community confirmation"
                         >
                           Claimed

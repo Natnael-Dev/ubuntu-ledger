@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { IBM_Plex_Sans, IBM_Plex_Mono } from "next/font/google";
 import { SiteNav } from "@/components/SiteNav";
+import { BottomNav } from "@/components/BottomNav";
 import { SiteFooter } from "@/components/SiteFooter";
 import "./globals.css";
 
@@ -79,10 +80,11 @@ export default function RootLayout({
           Skip to main content
         </a>
         <SiteNav />
-        <main id="main-content" tabIndex={-1} className="focus:outline-none flex-1">
+        <main id="main-content" tabIndex={-1} className="focus:outline-none flex-1 pb-20 md:pb-8">
           {children}
         </main>
         <SiteFooter />
+        <BottomNav />
       </body>
     </html>
   );

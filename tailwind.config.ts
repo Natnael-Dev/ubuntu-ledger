@@ -15,6 +15,18 @@ const config: Config = {
       },
       colors: {
         paper: "var(--paper)",
+        "paper-warm": "var(--paper-warm)",
+        canvas: "var(--bg-canvas, #F8FAFC)",
+        surface: {
+          DEFAULT: "var(--bg-surface, #FFFFFF)",
+          subtle: "var(--bg-subtle, #F1F5F9)",
+        },
+        civic: {
+          DEFAULT: "#2563EB",
+          hover: "#1D4ED8",
+          subtle: "#EFF6FF",
+          border: "#BFDBFE",
+        },
         ink: {
           DEFAULT: "var(--ink)",
           soft: "var(--ink-soft)",

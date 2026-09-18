@@ -590,62 +590,59 @@ export function ProjectBoard({
       )}
 
       {/* Ledger Stats Bar with Explicit "Locked" Stat Definition (Audit #75 / Task 3) */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 border border-[var(--rule)] bg-white p-3 font-mono">
-        <div className="space-y-1">
-          <div className="text-[10px] text-[var(--ink-soft)] uppercase tracking-wider">
-            Total Allocated Budget
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 font-sans">
+        <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm space-y-1.5">
+          <div className="flex items-center justify-between text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            <span>Total Allocated Budget</span>
+            <span className="w-2 h-2 rounded-full bg-blue-600" />
           </div>
-          <div className="text-base font-bold text-[var(--ink)] tabular-nums">
+          <div className="text-2xl sm:text-3xl font-extrabold text-slate-900 tabular-nums">
             {formatCurrency(totalBudgetMinor, currencyCode)}
           </div>
-          <div className="text-[10px] text-[var(--ink-soft)]">
+          <div className="text-xs text-slate-500">
             {projects.length} municipal infrastructure projects
           </div>
         </div>
 
-        <div className="space-y-1 border-t sm:border-t-0 sm:border-l border-[var(--rule)] pt-2 sm:pt-0 sm:pl-3">
-          <div className="flex items-center gap-1.5">
-            <span className="text-[10px] text-[var(--ink-soft)] uppercase tracking-wider">
-              Locked in Escrow
-            </span>
+        <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm space-y-1.5">
+          <div className="flex items-center justify-between text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            <span>Locked in Escrow</span>
             <span
-              className="inline-flex items-center px-1 py-0.2 text-[9px] font-semibold bg-amber-100 text-amber-900 border border-amber-300"
+              className="inline-flex items-center px-2 py-0.5 text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-300 rounded-md"
               title="Statutory definition: Funds committed / held in escrow / non-disbursable pending community verification"
             >
               STATUTORY HOLD
             </span>
           </div>
-          <div className="text-base font-bold text-amber-900 tabular-nums">
+          <div className="text-2xl sm:text-3xl font-extrabold text-amber-700 tabular-nums">
             {formatCurrency(lockedBudgetMinor, currencyCode)}
           </div>
-          <p className="text-[10px] text-amber-900/90 leading-tight">
+          <p className="text-xs text-slate-500 leading-tight">
             <strong>Locked stat definition:</strong> funds committed / held in escrow / non-disbursable pending community verification.
           </p>
         </div>
 
-        <div className="space-y-1 border-t sm:border-t-0 sm:border-l border-[var(--rule)] pt-2 sm:pt-0 sm:pl-3">
-          <div className="flex items-center gap-1.5">
-            <span className="text-[10px] text-[var(--ink-soft)] uppercase tracking-wider">
-              Probation Lock (INV-01)
-            </span>
-            <span className="inline-flex items-center px-1 py-0.2 text-[9px] font-semibold bg-neutral-100 text-[var(--ink)] border border-[var(--rule)]">
+        <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm space-y-1.5">
+          <div className="flex items-center justify-between text-xs font-semibold text-slate-500 uppercase tracking-wider">
+            <span>Probation Lock (INV-01)</span>
+            <span className="inline-flex items-center px-2 py-0.5 text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-300 rounded-md">
               RULE INV-01
             </span>
           </div>
-          <div className="text-base font-bold text-[var(--ink)] tabular-nums">
+          <div className="text-2xl sm:text-3xl font-extrabold text-slate-900 tabular-nums">
             {activeProbationCount} under review
           </div>
-          <p className="text-[10px] text-[var(--ink-soft)] leading-tight">
+          <p className="text-xs text-slate-500 leading-tight">
             Closure locked for 7 days post-repair claim. Contractor self-close is cryptographically refused.
           </p>
         </div>
       </div>
 
       {/* Table Filters & Search */}
-        <div className="flex flex-wrap items-center justify-between gap-3 py-1">
+      <div className="flex flex-wrap items-center justify-between gap-3 py-2">
         {/* Filter Pills */}
-        <div className="flex items-center gap-1 text-xs font-mono">
-          <span className="text-[var(--ink-soft)] mr-1">Filter:</span>
+        <div className="flex flex-wrap items-center gap-1.5 text-xs">
+          <span className="text-slate-500 mr-1 font-medium">Filter:</span>
           {(
             [
               ['all', `All (${projects.length})`],
@@ -659,10 +656,10 @@ export function ProjectBoard({
               type="button"
               data-testid={`filter-${key}`}
               onClick={() => setFilter(key)}
-              className={`px-2 py-0.5 border text-xs ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-all ${
                 filter === key
-                  ? 'bg-[var(--ink)] text-[var(--paper)] border-[var(--ink)] font-semibold'
-                  : 'bg-transparent text-[var(--ink-soft)] border-[var(--rule)] hover:text-[var(--ink)]'
+                  ? 'bg-blue-600 text-white font-semibold shadow-xs'
+                  : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
               }`}
             >
               {label}
@@ -677,13 +674,13 @@ export function ProjectBoard({
             placeholder="Search code / title..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="px-2 py-1 text-xs font-mono border border-[var(--rule)] bg-white text-[var(--ink)] focus:outline-none focus:border-[var(--ink)] w-48"
+            className="px-3 py-1.5 text-xs font-sans rounded-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-1 focus:ring-blue-500 w-52 shadow-2xs"
           />
           {searchQuery && (
             <button
               type="button"
               onClick={() => setSearchQuery('')}
-              className="text-xs font-mono text-[var(--ink-soft)] hover:text-[var(--ink)]"
+              className="text-xs font-medium text-slate-500 hover:text-slate-900 px-2 py-1 bg-slate-100 rounded-lg transition-colors"
             >
               Clear
             </button>
@@ -692,70 +689,70 @@ export function ProjectBoard({
       </div>
 
       {/* Mobile Swipe Hint */}
-      <div className="sm:hidden text-[10px] font-mono text-[var(--ink-soft)] flex items-center justify-between px-1">
-        <span>↔ Dense ledger: swipe to scroll columns</span>
+      <div className="sm:hidden text-[10px] text-slate-500 flex items-center justify-between px-1">
+        <span>↔ Scroll horizontally to view all columns</span>
         <span>6 projects</span>
       </div>
 
-      {/* Dense Table (08-ui-ux-design.md §7) */}
-      <div className="border border-[var(--rule)] bg-white overflow-x-auto">
-        <table className="w-full min-w-[780px] text-left border-collapse text-xs">
+      {/* Modern Civic Project Table */}
+      <div className="border border-slate-200/80 bg-white rounded-2xl shadow-sm overflow-x-auto">
+        <table className="w-full min-w-[840px] text-left border-collapse text-xs">
           <caption className="sr-only">
             Municipal Project Board Ledger for {wardName} ({wardCode}) — tracking project codes, contracts, amounts, fiscal status, audit verification, citizen witness counts, and repair probation states.
           </caption>
           <thead>
-            <tr className="border-b border-[var(--rule)] bg-neutral-50 text-[11px] font-mono text-[var(--ink-soft)] uppercase tracking-wider">
+            <tr className="border-b border-slate-200 bg-slate-50/80 text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
               <th
                 scope="col"
-                className="py-2 px-3 cursor-pointer select-none hover:text-[var(--ink)] focus-visible:ring-1 focus-visible:ring-[var(--ink)] focus-visible:outline-none"
+                className="py-3 px-3.5 cursor-pointer select-none hover:text-slate-900 focus-visible:ring-1 focus-visible:ring-blue-600 focus-visible:outline-none"
                 onClick={() => handleSort('projectCode')}
               >
                 Code {sortField === 'projectCode' && (sortAsc ? '▲' : '▼')}
               </th>
               <th
                 scope="col"
-                className="py-2 px-3 cursor-pointer select-none hover:text-[var(--ink)] focus-visible:ring-1 focus-visible:ring-[var(--ink)] focus-visible:outline-none"
+                className="py-3 px-3.5 cursor-pointer select-none hover:text-slate-900 focus-visible:ring-1 focus-visible:ring-blue-600 focus-visible:outline-none"
                 onClick={() => handleSort('title')}
               >
                 Project Title {sortField === 'title' && (sortAsc ? '▲' : '▼')}
               </th>
               <th
                 scope="col"
-                className="py-2 px-3 cursor-pointer select-none text-right hover:text-[var(--ink)] focus-visible:ring-1 focus-visible:ring-[var(--ink)] focus-visible:outline-none"
+                className="py-3 px-3.5 cursor-pointer select-none text-right hover:text-slate-900 focus-visible:ring-1 focus-visible:ring-blue-600 focus-visible:outline-none"
                 onClick={() => handleSort('amountMinor')}
               >
                 Amount {sortField === 'amountMinor' && (sortAsc ? '▲' : '▼')}
               </th>
               <th
                 scope="col"
-                className="py-2 px-3 cursor-pointer select-none hover:text-[var(--ink)] focus-visible:ring-1 focus-visible:ring-[var(--ink)] focus-visible:outline-none"
+                className="py-3 px-3.5 cursor-pointer select-none hover:text-slate-900 focus-visible:ring-1 focus-visible:ring-blue-600 focus-visible:outline-none"
                 onClick={() => handleSort('fiscal')}
               >
                 Fiscal {sortField === 'fiscal' && (sortAsc ? '▲' : '▼')}
               </th>
               <th
                 scope="col"
-                className="py-2 px-3 cursor-pointer select-none hover:text-[var(--ink)] focus-visible:ring-1 focus-visible:ring-[var(--ink)] focus-visible:outline-none"
+                className="py-3 px-3.5 cursor-pointer select-none hover:text-slate-900 focus-visible:ring-1 focus-visible:ring-blue-600 focus-visible:outline-none"
                 onClick={() => handleSort('audit')}
               >
                 Audit State {sortField === 'audit' && (sortAsc ? '▲' : '▼')}
               </th>
               <th
                 scope="col"
-                className="py-2 px-3 cursor-pointer select-none text-center hover:text-[var(--ink)] focus-visible:ring-1 focus-visible:ring-[var(--ink)] focus-visible:outline-none"
+                className="py-3 px-3.5 cursor-pointer select-none text-center hover:text-slate-900 focus-visible:ring-1 focus-visible:ring-blue-600 focus-visible:outline-none"
                 onClick={() => handleSort('witnesses')}
               >
                 Witnesses {sortField === 'witnesses' && (sortAsc ? '▲' : '▼')}
               </th>
-              <th scope="col" className="py-2 px-3">
+              <th scope="col" className="py-3 px-3.5">
                 Probation Countdown
               </th>
-              <th scope="col" className="py-2 px-3 text-right">
+              <th scope="col" className="py-3 px-3.5 text-right">
                 Actions
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-[var(--rule)] font-mono text-xs">
+          <tbody className="divide-y divide-slate-100 font-mono text-xs">
             {sortedProjects.map((p) => {
               const isBroken =
                 p.probationState === 'REPORTED_BROKEN' || p.probationState === 'PROBATION_FAILED';

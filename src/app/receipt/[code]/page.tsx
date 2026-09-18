@@ -207,8 +207,12 @@ export default async function ReceiptPage(props: PageProps) {
             <div className="flex justify-between items-start">
               <div>
                 <div className="flex items-center gap-2 mb-1.5">
-                  <div className="w-4 h-4 rounded bg-blue-600 flex items-center justify-center text-white">
-                    <span className="text-[10px] font-bold">U</span>
+                  <div className="w-5 h-5 rounded-md bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600">
+                    <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <path d="M12 22v-9" />
+                      <path d="M12 13c0-4.5 3.5-7 8-7 0 4.5-2.5 8-8 8Z" />
+                      <path d="M12 13c0-4.5-3.5-7-8-7 0 4.5 2.5 8 8 8Z" />
+                    </svg>
                   </div>
                   <span className="font-mono text-[10px] font-bold text-slate-900 uppercase tracking-widest">
                     Ubuntu Ledger

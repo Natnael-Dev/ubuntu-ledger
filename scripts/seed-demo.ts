@@ -33,6 +33,7 @@ async function seedDemoDatabase(): Promise<void> {
       'Ubuntu Ledger runtime automatically operates using the in-memory canonical demo container.\n' +
       'To seed a real PostgreSQL instance, ensure DATABASE_URL is set and the database service is running.'
     );
+    await closePostgresPool();
     return;
   }
 

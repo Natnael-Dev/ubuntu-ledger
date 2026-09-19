@@ -97,7 +97,7 @@ export async function POST(req: Request): Promise<Response> {
     );
   }
 
-  const validLocales: Locale[] = ['en', 'am', 'om', 'sw' as Locale];
+  const validLocales: Locale[] = ['en', 'am', 'om', 'sw'];
   const locale: Locale = validLocales.includes(rawLocale as Locale) ? (rawLocale as Locale) : 'en';
 
   // Deterministic IVR session reduction

@@ -14,7 +14,8 @@
     "test:integration": "vitest run tests/integration",
     "test:e2e": "playwright test",
     "dev:full": "next dev",
-    "seed:demo": "tsx scripts/seed-demo.ts"
+    "seed:demo": "tsx scripts/seed-demo.ts",
+    "seed": "npm run seed:demo"
   },
   "dependencies": {
     "clsx": "^2.1.1",

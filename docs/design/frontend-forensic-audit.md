@@ -1,8 +1,8 @@
-﻿# Ubuntu Ledger — Frontend Forensic Audit
+# Ubuntu Ledger — Frontend Forensic Audit
 
 **Audit Date:** 2026-09-17
 **Auditor:** Antigravity (forensic pass)
-**Project Root:** `C:\Users\HP\dev\Kenya hackaton`
+**Project Root:** `./` (Ubuntu Ledger Root)
 **Status:** Initial audit — pre-iteration baseline
 
 ---

@@ -108,7 +108,7 @@ export const MESSAGES: Record<Locale, Record<string, string>> = {
     'fault.recorded': 'Fault report recorded. Thank you.',
 
     // Language Selection Branch
-    'language.menu': '1 English\n2 አማርኛ\n3 Afaan Oromoo\n0 Back',
+    'language.menu': '1 English\n2 አማርኛ\n3 Afaan Oromoo\n4 Kiswahili\n0 Back',
     'language.selected': 'Language updated.',
 
     // Outcome Menu
@@ -174,7 +174,7 @@ export const MESSAGES: Record<Locale, Record<string, string>> = {
     'fault.recorded': 'የብልሽት ሪፖርት ተመዝግቧል። እናመሰግናለን።',
 
     // Language Selection Branch
-    'language.menu': '1 English\n2 አማርኛ\n3 Afaan Oromoo\n0 ተመለስ',
+    'language.menu': '1 English\n2 አማርኛ\n3 Afaan Oromoo\n4 Kiswahili\n0 ተመለስ',
     'language.selected': 'ቋንቋ ተቀይሯል።',
 
     // Outcome Menu
@@ -240,7 +240,7 @@ export const MESSAGES: Record<Locale, Record<string, string>> = {
     'fault.recorded': 'Gabaasni hanqinaa galmaa\'eera. Galatoomaa.',
 
     // Language Selection Branch
-    'language.menu': '1 English\n2 አማርኛ\n3 Afaan Oromoo\n0 Duubatti',
+    'language.menu': '1 English\n2 አማርኛ\n3 Afaan Oromoo\n4 Kiswahili\n0 Duubatti',
     'language.selected': 'Afaan jijjiirameera.',
 
     // Outcome Menu

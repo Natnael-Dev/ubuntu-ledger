@@ -213,6 +213,7 @@ export function reduceUssdSession(
         if (token === '1') currentLocale = 'en';
         if (token === '2') currentLocale = 'am';
         if (token === '3') currentLocale = 'om';
+        if (token === '4') currentLocale = 'sw';
       }
     }
   }
@@ -381,7 +382,7 @@ function evaluateTransition(
     }
 
     case 'LANGUAGE_SELECT': {
-      if (token === '1' || token === '2' || token === '3') {
+      if (token === '1' || token === '2' || token === '3' || token === '4') {
         return { nodeId: 'LANGUAGE_UPDATED', answers: {} };
       }
       return { ...current, invalidHint: true };

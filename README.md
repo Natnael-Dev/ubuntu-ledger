@@ -2,7 +2,7 @@
 
 > **Ward Proof-Line turns a line in a local government budget into a five-minute physical check a neighbour can answer on a feature phone — and refuses to let a contractor close their own ticket.**
 
-[![CI Status](https://img.shields.io/badge/CI-passing-brightgreen)](#) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE) [![Test Coverage](https://img.shields.io/badge/Vitest-566%20passed-success)](#) [![Playwright E2E](https://img.shields.io/badge/Playwright-69%2F69%20passed-success)](#)
+[![CI Status](https://img.shields.io/badge/CI-passing-brightgreen)](#) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE) [![Test Coverage](https://img.shields.io/badge/Vitest-565%20passed-success)](#) [![Playwright E2E](https://img.shields.io/badge/Playwright-69%2F69%20passed-success)](#)
 
 ---
 
@@ -32,7 +32,7 @@ We invite judges to explore the 6 verified demonstration portals in order:
 ### Local Setup for Judges (Full 574-Test Suite)
 The repository runs out-of-the-box in memory (`npm run dev` / `npm test`), passing 565 tests (with 11 multi-connection database tests skipped).  
 To run the full **574-test live PostgreSQL & RLS concurrency suite**, please refer to our step-by-step guide:  
-👉 **[docs/hackathon/ci-notes.md](file:///docs/hackathon/ci-notes.md)**
+👉 **[docs/hackathon/ci-notes.md](docs/hackathon/ci-notes.md)**
 
 ---
 
@@ -59,31 +59,59 @@ When a contractor claims a broken public asset has been fixed, the project enter
 
 ---
 
-## Five-Minute Setup (Run It Locally)
+## ⏱️ 5-Minute Evaluator Quickstart
 
-Prerequisites: Node.js $\ge 20.11$ (`.nvmrc`), Docker Desktop (optional for live PostgreSQL).
+The fastest path for hackathon judges to verify the system end-to-end:
 
-```bash
-# 1. Install dependencies
-npm install
+- **Minute 1: Setup & Launch (Zero External Dependencies)**
+  ```bash
+  npm install
+  npm run dev
+  ```
+  Open [http://localhost:3000](http://localhost:3000) to inspect the civic thesis and 6-stage Proof-Line pipeline. The system runs 100% in-memory by default.  
+  *(Optional: To run with a live Supabase / PostgreSQL instance, export `DATABASE_URL` and run `npm run seed`).*
 
-# 2. Start development server (in-memory mode works out-of-the-box)
-npm run dev
+- **Minute 2: Witness Quorum & Sybil Refusal (Proof A)**
+  Open [`/simulator`](http://localhost:3000/simulator). Dial `*890#`. Check project `4412` as Amina — witness count advances $2 \to 3$. Switch the caller profile to Girma (same spatial cell cluster `CELL_ET_AA_042` and prefix bucket) and answer: spatial suppression assigns `weight = 0`, and the counter visibly remains locked at 3.
 
-# 3. Open the simulator
-# Navigate to: http://localhost:3000/simulator
-```
+- **Minute 3: Contractor 409 Lockout & Probation Lock (Proof B & INV-01)**
+  Open [`/console`](http://localhost:3000/console). On borehole `ET-AA-W09-BH-001`, click **Record Repair Claim**. The status turns amber (`REPAIR_CLAIMED`), never green. Click **Attempt Early Close**: the municipal engine strictly refuses the close with `409 E_PROBATION_LOCKED`, appending the violation to the cryptographic audit chain.
 
-To run with live local Supabase / PostgreSQL:
-```bash
-# Start local Supabase container (requires Docker)
-npx supabase start
+- **Minute 4: Public Gazette Receipt & Cryptographic Provenance**
+  Open [`/receipt/4412`](http://localhost:3000/receipt/4412). Review the public spending receipt citing Official Gazette Vol 14, Page 88, accompanied by its SHA-256 payload hash and trilingual audio readouts in Amharic, Afaan Oromoo, and English.
 
-# Export database connection and seed demo scenario
-export DATABASE_URL="postgresql://postgres:postgres@127.0.0.1:54322/postgres"
-npm run seed:demo
-npm run dev
-```
+- **Minute 5: Run the Verification Suite**
+  Run the complete automated test suite to confirm all 12 mathematical invariants:
+  ```bash
+  npm run typecheck
+  npm test                        # 565 Vitest tests passing (11 live-DB multi-conn skipped)
+  npx playwright install chromium # install Playwright browsers if needed
+  npx playwright test            # 69 Playwright E2E browser tests passing
+  ```
+
+---
+
+## 🤖 AI Coding Usage & Division of Labor
+
+Ubuntu Ledger was developed with an explicit human-in-the-loop AI swarm architecture. We uphold full transparency regarding division of labor, architectural ownership, and critical human vetoes:
+
+- **Human Architecture (100%):**
+  - **Invariants:** 100% of mathematical invariants (INV-01 through INV-12), including the 7-day non-negotiable probation lock, monotonic hash-chained sequence IDs, and RFC 8785 canonical JSON deterministic hashing.
+  - **Sybil Resistance:** Mathematical formulation of spatial Sybil cluster keys: $\text{HMAC-SHA256}(\text{taskId} \parallel \text{geoCell} \parallel \text{prefixBucket} \parallel \text{cohort})$.
+  - **State Machines:** Exhaustive transition matrices for Fiscal Lifecycle, Triangulation Consensus, Repair Probation, and Ingress Gateway.
+  - **Multi-Country Portability:** Zero-branching design eliminating country conditionals in favor of declarative schema configs (`config/countries/{et,ke}.json`).
+
+- **AI Swarm Execution:**
+  - Fast boilerplate generation, Next.js 15 App Router endpoints, and React 19 UI component wiring.
+  - In-memory mock repositories, Postgres pool adapters, and SQL schema migrations.
+  - Implementation and stress-testing of 45 adversarial test attack scenarios (covering SQL injection, path traversal, differencing attacks, role escalation, and header spoofing).
+
+- **Documented Human Vetoes:**
+  - *Vetoed Client Consensus Flags:* Rejected an AI agent proposal allowing client requests to send consensus override parameters; triangulation consensus is computed strictly server-side by the deterministic domain engine.
+  - *Vetoed Calendar-Day Arithmetic:* Rejected naive calendar date diffs; enforced monotonically advancing Unix epoch millisecond comparisons (`clock.now() + 7 * 86_400_000`) to eliminate timezone and leap-second attack vectors.
+  - *Vetoed Unhashed MSISDN Storage:* Overrode an agent attempt to store telephone numbers with reversible masking; enforced zero-PII salted SHA-256 HMAC hashing at the ingress boundary prior to database storage or log output.
+
+👉 *For the comprehensive task-by-task log, prompts, rejections, and test records, see [docs/ai-build-log.md](docs/ai-build-log.md).*
 
 ---
 
@@ -96,12 +124,13 @@ Every claim made in this project is verified by automated test suites:
 npm run lint
 
 # 2. TypeScript compilation
-npx tsc --noEmit
+npm run typecheck
 
-# 3. Complete Vitest Suite (566 tests across 40 test files: 35 unit, 3 adversarial, 2 integration)
+# 3. Complete Vitest Suite (565 tests across 40 test files: 35 unit, 3 adversarial, 2 integration)
 npm run test:unit && npm run test:adversarial && npm run test:integration
 
 # 4. Playwright End-to-End Suite (69 tests across 6 spec files)
+npx playwright install chromium
 npx playwright test
 
 # 5. Next.js Production Build (28 routes compiled cleanly)

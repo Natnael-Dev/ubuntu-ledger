@@ -12,11 +12,11 @@ export default function PwaPage() {
   return (
     <>
       <MonitorPwaClient />
-      <div className="mt-8 pt-4 border-t border-[var(--rule)] flex justify-between items-center font-mono text-[11px] text-[var(--ink-soft)] max-w-4xl mx-auto px-4 pb-8">
-        <Link href="/services/ET-ID-REPLACE" className="hover:text-[var(--ink)] transition-colors">
+      <div className="mt-10 pt-5 border-t border-[var(--rule)] flex justify-between items-center font-mono text-xs text-slate-500 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pb-10">
+        <Link href="/services/ET-ID-REPLACE" className="hover:text-slate-900 transition-colors">
           ‹ Step 4: Divergence
         </Link>
-        <Link href="/" className="hover:text-[var(--ink)] transition-colors">
+        <Link href="/" className="hover:text-slate-900 transition-colors">
           Return to overview ›
         </Link>
       </div>

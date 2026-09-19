@@ -74,11 +74,11 @@ export default async function ServiceCardPage(props: PageProps) {
           `,
         }}
       />
-      <div className="min-h-screen bg-slate-50 text-slate-900 py-10 px-4 print:bg-white print:text-black print:p-0">
-        <nav aria-label="Return navigation" className="max-w-2xl mx-auto mb-4 print-hide">
+      <div className="min-h-screen bg-slate-50 text-slate-900 py-10 px-4 sm:px-6 lg:px-8 print:bg-white print:text-black print:p-0">
+        <nav aria-label="Return navigation" className="max-w-5xl mx-auto mb-5 print-hide">
           <Link
             href="/"
-            className="font-mono text-xs text-slate-500 hover:text-blue-600 inline-flex items-center gap-1.5 focus:outline-none focus:ring-2 focus:ring-blue-600 font-medium transition-colors"
+            className="font-mono text-xs text-slate-600 hover:text-blue-600 inline-flex items-center gap-1.5 focus:outline-none focus:ring-2 focus:ring-blue-600 font-semibold transition-colors"
           >
             ← Return to Proof-Line Overview
           </Link>
@@ -90,7 +90,7 @@ export default async function ServiceCardPage(props: PageProps) {
         {/* Journey navigation */}
         <nav
           aria-label="Proof-Line steps"
-          className="max-w-2xl mx-auto mt-8 pt-4 border-t border-slate-200 flex justify-between items-center font-mono text-[11px] text-slate-500 print-hide"
+          className="max-w-5xl mx-auto mt-10 pt-5 border-t border-slate-200 flex justify-between items-center font-mono text-xs text-slate-600 print-hide"
         >
           <Link
             href="/receipt/4412"

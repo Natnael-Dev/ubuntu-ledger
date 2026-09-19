@@ -1,21 +1,20 @@
 import React from 'react';
 import Link from 'next/link';
+import { UbuntuLedgerIcon } from '@/components/UbuntuLedgerIcon';
 
 export function SiteFooter() {
   return (
     <footer className="border-t border-slate-200 bg-slate-50 mt-20 no-print">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-10">
-        <div className="grid sm:grid-cols-3 gap-8 mb-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="grid sm:grid-cols-3 gap-8 mb-10">
           <div>
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-5 h-5 rounded-md bg-blue-600 flex items-center justify-center shadow-sm">
-                <div className="w-1.5 h-1.5 rounded-full bg-white" />
-              </div>
+            <div className="flex items-center gap-3 mb-3.5">
+              <UbuntuLedgerIcon className="w-6 h-6 rounded-md shadow-2xs shrink-0" size={24} />
               <div>
-                <div className="font-sans text-xs font-bold text-slate-900 tracking-tight">
+                <div className="font-sans text-sm font-bold text-slate-900 tracking-tight">
                   Ubuntu Ledger
                 </div>
-                <div className="font-mono text-[9px] text-blue-600 uppercase tracking-widest font-semibold">
+                <div className="font-mono text-[10px] text-blue-600 uppercase tracking-widest font-semibold">
                   Ward Proof-Line
                 </div>
               </div>

@@ -640,11 +640,13 @@ export function ProjectBoard({
         </div>
       </div>
 
-      {/* Table Filters & Search */}
-      <div className="flex flex-wrap items-center justify-between gap-3 py-2">
-        {/* Filter Pills */}
-        <div className="flex flex-wrap items-center gap-1.5 text-xs">
-          <span className="text-slate-500 mr-1 font-medium">Filter:</span>
+      {/* Table Filters & Search Controls Bar (Agent 7) */}
+      <div className="bg-white border border-slate-200/90 rounded-2xl p-4 sm:p-5 shadow-sm flex flex-wrap items-center justify-between gap-4">
+        {/* Filter Buttons */}
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-xs font-mono font-bold uppercase tracking-wider text-slate-500 mr-1">
+            Status Filter:
+          </span>
           {(
             [
               ['all', `All (${projects.length})`],
@@ -658,10 +660,10 @@ export function ProjectBoard({
               type="button"
               data-testid={`filter-${key}`}
               onClick={() => setFilter(key)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-all ${
+              className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 ${
                 filter === key
-                  ? 'bg-blue-600 text-white font-semibold shadow-xs'
-                  : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
+                  ? 'bg-[#0F172A] text-white shadow-sm ring-1 ring-slate-900'
+                  : 'bg-slate-50 text-slate-700 border border-slate-200/90 hover:bg-slate-100 hover:border-slate-300'
               }`}
             >
               {label}
@@ -669,20 +671,25 @@ export function ProjectBoard({
           ))}
         </div>
 
-        {/* Search */}
+        {/* Search Input Box */}
         <div className="flex items-center gap-2">
-          <input
-            type="text"
-            placeholder="Search code / title..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="px-3 py-1.5 text-xs font-sans rounded-xl border border-slate-200 bg-white text-slate-900 focus:outline-none focus:ring-1 focus:ring-blue-500 w-52 shadow-2xs"
-          />
+          <div className="relative">
+            <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 text-xs">
+              🔍
+            </span>
+            <input
+              type="text"
+              placeholder="Search code / title..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-8 pr-3 py-2 text-xs font-sans rounded-xl border border-slate-300 bg-white text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 w-64 shadow-2xs"
+            />
+          </div>
           {searchQuery && (
             <button
               type="button"
               onClick={() => setSearchQuery('')}
-              className="text-xs font-medium text-slate-500 hover:text-slate-900 px-2 py-1 bg-slate-100 rounded-lg transition-colors"
+              className="text-xs font-bold text-slate-700 hover:text-slate-950 px-3 py-2 bg-slate-100 hover:bg-slate-200 rounded-xl transition-colors cursor-pointer"
             >
               Clear
             </button>
@@ -691,65 +698,65 @@ export function ProjectBoard({
       </div>
 
       {/* Mobile Swipe Hint */}
-      <div className="sm:hidden text-[10px] text-slate-500 flex items-center justify-between px-1">
+      <div className="sm:hidden text-xs text-slate-500 flex items-center justify-between px-1 font-mono">
         <span>↔ Scroll horizontally to view all columns</span>
-        <span>6 projects</span>
+        <span>{filteredProjects.length} projects</span>
       </div>
 
       {/* Modern Civic Project Table */}
-      <div className="border border-slate-200/80 bg-white rounded-2xl shadow-sm overflow-x-auto">
-        <table className="w-full min-w-[840px] text-left border-collapse text-xs">
+      <div className="border border-slate-200/90 bg-white rounded-2xl shadow-sm overflow-x-auto">
+        <table className="w-full min-w-[880px] text-left border-collapse text-xs">
           <caption className="sr-only">
             Municipal Project Board Ledger for {wardName} ({wardCode}) — tracking project codes, contracts, amounts, fiscal status, audit verification, citizen witness counts, and repair probation states.
           </caption>
           <thead>
-            <tr className="border-b border-slate-200 bg-slate-50/80 text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
+            <tr className="border-b border-slate-200 bg-slate-100/80 text-[11px] font-bold text-slate-700 uppercase tracking-wider">
               <th
                 scope="col"
-                className="py-3 px-3.5 cursor-pointer select-none hover:text-slate-900 focus-visible:ring-1 focus-visible:ring-blue-600 focus-visible:outline-none"
+                className="py-3.5 px-4 cursor-pointer select-none hover:text-slate-950 focus-visible:ring-1 focus-visible:ring-blue-600 focus-visible:outline-none"
                 onClick={() => handleSort('projectCode')}
               >
                 Code {sortField === 'projectCode' && (sortAsc ? '▲' : '▼')}
               </th>
               <th
                 scope="col"
-                className="py-3 px-3.5 cursor-pointer select-none hover:text-slate-900 focus-visible:ring-1 focus-visible:ring-blue-600 focus-visible:outline-none"
+                className="py-3.5 px-4 cursor-pointer select-none hover:text-slate-950 focus-visible:ring-1 focus-visible:ring-blue-600 focus-visible:outline-none"
                 onClick={() => handleSort('title')}
               >
                 Project Title {sortField === 'title' && (sortAsc ? '▲' : '▼')}
               </th>
               <th
                 scope="col"
-                className="py-3 px-3.5 cursor-pointer select-none text-right hover:text-slate-900 focus-visible:ring-1 focus-visible:ring-blue-600 focus-visible:outline-none"
+                className="py-3.5 px-4 cursor-pointer select-none text-right hover:text-slate-950 focus-visible:ring-1 focus-visible:ring-blue-600 focus-visible:outline-none"
                 onClick={() => handleSort('amountMinor')}
               >
                 Amount {sortField === 'amountMinor' && (sortAsc ? '▲' : '▼')}
               </th>
               <th
                 scope="col"
-                className="py-3 px-3.5 cursor-pointer select-none hover:text-slate-900 focus-visible:ring-1 focus-visible:ring-blue-600 focus-visible:outline-none"
+                className="py-3.5 px-4 cursor-pointer select-none hover:text-slate-950 focus-visible:ring-1 focus-visible:ring-blue-600 focus-visible:outline-none"
                 onClick={() => handleSort('fiscal')}
               >
                 Fiscal {sortField === 'fiscal' && (sortAsc ? '▲' : '▼')}
               </th>
               <th
                 scope="col"
-                className="py-3 px-3.5 cursor-pointer select-none hover:text-slate-900 focus-visible:ring-1 focus-visible:ring-blue-600 focus-visible:outline-none"
+                className="py-3.5 px-4 cursor-pointer select-none hover:text-slate-950 focus-visible:ring-1 focus-visible:ring-blue-600 focus-visible:outline-none"
                 onClick={() => handleSort('audit')}
               >
                 Audit State {sortField === 'audit' && (sortAsc ? '▲' : '▼')}
               </th>
               <th
                 scope="col"
-                className="py-3 px-3.5 cursor-pointer select-none text-center hover:text-slate-900 focus-visible:ring-1 focus-visible:ring-blue-600 focus-visible:outline-none"
+                className="py-3.5 px-4 cursor-pointer select-none text-center hover:text-slate-950 focus-visible:ring-1 focus-visible:ring-blue-600 focus-visible:outline-none"
                 onClick={() => handleSort('witnesses')}
               >
                 Witnesses {sortField === 'witnesses' && (sortAsc ? '▲' : '▼')}
               </th>
-              <th scope="col" className="py-3 px-3.5">
+              <th scope="col" className="py-3.5 px-4">
                 Probation Countdown
               </th>
-              <th scope="col" className="py-3 px-3.5 text-right">
+              <th scope="col" className="py-3.5 px-4 text-right">
                 Actions
               </th>
             </tr>

@@ -174,21 +174,21 @@ export default async function ReceiptPage(props: PageProps) {
         {/* Print trigger bar for demo */}
         <nav
           aria-label="Proof-Line steps"
-          className="print-hide w-full max-w-[440px] mb-3 flex justify-between items-center text-xs text-[var(--ink-soft)] font-mono"
+          className="print-hide w-full max-w-[560px] mb-4 flex justify-between items-center text-xs text-[var(--ink-soft)] font-mono"
         >
           <Link
             href="/"
-            className="hover:text-[var(--ink)] hover:underline flex items-center gap-1 focus:outline-none focus:ring-1 focus:ring-[var(--ink)]"
+            className="hover:text-[var(--ink)] hover:underline flex items-center gap-1.5 focus:outline-none focus:ring-1 focus:ring-[var(--ink)] text-xs font-semibold"
           >
             ← Overview
           </Link>
-          <div className="flex items-center gap-3">
-            <span aria-current="step" className="font-bold text-[var(--ink)] text-[11px]">
+          <div className="flex items-center gap-4">
+            <span aria-current="step" className="font-bold text-[var(--ink)] text-xs">
               Step 3: Receipt
             </span>
             <Link
               href="/services/ET-ID-REPLACE"
-              className="inline-flex items-center gap-1 font-mono text-[11px] text-[var(--ink-soft)] hover:text-[var(--ink)] transition-colors focus:outline-none focus:ring-1 focus:ring-[var(--ink)]"
+              className="inline-flex items-center gap-1 font-mono text-xs text-blue-700 font-semibold hover:underline transition-colors focus:outline-none focus:ring-1 focus:ring-[var(--ink)]"
             >
               Step 4: Divergence
               <span aria-hidden="true">›</span>
@@ -197,10 +197,10 @@ export default async function ReceiptPage(props: PageProps) {
           </div>
         </nav>
 
-        {/* The Receipt Card Layout — Public Verification Artifact */}
-        <article className="receipt-container max-w-[480px] w-full border border-slate-200/90 bg-white p-6 sm:p-8 rounded-2xl shadow-lg shadow-slate-200/50 font-sans transition-all relative print:bg-white print:text-black print:border-black print:shadow-none">
+        {/* The Receipt Card Layout — Public Verification Artifact (Expanded to max-w-[560px] - Agent 8) */}
+        <article className="receipt-container max-w-[560px] w-full border border-slate-200/90 bg-white p-7 sm:p-9 rounded-2xl shadow-xl shadow-slate-200/50 font-sans transition-all relative print:bg-white print:text-black print:border-black print:shadow-none">
           {/* Perforation top edge */}
-          <div className="perf-bold -mx-6 -mt-6 sm:-mx-8 sm:-mt-8 mb-6" />
+          <div className="perf-bold -mx-7 -mt-7 sm:-mx-9 sm:-mt-9 mb-7" />
 
           {/* Header */}
           <header className="pb-5 border-b border-slate-100 relative print:bg-white print:text-black print:border-black">

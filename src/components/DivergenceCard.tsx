@@ -73,27 +73,27 @@ export function DivergenceCard({ card, className = '' }: DivergenceCardProps) {
   return (
     <div
       data-testid="divergence-card"
-      className={`max-w-3xl mx-auto font-sans bg-white text-slate-900 rounded-2xl border border-slate-200/90 shadow-lg shadow-slate-200/40 overflow-hidden print:bg-white print:text-black print:border-black print:shadow-none ${className}`}
+      className={`max-w-5xl mx-auto font-sans bg-white text-slate-900 rounded-2xl border border-slate-200/90 shadow-xl shadow-slate-200/40 overflow-hidden print:bg-white print:text-black print:border-black print:shadow-none ${className}`}
     >
       {/* Header Bar */}
-      <div className="border-b border-slate-100 p-6 bg-slate-50/70 flex flex-wrap items-baseline justify-between print:bg-white print:text-black print:border-black">
+      <div className="border-b border-slate-100 p-7 sm:p-8 bg-slate-50/80 flex flex-wrap items-baseline justify-between print:bg-white print:text-black print:border-black">
         <div>
-          <span className="font-mono text-[10px] text-blue-600 font-bold uppercase tracking-widest block mb-1.5 print:text-black">
+          <span className="font-mono text-xs text-blue-600 font-bold uppercase tracking-widest block mb-2 print:text-black">
             Public Service Fee Ledger · S-11 Two-Ledger Isolation
           </span>
           {SERVICE_NAMES[serviceCode] && (
-            <div className="mb-2.5">
-              <h2 className="font-sans text-xl font-bold tracking-tight text-slate-900 print:text-black">
+            <div className="mb-3">
+              <h2 className="font-sans text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 print:text-black">
                 {SERVICE_NAMES[serviceCode].name}
               </h2>
               {SERVICE_NAMES[serviceCode].amharic && (
-                <p className="font-mono text-xs text-slate-500 mt-0.5 print:text-black">
+                <p className="font-mono text-xs text-slate-500 mt-1 print:text-black">
                   {SERVICE_NAMES[serviceCode].amharic}
                 </p>
               )}
             </div>
           )}
-          <span className="font-mono text-[11px] font-semibold text-blue-700 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded-md print:bg-white print:text-black print:border-black">
+          <span className="font-mono text-xs font-bold text-blue-700 bg-blue-50 border border-blue-200 px-2.5 py-1 rounded-md print:bg-white print:text-black print:border-black">
             GAZETTE CODE: {serviceCode}
           </span>
         </div>
@@ -109,7 +109,7 @@ export function DivergenceCard({ card, className = '' }: DivergenceCardProps) {
             ========================================================================= */}
         <section
           data-testid="statutory-ledger"
-          className="p-6 sm:p-7 flex flex-col justify-between bg-white print:bg-white print:text-black"
+          className="p-7 sm:p-9 flex flex-col justify-between bg-white print:bg-white print:text-black"
         >
           <div>
             <div className="flex items-center justify-between pb-3 border-b border-slate-200 mb-4 print:border-black">

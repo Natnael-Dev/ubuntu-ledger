@@ -22,6 +22,7 @@ export interface AlcatelHandsetProps {
   lcdLines: string[];
   loading: boolean;
   channelMode: 'USSD' | 'IVR';
+  onChannelModeChange?: (mode: 'USSD' | 'IVR') => void;
   invalidInputNotice: string | null;
   inputBuffer: string;
   onInputChange: (value: string) => void;
@@ -59,6 +60,7 @@ export function AlcatelHandset({
   lcdLines,
   loading,
   channelMode,
+  onChannelModeChange,
   invalidInputNotice,
   inputBuffer,
   onInputChange,
@@ -77,7 +79,96 @@ export function AlcatelHandset({
   const sessionActive = Boolean(session?.isAlive);
 
   return (
-    <div className="flex flex-col items-center select-none w-full max-w-[320px] mx-auto">
+    <div className="flex flex-col items-center select-none w-full max-w-[340px] mx-auto space-y-4">
+      {/* ─── Prominent Channel Protocol Selection (Agent 5) ─── */}
+      <div className="w-full bg-white border border-slate-200/90 rounded-2xl p-4 shadow-sm">
+        <div className="flex items-center justify-between mb-2.5">
+          <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-slate-500">
+            Channel Protocol
+          </span>
+          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
+            GSM Carrier Layer
+          </span>
+        </div>
+
+        <div className="grid grid-cols-2 gap-1.5 p-1 bg-slate-100 rounded-xl mb-2.5">
+          <button
+            type="button"
+            onClick={() => onChannelModeChange?.('USSD')}
+            className={`py-2 px-3 text-xs font-bold rounded-lg transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+              channelMode === 'USSD'
+                ? 'bg-white text-blue-700 shadow-xs ring-1 ring-slate-200/60'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <span>USSD (*890#)</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => onChannelModeChange?.('IVR')}
+            className={`py-2 px-3 text-xs font-bold rounded-lg transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+              channelMode === 'IVR'
+                ? 'bg-white text-blue-700 shadow-xs ring-1 ring-slate-200/60'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <span>IVR (Voice)</span>
+          </button>
+        </div>
+
+        <p className="text-[11px] text-slate-600 leading-snug">
+          {channelMode === 'USSD'
+            ? 'Interactive GSM session via shortcode. Works on basic 2G feature phones without data.'
+            : 'Interactive voice response audio prompts designed for low-literacy rural field verification.'}
+        </p>
+      </div>
+
+      {/* ─── Redesigned High-Visibility "Current Action" Card (Agent 5) ─── */}
+      <div className="w-full bg-white border-2 border-blue-600/40 rounded-2xl p-4 sm:p-5 shadow-sm flex flex-col gap-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span
+              className={`w-2.5 h-2.5 rounded-full ${
+                sessionActive ? 'bg-emerald-500 animate-pulse' : 'bg-blue-600'
+              }`}
+            />
+            <span className="font-mono text-xs font-extrabold uppercase tracking-wider text-blue-700">
+              Current Action
+            </span>
+          </div>
+          <span className="text-xs font-mono font-semibold text-slate-500">
+            {sessionActive ? 'Session Active' : 'Ready to Dial'}
+          </span>
+        </div>
+
+        <p className="text-sm font-bold text-slate-900 leading-snug">
+          {sessionActive
+            ? 'Follow instructions on phone LCD or press digits on the keypad.'
+            : 'Dial *890# to open the Ubuntu Ledger menu.'}
+        </p>
+
+        <div className="flex items-center gap-2.5 pt-1">
+          <button
+            type="button"
+            onClick={onDial}
+            disabled={loading}
+            className="flex-1 py-3 px-4 rounded-xl text-sm font-bold bg-blue-600 hover:bg-blue-700 active:scale-98 text-white flex items-center justify-center gap-2 transition-all shadow-sm shadow-blue-500/25 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
+          >
+            <span>{sessionActive ? 'Redial *890#' : 'Dial *890#'}</span>
+            <span className="text-base font-bold">›</span>
+          </button>
+          <button
+            type="button"
+            data-testid="btn-new"
+            aria-label="Start new session"
+            onClick={onStartNew || onDial}
+            className="py-3 px-4 rounded-xl text-sm font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
+          >
+            Reset
+          </button>
+        </div>
+      </div>
+
       {/* ─── Outer Physical Chassis (Alcatel 1066 Handset Styling) ─── */}
       <div
         data-testid="feature-phone"
@@ -388,48 +479,6 @@ export function AlcatelHandset({
             </button>
           </div>
         )}
-      </div>
-
-      {/* ─── Redesigned High-Visibility "Current Action" Card (Agent 3 & 4) ─── */}
-      <div className="w-full mt-4 bg-white border-2 border-blue-600/30 rounded-2xl p-4 shadow-sm flex flex-col gap-2.5">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-blue-600 animate-ping" />
-            <span className="font-mono text-xs font-extrabold uppercase tracking-wider text-blue-700">
-              Current Action
-            </span>
-          </div>
-          <span className="text-[11px] font-mono text-slate-500">
-            {sessionActive ? 'Session in progress' : 'Ready to dial'}
-          </span>
-        </div>
-
-        <p className="text-sm font-semibold text-slate-900 leading-snug">
-          {sessionActive
-            ? 'Follow instructions on phone LCD or press digits on the keypad.'
-            : 'Dial *890# to open the Ubuntu Ledger menu.'}
-        </p>
-
-        <div className="flex items-center gap-3 pt-1">
-          <button
-            type="button"
-            onClick={onDial}
-            disabled={loading}
-            className="flex-1 py-3 px-4 rounded-xl text-sm font-bold bg-blue-600 hover:bg-blue-700 active:scale-98 text-white flex items-center justify-center gap-1.5 transition-all shadow-sm shadow-blue-500/25 cursor-pointer"
-          >
-            <span>Dial *890#</span>
-            <span className="text-base">›</span>
-          </button>
-          <button
-            type="button"
-            data-testid="btn-new"
-            aria-label="Start new session"
-            onClick={onStartNew || onDial}
-            className="py-3 px-4 rounded-xl text-sm font-semibold bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-300 transition-colors cursor-pointer"
-          >
-            Reset
-          </button>
-        </div>
       </div>
     </div>
   );

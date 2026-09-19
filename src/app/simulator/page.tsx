@@ -72,11 +72,11 @@ export default function SimulatorPage() {
 
   return (
     <div id="simulator-container" className="bg-[#F8FAFC] min-h-screen">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-12">
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-12 pt-8 pb-16">
         {/* ─── Top Brand & Scenario Header (Reference 2 §12) ─── */}
         <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-6 mb-8">
           <div className="max-w-2xl">
-            <p className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">
+            <p className="text-xs font-mono font-bold uppercase tracking-wider text-slate-500 mb-2">
               Proof A · Sybil Resistance // Feature Phone Simulator
             </p>
             <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900 leading-tight mb-3">

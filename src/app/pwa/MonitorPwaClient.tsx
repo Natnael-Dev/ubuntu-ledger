@@ -302,8 +302,8 @@ export function MonitorPwaClient() {
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 font-sans antialiased pb-16">
       {/* Header */}
-      <header className="border-b border-slate-200 bg-white px-4 sm:px-6 py-4 shadow-sm">
-        <div className="max-w-4xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <header className="border-b border-slate-200 bg-white px-4 sm:px-6 lg:px-8 py-4 shadow-sm">
+        <div className="max-w-5xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <div className="text-[10px] font-mono uppercase tracking-widest text-slate-500 font-bold">
               Ward Proof-Line // Field Monitor Interface
@@ -355,7 +355,7 @@ export function MonitorPwaClient() {
       </header>
 
       {/* Main Content Container */}
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6">
         {/* Context & Demo Scenario Banner */}
         <div className="border border-slate-200 bg-white rounded-2xl p-5 sm:p-6 shadow-sm">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">

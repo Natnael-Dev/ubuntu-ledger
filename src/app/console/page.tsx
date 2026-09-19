@@ -55,55 +55,56 @@ export default function ConsolePage() {
   });
 
   return (
-    <div className="min-h-screen bg-[var(--paper)] text-[var(--ink)] font-sans antialiased p-4 sm:p-6 lg:p-8">
-      <div className="max-w-6xl mx-auto space-y-6">
-        {/* Top Operational Bar (Modern Civic Header) */}
-        <header className="border border-slate-200/80 bg-white rounded-2xl p-5 shadow-sm space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+    <div className="min-h-screen bg-[var(--paper)] text-[var(--ink)] font-sans antialiased">
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-12 py-8 space-y-8">
+        {/* Top Operational Bar (Deliberate Charcoal Operator Header - Agent 7) */}
+        <header className="border border-slate-800 bg-[#0B0F17] text-white rounded-2xl p-6 sm:p-8 shadow-lg space-y-5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-5">
             <div>
-              <div className="text-[10px] font-mono tracking-widest text-slate-500 uppercase font-semibold">
-                Ward Proof-Line // Municipal Operator Interface
+              <div className="text-xs font-mono tracking-widest text-emerald-400 uppercase font-bold flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span>Ward Proof-Line // Municipal Operator Interface</span>
               </div>
-              <h1 className="text-xl font-bold tracking-tight text-slate-900 mt-1">
+              <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white mt-1.5 font-sans">
                 CONSOLE: {ward.name.toUpperCase()} ({ward.code})
               </h1>
             </div>
 
-            <div className="flex flex-wrap items-center gap-2.5 text-xs font-mono">
-              <div className="flex items-center gap-1.5 border border-slate-200 px-2.5 py-1 bg-slate-50 rounded-lg text-slate-700">
-                <span className="font-semibold">Role: ADMIN</span>
+            <div className="flex flex-wrap items-center gap-3 text-xs font-mono">
+              <div className="flex items-center gap-2 border border-slate-700 px-3 py-1.5 bg-[#131924] rounded-xl text-slate-200">
+                <span className="font-bold text-amber-400">Role: ADMIN</span>
               </div>
-              <div className="flex items-center gap-1.5 border border-emerald-200 px-2.5 py-1 bg-emerald-50 text-emerald-800 rounded-lg font-medium">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
+              <div className="flex items-center gap-2 border border-emerald-900/60 px-3 py-1.5 bg-emerald-950/40 text-emerald-300 rounded-xl font-medium">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                 <span>Audit Chain: Genesis-linked</span>
               </div>
               <Link
                 href="/simulator"
-                className="px-2.5 py-1 border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 rounded-lg transition-colors inline-flex items-center gap-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
+                className="px-3 py-1.5 border border-slate-700 bg-slate-800 hover:bg-slate-700 text-white rounded-xl transition-colors inline-flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
                 target="_blank"
               >
                 <span>Simulator</span>
-                <span className="text-[10px]">↗</span>
+                <span className="text-xs">↗</span>
               </Link>
             </div>
           </div>
 
-          {/* Console Section Header */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 py-2.5 bg-slate-50/70 rounded-xl border border-slate-100">
-            <div className="flex items-center gap-2.5">
-              <span className="font-mono text-xs font-bold text-white bg-blue-600 px-3 py-1 rounded-md">
+          {/* Console Section Header Sub-bar */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 py-3 bg-[#131924] rounded-xl border border-slate-800/80">
+            <div className="flex items-center gap-3">
+              <span className="font-mono text-xs font-bold text-white bg-blue-600 px-3 py-1 rounded-lg shadow-xs">
                 Project Board
               </span>
-              <span className="text-xs text-slate-600 font-medium">
-                {ward.name} · {projectItems.length} Municipal Projects
+              <span className="text-xs text-slate-300 font-medium">
+                {ward.name} · {projectItems.length} Municipal Projects Under Oversight
               </span>
             </div>
-            <div className="text-[11px] font-mono text-slate-600 flex items-center gap-1.5">
-              <span className="border border-amber-300 bg-amber-50 text-amber-900 px-2 py-0.5 rounded text-[10px] font-semibold uppercase">
-                Stat: Locked Funds
+            <div className="text-xs font-mono text-slate-300 flex items-center gap-2">
+              <span className="border border-amber-500/50 bg-amber-950/40 text-amber-300 px-2.5 py-0.5 rounded-md text-[11px] font-bold uppercase">
+                Statutory Hold: Locked Funds
               </span>
-              <span className="text-[11px] text-slate-500 hidden sm:inline">
-                Funds committed / held in escrow / non-disbursable pending community verification
+              <span className="text-xs text-slate-400 hidden lg:inline">
+                Funds held in escrow pending community quorum
               </span>
             </div>
           </div>

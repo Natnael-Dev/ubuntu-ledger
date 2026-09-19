@@ -424,33 +424,49 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
   return (
     <div className="space-y-8">
       {/* ─── Compact Stepper (Reference 2 §14) ─── */}
-      <div className="bg-white border border-slate-200/80 rounded-2xl p-4 sm:p-5 shadow-sm">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="grid grid-cols-3 gap-2 sm:gap-4 flex-1">
+      <div className="bg-white border border-slate-200/80 rounded-2xl p-5 sm:p-6 shadow-sm">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 flex-1">
             {/* Step 1: Amina */}
             <div
               onClick={() => {
                 const p = config.personas.find((x) => x.role === 'primary');
                 if (p) handleSelectPersona(p);
               }}
-              className={`flex items-center gap-2 sm:gap-3 p-2 rounded-xl transition-all cursor-pointer ${
+              className={`text-left p-3.5 sm:p-4 rounded-xl transition-all cursor-pointer border-2 flex items-center gap-3.5 select-none ${
                 currentStep === 1
-                  ? 'bg-blue-50/80 text-blue-900 font-semibold border border-blue-200/60'
-                  : 'text-slate-600 hover:bg-slate-50'
+                  ? 'bg-blue-50/90 text-blue-900 border-blue-600 shadow-xs'
+                  : currentStep > 1
+                  ? 'bg-emerald-50/50 text-emerald-900 border-emerald-300'
+                  : 'bg-slate-50/60 text-slate-700 border-slate-200 hover:border-slate-300'
               }`}
             >
               <div
-                className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
+                className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 shadow-2xs ${
                   currentStep === 1
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-slate-100 text-slate-500'
+                    ? 'bg-blue-600 text-white animate-pulse'
+                    : currentStep > 1
+                    ? 'bg-emerald-600 text-white'
+                    : 'bg-slate-200 text-slate-600'
                 }`}
               >
-                1
+                {currentStep > 1 ? '✓' : '1'}
               </div>
               <div className="min-w-0">
-                <p className="text-xs font-bold leading-tight truncate">Amina</p>
-                <p className="text-[10px] text-slate-500 truncate hidden sm:block">
+                <div className="flex items-center gap-1.5">
+                  <p className="text-sm font-bold leading-tight truncate">1. Amina</p>
+                  {currentStep === 1 && (
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-600 text-white uppercase">
+                      Active
+                    </span>
+                  )}
+                  {currentStep > 1 && (
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+                      Confirmed
+                    </span>
+                  )}
+                </div>
+                <p className="text-xs text-slate-500 mt-0.5 truncate">
                   Submit observation
                 </p>
               </div>
@@ -462,25 +478,41 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
                 const p = config.personas.find((x) => x.role === 'duplicate');
                 if (p) handleSelectPersona(p);
               }}
-              className={`flex items-center gap-2 sm:gap-3 p-2 rounded-xl transition-all cursor-pointer ${
+              className={`text-left p-3.5 sm:p-4 rounded-xl transition-all cursor-pointer border-2 flex items-center gap-3.5 select-none ${
                 currentStep === 2
-                  ? 'bg-amber-50/80 text-amber-900 font-semibold border border-amber-200/60'
-                  : 'text-slate-600 hover:bg-slate-50'
+                  ? 'bg-amber-50/90 text-amber-950 border-amber-500 shadow-xs'
+                  : currentStep > 2
+                  ? 'bg-emerald-50/50 text-emerald-900 border-emerald-300'
+                  : 'bg-slate-50/60 text-slate-700 border-slate-200 hover:border-slate-300'
               }`}
             >
               <div
-                className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
+                className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 shadow-2xs ${
                   currentStep === 2
-                    ? 'bg-amber-500 text-white'
-                    : 'bg-slate-100 text-slate-500'
+                    ? 'bg-amber-500 text-white animate-pulse'
+                    : currentStep > 2
+                    ? 'bg-emerald-600 text-white'
+                    : 'bg-slate-200 text-slate-600'
                 }`}
               >
-                2
+                {currentStep > 2 ? '✓' : '2'}
               </div>
               <div className="min-w-0">
-                <p className="text-xs font-bold leading-tight truncate">Girma</p>
-                <p className="text-[10px] text-slate-500 truncate hidden sm:block">
-                  Duplicate cluster (rejected)
+                <div className="flex items-center gap-1.5">
+                  <p className="text-sm font-bold leading-tight truncate">2. Girma</p>
+                  {currentStep === 2 && (
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-600 text-white uppercase">
+                      Active
+                    </span>
+                  )}
+                  {currentStep > 2 && (
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+                      Suppressed
+                    </span>
+                  )}
+                </div>
+                <p className="text-xs text-slate-500 mt-0.5 truncate">
+                  Duplicate cluster rejected
                 </p>
               </div>
             </div>
@@ -491,24 +523,31 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
                 const p = config.personas.find((x) => x.id === 'kalinda');
                 if (p) handleSelectPersona(p);
               }}
-              className={`flex items-center gap-2 sm:gap-3 p-2 rounded-xl transition-all cursor-pointer ${
+              className={`text-left p-3.5 sm:p-4 rounded-xl transition-all cursor-pointer border-2 flex items-center gap-3.5 select-none ${
                 currentStep === 3
-                  ? 'bg-emerald-50/80 text-emerald-900 font-semibold border border-emerald-200/60'
-                  : 'text-slate-600 hover:bg-slate-50'
+                  ? 'bg-emerald-50/90 text-emerald-950 border-emerald-600 shadow-xs'
+                  : 'bg-slate-50/60 text-slate-700 border-slate-200 hover:border-slate-300'
               }`}
             >
               <div
-                className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
+                className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 shadow-2xs ${
                   currentStep === 3
-                    ? 'bg-emerald-600 text-white'
-                    : 'bg-slate-100 text-slate-500'
+                    ? 'bg-emerald-600 text-white animate-pulse'
+                    : 'bg-slate-200 text-slate-600'
                 }`}
               >
                 3
               </div>
               <div className="min-w-0">
-                <p className="text-xs font-bold leading-tight truncate">Kalinda</p>
-                <p className="text-[10px] text-slate-500 truncate hidden sm:block">
+                <div className="flex items-center gap-1.5">
+                  <p className="text-sm font-bold leading-tight truncate">3. Kalinda</p>
+                  {currentStep === 3 && (
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-600 text-white uppercase">
+                      Active
+                    </span>
+                  )}
+                </div>
+                <p className="text-xs text-slate-500 mt-0.5 truncate">
                   Independent confirmation
                 </p>
               </div>
@@ -516,12 +555,12 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
           </div>
 
           {/* Stepper Progress bar & indicator */}
-          <div className="sm:w-36 flex flex-col justify-center border-t sm:border-t-0 sm:border-l border-slate-100 pt-2 sm:pt-0 sm:pl-4">
-            <div className="flex justify-between items-center text-[11px] font-semibold text-slate-600 mb-1">
+          <div className="md:w-44 flex flex-col justify-center border-t md:border-t-0 md:border-l border-slate-100 pt-3 md:pt-0 md:pl-6">
+            <div className="flex justify-between items-center text-xs font-bold text-slate-700 mb-1.5">
               <span>Step {currentStep} of 3</span>
-              <span>{Math.round((currentStep / 3) * 100)}%</span>
+              <span className="text-blue-600 font-mono">{Math.round((currentStep / 3) * 100)}%</span>
             </div>
-            <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+            <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
               <div
                 className="h-full bg-blue-600 rounded-full transition-all duration-300"
                 style={{ width: `${(currentStep / 3) * 100}%` }}
@@ -532,18 +571,18 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
       </div>
 
       {/* ─── 3-Column Bento Architecture (Reference 2 §12) ─── */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        {/* ─── Column 1: Field Personas (Left - 3 cols) ─── */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        {/* ─── Column 1: Field Personas (Left - 4 cols) ─── */}
         <section
           aria-label="Persona selector"
-          className="lg:col-span-3 space-y-4"
+          className="lg:col-span-4 space-y-4"
         >
-          <div className="bg-white border border-slate-200/80 rounded-2xl p-4 sm:p-5 shadow-sm">
-            <div className="flex items-center justify-between mb-3">
+          <div className="bg-white border border-slate-200/80 rounded-2xl p-5 sm:p-6 shadow-sm">
+            <div className="flex items-center justify-between mb-4">
               <div>
-                <h3 className="font-bold text-sm text-slate-900">Field Personas</h3>
-                <p className="text-xs text-slate-500">
-                  Select a person to simulate their USSD session:
+                <h3 className="font-bold text-base text-slate-900">Field Personas</h3>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Select a citizen to simulate their feature phone session:
                 </p>
               </div>
             </div>
@@ -553,7 +592,7 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
               data-testid="persona-selector"
               role="radiogroup"
               aria-label="Select demo persona"
-              className="space-y-3"
+              className="space-y-3.5"
             >
               {config.personas.map((p) => {
                 const isSelected = selectedPersona.id === p.id;
@@ -567,17 +606,17 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
                     type="button"
                     aria-pressed={isSelected}
                     onClick={() => handleSelectPersona(p)}
-                    className={`w-full text-left p-4 rounded-2xl border-2 transition-all flex flex-col gap-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 cursor-pointer ${
+                    className={`w-full text-left p-5 rounded-2xl border-2 transition-all flex flex-col gap-3.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 cursor-pointer ${
                       isSelected
                         ? 'border-blue-600 bg-blue-50/40 shadow-sm ring-1 ring-blue-600'
                         : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/70'
                     }`}
                   >
                     <div className="flex items-start justify-between w-full">
-                      <div className="flex items-center gap-3.5">
+                      <div className="flex items-center gap-4">
                         {/* High-Contrast Civic Identity Avatar Badge */}
                         <div
-                          className={`w-12 h-12 rounded-full overflow-hidden shrink-0 border-2 flex items-center justify-center font-bold text-sm shadow-xs ${
+                          className={`w-14 h-14 rounded-2xl overflow-hidden shrink-0 border-2 flex items-center justify-center font-extrabold text-base shadow-xs ${
                             isAmina
                               ? 'bg-[#E07A5F] text-white border-amber-200'
                               : isGirma
@@ -589,33 +628,33 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
                         </div>
 
                         <div>
-                          <div className="font-bold text-base text-[#0F172A] leading-tight flex items-center gap-1.5">
+                          <div className="font-bold text-lg text-[#0F172A] leading-tight flex items-center gap-1.5">
                             <span>{isAmina ? 'Amina' : isGirma ? 'Girma' : 'Kalinda'}</span>
                             {/* Hidden/accessible full persona label for strict test contracts */}
                             <span className="sr-only"> {p.label}</span>
                           </div>
-                          <p className="text-xs text-slate-500 font-medium mt-0.5">
+                          <p className="text-xs text-slate-500 font-medium mt-1">
                             {isKalinda ? 'Woreda 09 · Kebele 09' : 'Woreda 09 · Kebele 08'}
                           </p>
-                          <p className="text-xs font-mono text-slate-600 mt-1 flex items-center gap-1.5">
+                          <p className="text-xs font-mono text-slate-700 font-semibold mt-1 flex items-center gap-1.5 bg-slate-100 px-2 py-0.5 rounded-md inline-flex">
                             <span>📞</span>
-                            <span className="font-semibold">{p.msisdn}</span>
+                            <span>{p.msisdn}</span>
                           </p>
                         </div>
                       </div>
 
                       {/* Prominent Selection Indicator Radio/Check */}
                       {isSelected ? (
-                        <div className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-bold shadow-xs shrink-0 mt-1">
+                        <div className="w-7 h-7 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm font-bold shadow-xs shrink-0 mt-0.5">
                           ✓
                         </div>
                       ) : (
-                        <div className="w-6 h-6 rounded-full border-2 border-slate-300 shrink-0 mt-1 hover:border-slate-400" />
+                        <div className="w-7 h-7 rounded-full border-2 border-slate-300 shrink-0 mt-0.5 hover:border-slate-400" />
                       )}
                     </div>
 
                     {/* Badge Pills Row */}
-                    <div className="flex items-center gap-2 pt-2 border-t border-slate-100">
+                    <div className="flex items-center gap-2 pt-3 border-t border-slate-100">
                       {isAmina && (
                         <>
                           <span className="text-xs font-bold px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-300">
@@ -657,35 +696,6 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
               <span>Cluster key: <strong className="text-slate-900 font-bold">{selectedPersona.clusterKey}</strong></span>
               <span className="text-[11px] bg-slate-100 text-slate-700 font-semibold px-2.5 py-0.5 rounded">Cell: et-aa-0917</span>
             </div>
-
-            {/* Channel Toggle (USSD vs IVR) */}
-            <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
-              <span className="text-xs text-slate-700 font-semibold">Channel Protocol:</span>
-              <div className="inline-flex rounded-xl border border-slate-200 p-0.5 bg-slate-50">
-                <button
-                  type="button"
-                  onClick={() => setChannelMode('USSD')}
-                  className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer ${
-                    channelMode === 'USSD'
-                      ? 'bg-white text-blue-700 shadow-xs'
-                      : 'text-slate-600 hover:text-slate-900'
-                  }`}
-                >
-                  USSD (*890#)
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setChannelMode('IVR')}
-                  className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer ${
-                    channelMode === 'IVR'
-                      ? 'bg-white text-blue-700 shadow-xs'
-                      : 'text-slate-600 hover:text-slate-900'
-                  }`}
-                >
-                  IVR (Voice)
-                </button>
-              </div>
-            </div>
           </div>
 
           {/* Key Scenario Collapsible Card */}
@@ -699,12 +709,12 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
                 <span className="text-blue-600 font-bold text-base">ⓘ</span>
                 <span className="font-bold text-sm text-slate-900">Key Scenario Walkthrough</span>
               </div>
-              <span className="text-xs font-mono font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded">
+              <span className="text-xs font-mono font-bold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-md">
                 {scenarioExpanded ? 'Hide ▲' : 'Open ▼'}
               </span>
             </button>
             {scenarioExpanded ? (
-              <div className="text-xs text-slate-600 mt-3 pt-3 border-t border-slate-100 space-y-2 leading-relaxed">
+              <div className="text-xs text-slate-600 mt-3 pt-3 border-t border-slate-100 space-y-2.5 leading-relaxed">
                 <p>
                   <strong>1. Amina (Demo Witness):</strong> Submits inspection observation for Generator #4412.
                   Independent confirmation recorded (quorum 1/3).
@@ -736,6 +746,7 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
             lcdLines={lcdLines}
             loading={loading}
             channelMode={channelMode}
+            onChannelModeChange={setChannelMode}
             invalidInputNotice={invalidInputNotice}
             inputBuffer={inputBuffer}
             onInputChange={setInputBuffer}
@@ -757,10 +768,10 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
           />
         </section>
 
-        {/* ─── Column 3: Human Proof First + Telemetry Stack (Right - 5 cols) ─── */}
+        {/* ─── Column 3: Human Proof First + Telemetry Stack (Right - 4 cols) ─── */}
         <section
           aria-label="Session Evidence and Telemetry"
-          className="lg:col-span-5 space-y-4"
+          className="lg:col-span-4 space-y-4"
         >
           {/* Segmented Control Tabs */}
           <div className="bg-slate-100 p-1.5 rounded-2xl flex items-center border border-slate-200">
@@ -866,68 +877,142 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
 
               <div className="space-y-3.5">
                 {/* Step 1 */}
-                <div className={`p-3.5 rounded-xl border transition-all ${
-                  !sessionActive && selectedPersona.role === 'primary'
-                    ? 'border-blue-500 bg-blue-50/50'
-                    : 'border-slate-100 bg-slate-50/40'
+                <div className={`p-4 rounded-xl border transition-all ${
+                  selectedPersona.role === 'primary'
+                    ? 'border-blue-500 bg-blue-50/70 shadow-xs'
+                    : 'border-slate-200 bg-slate-50/40'
                 }`}>
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="w-5 h-5 rounded-full bg-blue-600 text-white flex items-center justify-center text-[10px] font-bold">1</span>
-                    <span className="text-xs font-bold text-slate-900">Select Primary Witness (Amina)</span>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <div className="flex items-center gap-2">
+                      <span className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-bold shadow-2xs">1</span>
+                      <span className="text-sm font-bold text-slate-900">Select Primary Witness (Amina)</span>
+                    </div>
+                    {selectedPersona.role === 'primary' ? (
+                      <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">Selected ✓</span>
+                    ) : (
+                      <span
+                        onClick={() => {
+                          const p = config.personas.find((x) => x.role === 'primary');
+                          if (p) handleSelectPersona(p);
+                        }}
+                        className="text-[11px] font-bold text-blue-700 bg-blue-100 hover:bg-blue-200 px-2.5 py-1 rounded-lg transition-colors cursor-pointer"
+                      >
+                        Select Amina
+                      </span>
+                    )}
                   </div>
-                  <p className="text-xs text-slate-600 pl-7 leading-relaxed">
+                  <p className="text-xs text-slate-600 pl-8 leading-relaxed">
                     Select Amina on the left. She represents a genuine community monitor in Kebele 08 verifying Generator #4412.
                   </p>
                 </div>
 
                 {/* Step 2 */}
-                <div className={`p-3.5 rounded-xl border transition-all ${
+                <div className={`p-4 rounded-xl border transition-all ${
                   !sessionActive && selectedPersona.role === 'primary'
-                    ? 'border-blue-500 bg-blue-50/50'
-                    : 'border-slate-100 bg-slate-50/40'
+                    ? 'border-blue-500 bg-blue-50/70 shadow-xs'
+                    : 'border-slate-200 bg-slate-50/40'
                 }`}>
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="w-5 h-5 rounded-full bg-blue-600 text-white flex items-center justify-center text-[10px] font-bold">2</span>
-                    <span className="text-xs font-bold text-slate-900">Dial *890# on Handset</span>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <div className="flex items-center gap-2">
+                      <span className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-bold shadow-2xs">2</span>
+                      <span className="text-sm font-bold text-slate-900">Dial *890# on Handset</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={startSession}
+                      disabled={loading || sessionActive}
+                      className="text-[11px] font-bold text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 px-2.5 py-1 rounded-lg transition-colors cursor-pointer"
+                    >
+                      {sessionActive ? 'Dialed ✓' : 'Dial *890#'}
+                    </button>
                   </div>
-                  <p className="text-xs text-slate-600 pl-7 leading-relaxed">
+                  <p className="text-xs text-slate-600 pl-8 leading-relaxed">
                     Click the <strong>Dial *890#</strong> button or press the green call key to open the live USSD session.
                   </p>
                 </div>
 
                 {/* Step 3 */}
-                <div className={`p-3.5 rounded-xl border transition-all ${
+                <div className={`p-4 rounded-xl border transition-all ${
                   sessionActive
-                    ? 'border-emerald-500 bg-emerald-50/50'
-                    : 'border-slate-100 bg-slate-50/40'
+                    ? 'border-emerald-500 bg-emerald-50/70 shadow-xs'
+                    : 'border-slate-200 bg-slate-50/40'
                 }`}>
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[10px] font-bold">3</span>
-                    <span className="text-xs font-bold text-slate-900">Answer 3-Step Verification Checklist</span>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <div className="flex items-center gap-2">
+                      <span className="w-6 h-6 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xs font-bold shadow-2xs">3</span>
+                      <span className="text-sm font-bold text-slate-900">Answer 3-Step Verification Checklist</span>
+                    </div>
+                    {sessionActive && (
+                      <button
+                        type="button"
+                        onClick={() => handleKeypadPress('1')}
+                        className="text-[11px] font-bold text-emerald-800 bg-emerald-100 hover:bg-emerald-200 px-2.5 py-1 rounded-lg transition-colors cursor-pointer"
+                      >
+                        Press 1
+                      </button>
+                    )}
                   </div>
-                  <p className="text-xs text-slate-600 pl-7 leading-relaxed">
+                  <p className="text-xs text-slate-600 pl-8 leading-relaxed">
                     Use keypad numbers to verify: 1 = Generator operating, 1 = Operating within hours, 1 = Confirm submission.
                   </p>
                 </div>
 
                 {/* Step 4 */}
-                <div className="p-3.5 rounded-xl border border-slate-100 bg-slate-50/40">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="w-5 h-5 rounded-full bg-amber-500 text-white flex items-center justify-center text-[10px] font-bold">4</span>
-                    <span className="text-xs font-bold text-slate-900">Test Sybil Deduplication (Girma)</span>
+                <div className={`p-4 rounded-xl border transition-all ${
+                  selectedPersona.role === 'duplicate'
+                    ? 'border-amber-500 bg-amber-50/70 shadow-xs'
+                    : 'border-slate-200 bg-slate-50/40'
+                }`}>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <div className="flex items-center gap-2">
+                      <span className="w-6 h-6 rounded-full bg-amber-500 text-white flex items-center justify-center text-xs font-bold shadow-2xs">4</span>
+                      <span className="text-sm font-bold text-slate-900">Test Sybil Deduplication (Girma)</span>
+                    </div>
+                    {selectedPersona.role === 'duplicate' ? (
+                      <span className="text-[10px] font-bold text-amber-800 bg-amber-100 px-2 py-0.5 rounded-full">Selected ✓</span>
+                    ) : (
+                      <span
+                        onClick={() => {
+                          const p = config.personas.find((x) => x.role === 'duplicate');
+                          if (p) handleSelectPersona(p);
+                        }}
+                        className="text-[11px] font-bold text-amber-800 bg-amber-100 hover:bg-amber-200 px-2.5 py-1 rounded-lg transition-colors cursor-pointer"
+                      >
+                        Select Girma
+                      </span>
+                    )}
                   </div>
-                  <p className="text-xs text-slate-600 pl-7 leading-relaxed">
+                  <p className="text-xs text-slate-600 pl-8 leading-relaxed">
                     Switch to Girma on the left and dial *890#. Because Girma shares Amina's cell tower, the system recognizes the duplicate cluster key and refuses duplicate inflation.
                   </p>
                 </div>
 
                 {/* Step 5 */}
-                <div className="p-3.5 rounded-xl border border-slate-100 bg-slate-50/40">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="w-5 h-5 rounded-full bg-indigo-600 text-white flex items-center justify-center text-[10px] font-bold">5</span>
-                    <span className="text-xs font-bold text-slate-900">Confirm Independent Quorum (Kalinda)</span>
+                <div className={`p-4 rounded-xl border transition-all ${
+                  selectedPersona.id === 'kalinda'
+                    ? 'border-indigo-500 bg-indigo-50/70 shadow-xs'
+                    : 'border-slate-200 bg-slate-50/40'
+                }`}>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <div className="flex items-center gap-2">
+                      <span className="w-6 h-6 rounded-full bg-indigo-600 text-white flex items-center justify-center text-xs font-bold shadow-2xs">5</span>
+                      <span className="text-sm font-bold text-slate-900">Confirm Independent Quorum (Kalinda)</span>
+                    </div>
+                    {selectedPersona.id === 'kalinda' ? (
+                      <span className="text-[10px] font-bold text-indigo-800 bg-indigo-100 px-2 py-0.5 rounded-full">Selected ✓</span>
+                    ) : (
+                      <span
+                        onClick={() => {
+                          const p = config.personas.find((x) => x.id === 'kalinda');
+                          if (p) handleSelectPersona(p);
+                        }}
+                        className="text-[11px] font-bold text-indigo-800 bg-indigo-100 hover:bg-indigo-200 px-2.5 py-1 rounded-lg transition-colors cursor-pointer"
+                      >
+                        Select Kalinda
+                      </span>
+                    )}
                   </div>
-                  <p className="text-xs text-slate-600 pl-7 leading-relaxed">
+                  <p className="text-xs text-slate-600 pl-8 leading-relaxed">
                     Switch to Kalinda (Kebele 09). Independent location quorum is satisfied, progressing the audit towards verified receipt.
                   </p>
                 </div>

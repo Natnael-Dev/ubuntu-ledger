@@ -1,0 +1,17 @@
+{
+  "taskId": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+  "transcription": "Borehole pump handle was repaired yesterday but no water flows when pumped. The contractor sign is posted on the tree.",
+  "detectedLanguage": "en",
+  "confidence": 0.94,
+  "answers": {
+    "q1": true,
+    "q2": false,
+    "q3": true
+  },
+  "summary": "Handpump head is fitted and project board is posted, but no water flows when pumped for 30 seconds.",
+  "urgency": "HIGH",
+  "extractedDetails": {
+    "pumpOperational": false,
+    "signagePresent": true
+  }
+}

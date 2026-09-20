@@ -1,0 +1,32 @@
+{
+  "contractorName": "Apex Rift Engineering Ltd",
+  "concentrationScore": 0.78,
+  "wardsInvolved": [
+    "ward-nandi-hills-01",
+    "ward-chepkunyuk-02",
+    "ward-ollessos-03"
+  ],
+  "activeProjectsCount": 5,
+  "totalCommittedBudgetMinor": 48500000,
+  "anomalyDetected": true,
+  "flaggedPatterns": [
+    {
+      "type": "CONCURRENT_OVERALLOCATION",
+      "severity": "HIGH",
+      "description": "Contractor has 5 concurrent water project awards across 3 wards, exceeding operational capacity guidelines",
+      "wardIds": [
+        "ward-nandi-hills-01",
+        "ward-chepkunyuk-02"
+      ]
+    },
+    {
+      "type": "HIGH_PROBATION_FAILURE_RATE",
+      "severity": "MEDIUM",
+      "description": "2 of 3 previously claimed repairs failed 7-day durability probation in adjacent ward",
+      "wardIds": [
+        "ward-ollessos-03"
+      ]
+    }
+  ],
+  "recommendation": "Withhold further disbursements on Project #4412 pending physical site verification by independent ward monitors."
+}

@@ -1,0 +1,16 @@
+{
+  "plainLanguageText": "The community is fixing the water pump behind the primary school. The county promised 320,000 shillings. Three neighbours must check that water actually flows before the repair can be marked complete.",
+  "audioUrl": "/audio/fixtures/eli5-borehole-4412.mp3",
+  "audioDurationSeconds": 18,
+  "keyTakeaways": [
+    "Project #4412 repairs the village water borehole",
+    "Total public budget allocated is 320,000 KES",
+    "Payment requires confirmation from 3 independent local witnesses"
+  ],
+  "locale": "en",
+  "readingLevel": "Grade 5 / Plain Civic",
+  "context": {
+    "entityType": "project",
+    "entityId": "4412"
+  }
+}

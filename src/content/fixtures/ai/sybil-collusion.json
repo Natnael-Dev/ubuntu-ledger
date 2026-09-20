@@ -1,0 +1,19 @@
+{
+  "flaggedObservationIds": [
+    "c8a1b2c3-1111-4000-8000-000000000001",
+    "c8a1b2c3-2222-4000-8000-000000000002",
+    "c8a1b2c3-3333-4000-8000-000000000003"
+  ],
+  "similarityScore": 0.89,
+  "collusionRisk": "HIGH",
+  "reasons": [
+    "Identical submission timing burst across 3 observations within 4 seconds",
+    "Identical inverted answer patterns contradicting physical ground truth",
+    "Matching MSISDN prefix cohort (254712) registered within the same hour"
+  ],
+  "narrative": "A cluster of 3 observations submitted within 4 seconds exhibited identical answer patterns contradicting physical ground checks, indicating an automated or coordinated reporting ring.",
+  "clusterKey": "a1b2c3d4e5f67890",
+  "flaggedCohorts": [
+    "2026-W38:254712"
+  ]
+}

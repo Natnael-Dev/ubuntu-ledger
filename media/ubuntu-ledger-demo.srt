@@ -1,0 +1,100 @@
+1
+00:00:00,500 --> 00:00:03,000
+Ward Proof-Line · Ubuntu Ledger
+Information You Can Trust
+
+2
+00:00:03,000 --> 00:00:09,000
+Across East Africa, public infrastructure projects are marked complete on paper while remaining broken in reality.
+
+3
+00:00:09,000 --> 00:00:15,960
+Ward Proof-Line enforces an unbreakable invariant: a contractor cannot close their own ticket.
+
+4
+00:00:15,960 --> 00:00:22,500
+Every public expenditure generates an ink-on-paper civic spending receipt with cryptographic provenance.
+
+5
+00:00:22,500 --> 00:00:29,500
+Contract 4412 for ETB 320,000 links directly to the official gazette publication with SHA-256 genesis hashes.
+
+6
+00:00:29,500 --> 00:00:37,800
+Elders and low-literacy citizens can hear receipts in local languages or inspect AI plain-language civic summaries.
+
+7
+00:00:37,800 --> 00:00:44,000
+On any $10 feature phone with zero mobile data, Amina dials *890#.
+
+8
+00:00:44,000 --> 00:00:50,000
+She verifies the health clinic generator repair by answering simple physical questions.
+
+9
+00:00:50,000 --> 00:00:55,720
+Her submission moves the community witness quorum from 2 of 3 to 3 of 3.
+
+10
+00:00:55,720 --> 00:01:02,000
+What prevents buying ten SIM cards to rig the system with Sybil attacks?
+
+11
+00:01:02,000 --> 00:01:08,000
+When Girma submits from the same cell cluster, the backend detects geographic collision.
+
+12
+00:01:08,000 --> 00:01:13,560
+The LCD strictly refuses: "Area already counted. Total stays at 3." Ten phones on one street count as one.
+
+13
+00:01:13,560 --> 00:01:20,500
+Switching to Kalinda in Kebele 09 provides independent multi-cluster confirmation.
+
+14
+00:01:20,500 --> 00:01:28,520
+Independent cell tower clusters satisfy the witness quorum, anchoring public claims to physical reality.
+
+15
+00:01:28,520 --> 00:01:36,000
+In the Municipal Console, recording a repair claim does NOT turn the project green—it turns amber.
+
+16
+00:01:36,000 --> 00:01:43,500
+A mandatory 7-day probation lock begins immediately, enforced at the PostgreSQL schema level.
+
+17
+00:01:43,500 --> 00:01:51,400
+When an administrator attempts early closure, the system strictly refuses: 409 E_PROBATION_LOCKED.
+
+18
+00:01:51,400 --> 00:01:58,000
+Two-Ledger Separation: official gazetted ceilings and k-anonymous citizen reports are never averaged.
+
+19
+00:01:58,000 --> 00:02:05,000
+When over 60% report extra fees, a Divergence Alert triggers, backed by statutory refusal scripts.
+
+20
+00:02:05,000 --> 00:02:12,600
+Strict k-anonymity (k >= 5) suppresses below-threshold reports to protect citizens from extortion.
+
+21
+00:02:12,600 --> 00:02:19,000
+For remote monitors with zero cellular coverage, our offline PWA stores observations locally.
+
+22
+00:02:19,000 --> 00:02:26,680
+When connectivity returns, the background sync engine flushes the outbox idempotently with zero duplicates.
+
+23
+00:02:26,680 --> 00:02:33,500
+AI Oversight Insights provide real-time Sybil ring detection and cross-ward contractor pattern audits.
+
+24
+00:02:33,500 --> 00:02:40,760
+Actionable intelligence for municipal operators, anchored in cryptographically sealed invariants.
+
+25
+00:02:40,760 --> 00:02:44,760
+574 Automated Invariant Tests Passing · github.com/Natnael-Dev/ubuntu-ledger

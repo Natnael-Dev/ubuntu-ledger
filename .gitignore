@@ -35,3 +35,9 @@ Thumbs.db
 # Supabase local runtime
 supabase/.temp/
 supabase/.branches/
+
+# Media recordings and output
+media/*
+!media/ubuntu-ledger-demo.srt
+
+

@@ -505,22 +505,22 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
                 const p = config.personas.find((x) => x.role === 'primary');
                 if (p) handleSelectPersona(p);
               }}
-              className={`text-left p-3.5 sm:p-4 rounded-xl transition-all cursor-pointer border-2 flex items-center gap-3.5 select-none ${
+              className={`text-left p-4 rounded-2xl transition-all cursor-pointer border-2 flex items-center gap-4 select-none ${
                 currentStep === 1
-                  ? 'bg-blue-50/90 text-blue-900 border-blue-600 shadow-xs'
+                  ? 'bg-blue-50/90 text-blue-900 border-blue-600 shadow-sm'
                   : currentStep > 1
-                  ? 'bg-emerald-50/50 text-emerald-900 border-emerald-300'
-                  : 'bg-slate-50/60 text-slate-700 border-slate-200 hover:border-slate-300'
+                  ? 'bg-emerald-50/60 text-emerald-900 border-emerald-300'
+                  : 'bg-slate-50/70 text-slate-700 border-slate-200 hover:border-slate-300'
               }`}
             >
               <div className="relative shrink-0">
                 <img
                   src="/personas/amina.jpg"
                   alt="Amina"
-                  className="w-9 h-9 rounded-full object-cover border border-slate-300 shadow-2xs"
+                  className="w-12 h-12 rounded-full object-cover border-2 border-slate-300 shadow-xs"
                 />
                 <div
-                  className={`absolute -bottom-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shadow-2xs ${
+                  className={`absolute -bottom-1 -right-1 w-6 h-6 rounded-full flex items-center justify-center text-xs font-black shadow-xs ${
                     currentStep === 1
                       ? 'bg-blue-600 text-white animate-pulse'
                       : currentStep > 1
@@ -532,21 +532,21 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
                 </div>
               </div>
               <div className="min-w-0">
-                <div className="flex items-center gap-1.5">
-                  <p className="text-sm font-bold leading-tight truncate">1. Amina</p>
+                <div className="flex items-center gap-2">
+                  <p className="text-base font-black leading-tight truncate text-slate-900">1. Amina</p>
                   {currentStep === 1 && (
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-600 text-white uppercase">
+                    <span className="text-xs font-extrabold px-2.5 py-0.5 rounded-full bg-blue-600 text-white uppercase">
                       Active
                     </span>
                   )}
                   {currentStep > 1 && (
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+                    <span className="text-xs font-extrabold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
                       Confirmed
                     </span>
                   )}
                 </div>
-                <p className="text-xs text-slate-500 mt-0.5 truncate">
-                  Submit observation
+                <p className="text-xs font-semibold text-slate-600 mt-0.5 truncate">
+                  Submit repair check
                 </p>
               </div>
             </div>
@@ -557,22 +557,22 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
                 const p = config.personas.find((x) => x.role === 'duplicate');
                 if (p) handleSelectPersona(p);
               }}
-              className={`text-left p-3.5 sm:p-4 rounded-xl transition-all cursor-pointer border-2 flex items-center gap-3.5 select-none ${
+              className={`text-left p-4 rounded-2xl transition-all cursor-pointer border-2 flex items-center gap-4 select-none ${
                 currentStep === 2
-                  ? 'bg-amber-50/90 text-amber-950 border-amber-500 shadow-xs'
+                  ? 'bg-amber-50/90 text-amber-950 border-amber-500 shadow-sm'
                   : currentStep > 2
-                  ? 'bg-emerald-50/50 text-emerald-900 border-emerald-300'
-                  : 'bg-slate-50/60 text-slate-700 border-slate-200 hover:border-slate-300'
+                  ? 'bg-emerald-50/60 text-emerald-900 border-emerald-300'
+                  : 'bg-slate-50/70 text-slate-700 border-slate-200 hover:border-slate-300'
               }`}
             >
               <div className="relative shrink-0">
                 <img
                   src="/personas/girma.jpg"
                   alt="Girma"
-                  className="w-9 h-9 rounded-full object-cover border border-slate-300 shadow-2xs"
+                  className="w-12 h-12 rounded-full object-cover border-2 border-slate-300 shadow-xs"
                 />
                 <div
-                  className={`absolute -bottom-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shadow-2xs ${
+                  className={`absolute -bottom-1 -right-1 w-6 h-6 rounded-full flex items-center justify-center text-xs font-black shadow-xs ${
                     currentStep === 2
                       ? 'bg-amber-500 text-white animate-pulse'
                       : currentStep > 2
@@ -584,20 +584,20 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
                 </div>
               </div>
               <div className="min-w-0">
-                <div className="flex items-center gap-1.5">
-                  <p className="text-sm font-bold leading-tight truncate">2. Girma</p>
+                <div className="flex items-center gap-2">
+                  <p className="text-base font-black leading-tight truncate text-slate-900">2. Girma</p>
                   {currentStep === 2 && (
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-600 text-white uppercase">
+                    <span className="text-xs font-extrabold px-2.5 py-0.5 rounded-full bg-amber-600 text-white uppercase">
                       Active
                     </span>
                   )}
                   {currentStep > 2 && (
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
+                    <span className="text-xs font-extrabold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
                       Suppressed
                     </span>
                   )}
                 </div>
-                <p className="text-xs text-slate-500 mt-0.5 truncate">
+                <p className="text-xs font-semibold text-slate-600 mt-0.5 truncate">
                   Duplicate cluster rejected
                 </p>
               </div>
@@ -609,20 +609,20 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
                 const p = config.personas.find((x) => x.id === 'kalinda');
                 if (p) handleSelectPersona(p);
               }}
-              className={`text-left p-3.5 sm:p-4 rounded-xl transition-all cursor-pointer border-2 flex items-center gap-3.5 select-none ${
+              className={`text-left p-4 rounded-2xl transition-all cursor-pointer border-2 flex items-center gap-4 select-none ${
                 currentStep === 3
-                  ? 'bg-emerald-50/90 text-emerald-950 border-emerald-600 shadow-xs'
-                  : 'bg-slate-50/60 text-slate-700 border-slate-200 hover:border-slate-300'
+                  ? 'bg-emerald-50/90 text-emerald-950 border-emerald-600 shadow-sm'
+                  : 'bg-slate-50/70 text-slate-700 border-slate-200 hover:border-slate-300'
               }`}
             >
               <div className="relative shrink-0">
                 <img
                   src="/personas/kalinda.jpg"
                   alt="Kalinda"
-                  className="w-9 h-9 rounded-full object-cover border border-slate-300 shadow-2xs"
+                  className="w-12 h-12 rounded-full object-cover border-2 border-slate-300 shadow-xs"
                 />
                 <div
-                  className={`absolute -bottom-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shadow-2xs ${
+                  className={`absolute -bottom-1 -right-1 w-6 h-6 rounded-full flex items-center justify-center text-xs font-black shadow-xs ${
                     currentStep === 3
                       ? 'bg-emerald-600 text-white animate-pulse'
                       : 'bg-slate-200 text-slate-600'
@@ -632,15 +632,15 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
                 </div>
               </div>
               <div className="min-w-0">
-                <div className="flex items-center gap-1.5">
-                  <p className="text-sm font-bold leading-tight truncate">3. Kalinda</p>
+                <div className="flex items-center gap-2">
+                  <p className="text-base font-black leading-tight truncate text-slate-900">3. Kalinda</p>
                   {currentStep === 3 && (
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-600 text-white uppercase">
+                    <span className="text-xs font-extrabold px-2.5 py-0.5 rounded-full bg-emerald-600 text-white uppercase">
                       Active
                     </span>
                   )}
                 </div>
-                <p className="text-xs text-slate-500 mt-0.5 truncate">
+                <p className="text-xs font-semibold text-slate-600 mt-0.5 truncate">
                   Independent confirmation
                 </p>
               </div>
@@ -648,12 +648,12 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
           </div>
 
           {/* Stepper Progress bar & indicator */}
-          <div className="md:w-44 flex flex-col justify-center border-t md:border-t-0 md:border-l border-slate-100 pt-3 md:pt-0 md:pl-6">
-            <div className="flex justify-between items-center text-xs font-bold text-slate-700 mb-1.5">
+          <div className="md:w-48 flex flex-col justify-center border-t md:border-t-0 md:border-l border-slate-100 pt-4 md:pt-0 md:pl-6">
+            <div className="flex justify-between items-center text-sm font-black text-slate-800 mb-2">
               <span>Step {currentStep} of 3</span>
-              <span className="text-blue-600 font-mono">{Math.round((currentStep / 3) * 100)}%</span>
+              <span className="text-blue-600 font-mono font-bold">{Math.round((currentStep / 3) * 100)}%</span>
             </div>
-            <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+            <div className="w-full h-2.5 bg-slate-200 rounded-full overflow-hidden">
               <div
                 className="h-full bg-blue-600 rounded-full transition-all duration-300"
                 style={{ width: `${(currentStep / 3) * 100}%` }}
@@ -673,8 +673,8 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
           <div className="bg-white border border-slate-200/80 rounded-2xl p-5 sm:p-6 shadow-sm">
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h3 className="font-bold text-base text-slate-900">Field Personas</h3>
-                <p className="text-xs text-slate-500 mt-0.5">
+                <h3 className="font-black text-lg text-slate-900">Field Personas</h3>
+                <p className="text-sm text-slate-600 font-medium mt-0.5">
                   Select a citizen to simulate their feature phone session:
                 </p>
               </div>
@@ -685,13 +685,13 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
               data-testid="persona-selector"
               role="radiogroup"
               aria-label="Select demo persona"
-              className="space-y-3.5"
+              className="space-y-4"
             >
               {config.personas.map((p) => {
                 const isSelected = selectedPersona.id === p.id;
-                const isAmina = p.role === 'primary';
-                const isGirma = p.role === 'duplicate';
-                const isKalinda = p.id === 'kalinda';
+                const isAmina = p.role === 'primary' || p.id.toLowerCase().includes('amina');
+                const isGirma = p.role === 'duplicate' || p.id.toLowerCase().includes('girma') || p.label.toLowerCase().includes('neighbor');
+                const isKalinda = p.id === 'kalinda' || p.role === 'resident';
 
                 return (
                   <button
@@ -699,19 +699,19 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
                     type="button"
                     aria-pressed={isSelected}
                     onClick={() => handleSelectPersona(p)}
-                    className={`w-full text-left p-5 rounded-2xl border-2 transition-all flex flex-col gap-3.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 cursor-pointer ${
+                    className={`w-full text-left p-5 rounded-2xl border-2 transition-all flex flex-col gap-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 cursor-pointer ${
                       isSelected
-                        ? 'border-blue-600 bg-blue-50/40 shadow-sm ring-1 ring-blue-600'
-                        : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/70'
+                        ? 'border-blue-600 bg-blue-50/50 shadow-md ring-2 ring-blue-500/20'
+                        : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/80'
                     }`}
                   >
                     <div className="flex items-start justify-between w-full">
                       <div className="flex items-center gap-4">
                         {/* High-Resolution Circular Persona Photo Avatar */}
                         <div
-                          className={`w-14 h-14 rounded-full overflow-hidden shrink-0 border-2 shadow-xs relative flex items-center justify-center font-extrabold text-base ${
+                          className={`w-16 h-16 rounded-full overflow-hidden shrink-0 border-2 shadow-xs relative flex items-center justify-center font-black text-lg ${
                             isSelected
-                              ? 'border-blue-600 ring-2 ring-blue-400'
+                              ? 'border-blue-600 ring-4 ring-blue-100'
                               : 'border-slate-300'
                           } ${
                             isAmina
@@ -735,21 +735,21 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
                               e.currentTarget.style.display = 'none';
                             }}
                           />
-                          <span className="absolute -z-10 font-bold text-sm">
+                          <span className="absolute -z-10 font-black text-base">
                             {isAmina ? 'AM' : isGirma ? 'GI' : 'KA'}
                           </span>
                         </div>
 
                         <div>
-                          <div className="font-bold text-lg text-[#0F172A] leading-tight flex items-center gap-1.5">
+                          <div className="font-black text-xl text-slate-900 leading-tight flex items-center gap-1.5">
                             <span>{isAmina ? 'Amina' : isGirma ? 'Girma' : 'Kalinda'}</span>
                             {/* Hidden/accessible full persona label for strict test contracts */}
                             <span className="sr-only"> {p.label}</span>
                           </div>
-                          <p className="text-xs text-slate-500 font-medium mt-1">
+                          <p className="text-sm text-slate-600 font-semibold mt-1">
                             {isKalinda ? 'Woreda 09 · Kebele 09' : 'Woreda 09 · Kebele 08'}
                           </p>
-                          <p className="text-xs font-mono text-slate-700 font-semibold mt-1 flex items-center gap-1.5 bg-slate-100 px-2 py-0.5 rounded-md inline-flex">
+                          <p className="text-xs font-mono text-slate-800 font-bold mt-1.5 flex items-center gap-1.5 bg-slate-100 border border-slate-200 px-2.5 py-1 rounded-lg inline-flex">
                             <span>📞</span>
                             <span>{p.msisdn}</span>
                           </p>
@@ -758,11 +758,11 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
 
                       {/* Prominent Selection Indicator Radio/Check */}
                       {isSelected ? (
-                        <div className="w-7 h-7 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm font-bold shadow-xs shrink-0 mt-0.5">
+                        <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center text-base font-black shadow-xs shrink-0 mt-0.5">
                           ✓
                         </div>
                       ) : (
-                        <div className="w-7 h-7 rounded-full border-2 border-slate-300 shrink-0 mt-0.5 hover:border-slate-400" />
+                        <div className="w-8 h-8 rounded-full border-2 border-slate-300 shrink-0 mt-0.5 hover:border-slate-400" />
                       )}
                     </div>
 
@@ -770,30 +770,30 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
                     <div className="flex items-center gap-2 pt-3 border-t border-slate-100">
                       {isAmina && (
                         <>
-                          <span className="text-xs font-bold px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-300">
+                          <span className="text-xs font-black px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-300">
                             DEMO WITNESS
                           </span>
-                          <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-900">
+                          <span className="text-xs font-bold px-3 py-1.5 rounded-lg bg-emerald-100 text-emerald-900">
                             Active
                           </span>
                         </>
                       )}
                       {isGirma && (
                         <>
-                          <span className="text-xs font-bold px-3 py-1 rounded-full bg-amber-50 text-amber-900 border border-amber-300">
+                          <span className="text-xs font-black px-3 py-1.5 rounded-lg bg-amber-50 text-amber-900 border border-amber-300">
                             DUPLICATE CLUSTER
                           </span>
-                          <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-100 text-slate-700">
+                          <span className="text-xs font-bold px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700">
                             Ready
                           </span>
                         </>
                       )}
                       {isKalinda && (
                         <>
-                          <span className="text-xs font-bold px-3 py-1 rounded-full bg-blue-50 text-blue-800 border border-blue-300">
+                          <span className="text-xs font-black px-3 py-1.5 rounded-lg bg-blue-50 text-blue-800 border border-blue-300">
                             Independent Witness
                           </span>
-                          <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-100 text-slate-700">
+                          <span className="text-xs font-bold px-3 py-1.5 rounded-lg bg-slate-100 text-slate-700">
                             Ready
                           </span>
                         </>
@@ -807,7 +807,7 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
             {/* Persona Section Footer showing active cluster key */}
             <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-mono text-slate-600">
               <span>Cluster key: <strong className="text-slate-900 font-bold">{selectedPersona.clusterKey}</strong></span>
-              <span className="text-[11px] bg-slate-100 text-slate-700 font-semibold px-2.5 py-0.5 rounded">Cell: et-aa-0917</span>
+              <span className="text-xs bg-slate-100 text-slate-700 font-bold px-2.5 py-0.5 rounded">Cell: et-aa-0917</span>
             </div>
           </div>
 
@@ -891,7 +891,7 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
             <button
               type="button"
               onClick={() => setActiveRightTab('live')}
-              className={`flex-1 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer ${
+              className={`flex-1 py-2.5 text-xs font-bold rounded-xl transition-all cursor-pointer ${
                 activeRightTab === 'live'
                   ? 'bg-white text-blue-700 shadow-sm'
                   : 'text-slate-600 hover:text-slate-900'
@@ -902,7 +902,7 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
             <button
               type="button"
               onClick={() => setActiveRightTab('walkthrough')}
-              className={`flex-1 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer ${
+              className={`flex-1 py-2.5 text-xs font-bold rounded-xl transition-all cursor-pointer ${
                 activeRightTab === 'walkthrough'
                   ? 'bg-white text-blue-700 shadow-sm'
                   : 'text-slate-600 hover:text-slate-900'
@@ -913,13 +913,13 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
           </div>
 
           {/* Status Alert Badge */}
-          <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 flex items-center gap-3">
-            <div className="w-3 h-3 rounded-full bg-emerald-500 animate-pulse shrink-0" />
-            <div className="text-xs text-emerald-950">
-              <strong className="font-bold text-sm block text-emerald-900">
+          <div className="bg-emerald-50 border-2 border-emerald-300 rounded-2xl p-5 flex items-center gap-3.5 shadow-2xs">
+            <div className="w-3.5 h-3.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+            <div className="text-emerald-950">
+              <strong className="font-black text-base block text-emerald-900">
                 {session?.isAlive ? 'Session Active (Connected)' : 'Waiting for user input'}
               </strong>
-              <p className="text-xs text-emerald-800 mt-0.5">
+              <p className="text-sm text-emerald-900 font-medium mt-0.5">
                 {session?.isAlive
                   ? 'Review prompt on phone LCD screen and press corresponding number.'
                   : 'Handset ready. Click "Dial *890#" or press the green DIAL key to begin.'}
@@ -928,62 +928,70 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
           </div>
 
           {/* 1. Human Summary Card */}
-          <div className="bg-white border border-slate-200/80 rounded-2xl p-5 sm:p-6 shadow-sm">
-            <div className="flex items-center justify-between gap-2 mb-3.5 pb-3 border-b border-slate-100">
-              <div className="flex items-center gap-2">
-                <span className="text-blue-600 text-lg">👥</span>
-                <h4 className="font-bold text-base text-slate-900">Human Summary</h4>
-              </div>
+          <div className="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-sm">
+            <div className="flex items-center justify-between gap-3 mb-4 pb-3.5 border-b border-slate-100">
               <div className="flex items-center gap-2.5">
+                <span className="text-blue-600 text-xl">👥</span>
+                <h4 className="font-black text-lg text-slate-900">Human Summary</h4>
+              </div>
+              <div className="flex items-center gap-3">
                 <img
                   src={
-                    selectedPersona.role === 'primary'
+                    selectedPersona.role === 'primary' || selectedPersona.id.toLowerCase().includes('amina')
                       ? '/personas/amina.jpg'
-                      : selectedPersona.role === 'duplicate'
+                      : selectedPersona.role === 'duplicate' || selectedPersona.id.toLowerCase().includes('girma')
                       ? '/personas/girma.jpg'
                       : '/personas/kalinda.jpg'
                   }
                   alt={selectedPersona.label}
-                  className="w-8 h-8 rounded-full object-cover border border-slate-300 shadow-2xs"
+                  className="w-12 h-12 rounded-full object-cover border-2 border-slate-300 shadow-xs"
                 />
-                <span className="text-xs font-bold text-slate-900">{selectedPersona.label.split(' ')[0]}</span>
+                <span className="text-sm font-black text-slate-900">
+                  {selectedPersona.id.toLowerCase().includes('amina') || selectedPersona.role === 'primary'
+                    ? 'Amina'
+                    : selectedPersona.id.toLowerCase().includes('girma') || selectedPersona.role === 'duplicate'
+                    ? 'Girma'
+                    : 'Kalinda'}
+                </span>
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-y-3 gap-x-4 text-xs pt-1">
+            <div className="grid grid-cols-2 gap-y-4 gap-x-5 text-xs pt-1">
               <div>
-                <span className="text-slate-500 block text-xs font-medium">Who</span>
-                <span className="font-bold text-sm text-slate-900">{selectedPersona.label}</span>
+                <span className="text-slate-500 block text-xs font-bold uppercase tracking-wider">Who</span>
+                <span className="font-black text-sm text-slate-900 block mt-0.5">{selectedPersona.label}</span>
               </div>
               <div>
-                <span className="text-slate-500 block text-xs font-medium">What</span>
-                <span className="font-bold text-sm text-slate-900">
-                  {selectedPersona.id === 'kalinda'
+                <span className="text-slate-500 block text-xs font-bold uppercase tracking-wider">What</span>
+                <span className="font-black text-sm text-slate-900 block mt-0.5">
+                  {selectedPersona.id === 'kalinda' || selectedPersona.role === 'resident'
                     ? 'Statutory fee audit'
                     : 'Submitting repair observation'}
                 </span>
               </div>
               <div>
-                <span className="text-slate-500 block text-xs font-medium">Project</span>
-                <span className="font-semibold text-slate-900">
+                <span className="text-slate-500 block text-xs font-bold uppercase tracking-wider">Project</span>
+                <span className="font-bold text-sm text-slate-900 block mt-0.5">
                   Health Post Generator (#4412)
                 </span>
               </div>
               <div>
-                <span className="text-slate-500 block text-xs font-medium">Location</span>
-                <span className="font-semibold text-slate-900">
-                  Woreda 09 · Kebele 08
+                <span className="text-slate-500 block text-xs font-bold uppercase tracking-wider">Location</span>
+                <span className="font-bold text-sm text-slate-900 block mt-0.5">
+                  {selectedPersona.id === 'kalinda' || selectedPersona.role === 'resident'
+                    ? 'Woreda 09 · Kebele 09'
+                    : 'Woreda 09 · Kebele 08'}
                 </span>
               </div>
               <div>
-                <span className="text-slate-500 block text-xs font-medium">Cluster</span>
-                <span className="font-mono text-xs text-slate-700 font-semibold">
+                <span className="text-slate-500 block text-xs font-bold uppercase tracking-wider">Cluster</span>
+                <span className="font-mono text-xs text-slate-800 font-bold block mt-0.5">
                   {selectedPersona.clusterKey}
                 </span>
               </div>
               <div>
-                <span className="text-slate-500 block text-xs font-medium">Status</span>
-                <span className="inline-flex items-center gap-1.5 font-bold text-xs text-emerald-700">
-                  <span className="w-2 h-2 rounded-full bg-emerald-600" />
+                <span className="text-slate-500 block text-xs font-bold uppercase tracking-wider">Status</span>
+                <span className="inline-flex items-center gap-1.5 font-bold text-sm text-emerald-700 mt-0.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-600" />
                   {session?.isAlive ? 'In Call' : 'Ready'}
                 </span>
               </div>

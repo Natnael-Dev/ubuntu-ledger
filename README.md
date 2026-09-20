@@ -2,7 +2,7 @@
 
 > **Ward Proof-Line turns a line in a local government budget into a five-minute physical check a neighbour can answer on a feature phone — and refuses to let a contractor close their own ticket.**
 
-[![CI Status](https://img.shields.io/badge/CI-passing-brightgreen)](#) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE) [![Test Coverage](https://img.shields.io/badge/Vitest-565%20passed-success)](#) [![Playwright E2E](https://img.shields.io/badge/Playwright-69%2F69%20passed-success)](#)
+[![CI Status](https://img.shields.io/badge/CI-passing-brightgreen)](#) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE) [![Test Coverage](https://img.shields.io/badge/Vitest-613%20passed-success)](#) [![Playwright E2E](https://img.shields.io/badge/Playwright-69%2F69%20passed-success)](#)
 
 ---
 
@@ -29,9 +29,9 @@ We invite judges to explore the 6 verified demonstration portals in order:
 | **5. Service Divergence Card** | [`/services/ET-ID-REPLACE`](http://localhost:3000/services/ET-ID-REPLACE) | **Proof C (Two-Ledger Separation & k-Anonymity):** Official ceiling (ETB 50) vs community reality (ETB 120). Reports below $k=5$ are strictly suppressed. Citizen refusal script included. |
 | **6. Field Monitor PWA** | [`/pwa`](http://localhost:3000/pwa) | **Offline-First Resilience:** Toggle Airplane Mode to test client-side IndexedDB outbox queueing and automatic idempotent background sync on reconnect. |
 
-### Local Setup for Judges (Full 574-Test Suite)
-The repository runs out-of-the-box in memory (`npm run dev` / `npm test`), passing 565 tests (with 11 multi-connection database tests skipped).  
-To run the full **574-test live PostgreSQL & RLS concurrency suite**, please refer to our step-by-step guide:  
+### Local Setup for Judges (Full 624-Test Suite)
+The repository runs out-of-the-box in memory (`npm run dev` / `npm test`), passing 613 tests (with 11 multi-connection database tests skipped).  
+To run the full **624-test live PostgreSQL & RLS concurrency suite**, please refer to our step-by-step guide:  
 👉 **[docs/hackathon/ci-notes.md](docs/hackathon/ci-notes.md)**
 
 ---
@@ -84,7 +84,7 @@ The fastest path for hackathon judges to verify the system end-to-end:
   Run the complete automated test suite to confirm all 12 mathematical invariants:
   ```bash
   npm run typecheck
-  npm test                        # 565 Vitest tests passing (11 live-DB multi-conn skipped)
+  npm test                        # 613 Vitest tests passing (11 live-DB multi-conn skipped)
   npx playwright install chromium # install Playwright browsers if needed
   npx playwright test            # 69 Playwright E2E browser tests passing
   ```
@@ -126,7 +126,7 @@ npm run lint
 # 2. TypeScript compilation
 npm run typecheck
 
-# 3. Complete Vitest Suite (565 tests across 40 test files: 35 unit, 3 adversarial, 2 integration)
+# 3. Complete Vitest Suite (613 tests across 45 test files: 40 unit, 3 adversarial, 2 integration)
 npm run test:unit && npm run test:adversarial && npm run test:integration
 
 # 4. Playwright End-to-End Suite (69 tests across 6 spec files)

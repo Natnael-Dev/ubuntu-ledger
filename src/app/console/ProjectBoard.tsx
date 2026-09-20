@@ -16,6 +16,8 @@ import { WitnessCounter } from '@/components/WitnessCounter';
 import { ProbationCountdown } from '@/components/ProbationCountdown';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { systemClock } from '@/infra/clock';
+import { SybilCollusionPanel } from '@/components/ai/SybilCollusionPanel';
+import { CrossWardPatternPanel } from '@/components/ai/CrossWardPatternPanel';
 
 export interface ProjectBoardItem {
   id: string;
@@ -145,9 +147,13 @@ export function ProjectBoard({
 }: ProjectBoardProps) {
   const [projects, setProjects] = useState<ProjectBoardItem[]>(initialProjects);
   const [filter, setFilter] = useState<FilterMode>('all');
-  const [searchQuery, setSearchQuery] = useState('');
+   const [searchQuery, setSearchQuery] = useState('');
   const [sortField, setSortField] = useState<SortField>('projectCode');
   const [sortAsc, setSortAsc] = useState<boolean>(true);
+
+  // AI Oversight Insights State
+  const [isAiInsightsOpen, setIsAiInsightsOpen] = useState(false);
+  const [aiActiveTab, setAiActiveTab] = useState<'both' | 'sybil' | 'cross-ward'>('both');
 
   // Claim Modal State
   const [claimModalProject, setClaimModalProject] = useState<ProjectBoardItem | null>(null);
@@ -432,6 +438,110 @@ export function ProjectBoard({
 
   return (
     <div className="w-full space-y-4">
+      {/* ─── AI Oversight Insights Collapsible Section ─── */}
+      <div className="border border-slate-300 bg-white rounded-2xl p-4 sm:p-5 shadow-sm space-y-4">
+        <div className="flex items-center justify-between flex-wrap gap-3">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600 font-bold text-sm">
+              AI
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="text-sm font-bold text-slate-900 tracking-tight">
+                  AI Oversight Insights
+                </h3>
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 font-medium">
+                  Assistive Intelligence
+                </span>
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200">
+                  2 Active Monitors
+                </span>
+              </div>
+              <p className="text-xs text-slate-500 mt-0.5">
+                Pre-consensus collusion detection &amp; multi-ward contractor patterns across regional ledger nodes
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            {isAiInsightsOpen && (
+              <div className="inline-flex p-0.5 bg-slate-100 rounded-lg border border-slate-200 text-xs font-medium">
+                <button
+                  type="button"
+                  onClick={() => setAiActiveTab('both')}
+                  className={`px-2.5 py-1 rounded-md transition-all cursor-pointer ${
+                    aiActiveTab === 'both' ? 'bg-white text-slate-900 shadow-2xs font-bold' : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  Both Monitors
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setAiActiveTab('sybil')}
+                  className={`px-2.5 py-1 rounded-md transition-all cursor-pointer ${
+                    aiActiveTab === 'sybil' ? 'bg-white text-slate-900 shadow-2xs font-bold' : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  Sybil / Collusion
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setAiActiveTab('cross-ward')}
+                  className={`px-2.5 py-1 rounded-md transition-all cursor-pointer ${
+                    aiActiveTab === 'cross-ward' ? 'bg-white text-slate-900 shadow-2xs font-bold' : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  Cross-Ward Risk
+                </button>
+              </div>
+            )}
+
+            <button
+              type="button"
+              data-testid="toggle-ai-insights-btn"
+              onClick={() => setIsAiInsightsOpen((prev) => !prev)}
+              className="px-3.5 py-1.5 text-xs font-semibold rounded-xl border border-slate-300 bg-slate-50 hover:bg-slate-100 text-slate-800 transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
+            >
+              <span>{isAiInsightsOpen ? 'Collapse Insights' : 'Expand Insights'}</span>
+              <svg
+                className={`w-3.5 h-3.5 transform transition-transform duration-200 ${
+                  isAiInsightsOpen ? 'rotate-180' : ''
+                }`}
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        {isAiInsightsOpen && (
+          <div className="pt-3 border-t border-slate-200/80 transition-all">
+            {aiActiveTab === 'both' ? (
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 items-start">
+                <SybilCollusionPanel className="h-full shadow-none border border-slate-200" />
+                <CrossWardPatternPanel
+                  contractorName="Apex Rift Engineering Ltd"
+                  className="h-full shadow-none border border-slate-200"
+                />
+              </div>
+            ) : aiActiveTab === 'sybil' ? (
+              <SybilCollusionPanel className="w-full shadow-none border border-slate-200" />
+            ) : (
+              <CrossWardPatternPanel
+                contractorName="Apex Rift Engineering Ltd"
+                className="w-full shadow-none border border-slate-200"
+              />
+            )}
+          </div>
+        )}
+      </div>
+
       {/* Console Sub-Header & Controls */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[var(--rule)] pb-3">
         <div>

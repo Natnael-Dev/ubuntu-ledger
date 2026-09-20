@@ -11,6 +11,9 @@
 
 import { test, expect } from '@playwright/test';
 
+// Serial mode: USSD simulator tests mutate in-memory session and project state.
+test.describe.configure({ mode: 'serial' });
+
 // ─── UI Rendering ─────────────────────────────────────────────────────────────
 
 test.describe('simulator page loads and renders', () => {
@@ -115,11 +118,8 @@ test.describe('real POST /api/ussd integration', () => {
     await page.goto('/simulator');
     await page.getByTestId('btn-dial').click();
 
-    await page.waitForSelector('[data-testid="raw-response"]', { timeout: 10000 });
-    const rawResponse = await page.getByTestId('raw-response').textContent();
-
-    // Real USSD backend always starts with CON or END
-    expect(rawResponse?.trim()).toMatch(/^(CON|END)/);
+    // Real USSD backend always starts with CON or END; wait for response
+    await expect(page.getByTestId('raw-response')).toHaveText(/^(CON|END)/, { timeout: 10000 });
   });
 
   test('pressing a digit key sends a request to /api/ussd with cumulative text', async ({

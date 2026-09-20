@@ -8,6 +8,7 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import type { SimulatorConfig, PersonaOption } from './page';
 import { AlcatelHandset } from '@/components/AlcatelHandset';
+import { VoiceEvidenceRecorder } from '@/components/ai/VoiceEvidenceRecorder';
 
 interface TranscriptEntry {
   id: number;
@@ -82,6 +83,7 @@ interface SimulatorShellProps {
 }
 
 export function SimulatorShell({ config }: SimulatorShellProps) {
+  const [viewMode, setViewMode] = useState<'ussd' | 'voice'>('ussd');
   const [selectedPersona, setSelectedPersona] = useState<PersonaOption>(config.personas[0]);
   const [channelMode, setChannelMode] = useState<'USSD' | 'IVR'>('USSD');
   const [activeAudioKeys, setActiveAudioKeys] = useState<string[]>([]);
@@ -423,8 +425,78 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
 
   return (
     <div className="space-y-8">
-      {/* ─── Compact Stepper (Reference 2 §14) ─── */}
-      <div className="bg-white border border-slate-200/80 rounded-2xl p-5 sm:p-6 shadow-sm">
+      {/* ─── Mode Switcher: USSD Simulation vs Voice AI Evidence ─── */}
+      <div className="flex items-center justify-between flex-wrap gap-3 pb-2 border-b border-slate-200">
+        <div className="inline-flex p-1 bg-slate-100 rounded-xl border border-slate-200/80 shadow-inner">
+          <button
+            type="button"
+            data-testid="mode-tab-ussd"
+            onClick={() => setViewMode('ussd')}
+            className={`px-4 py-2 text-xs sm:text-sm font-bold rounded-lg transition-all flex items-center gap-2 cursor-pointer ${
+              viewMode === 'ussd'
+                ? 'bg-white text-slate-900 shadow-sm border border-slate-200/60'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <span className={`w-2 h-2 rounded-full ${viewMode === 'ussd' ? 'bg-blue-600' : 'bg-slate-400'}`} />
+            USSD Simulation
+          </button>
+          <button
+            type="button"
+            data-testid="mode-tab-voice"
+            onClick={() => setViewMode('voice')}
+            className={`px-4 py-2 text-xs sm:text-sm font-bold rounded-lg transition-all flex items-center gap-2 cursor-pointer ${
+              viewMode === 'voice'
+                ? 'bg-white text-blue-900 shadow-sm border border-blue-200/60'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <span className={`w-2 h-2 rounded-full ${viewMode === 'voice' ? 'bg-blue-600 animate-pulse' : 'bg-slate-400'}`} />
+            Voice AI Evidence
+            <span className="text-[10px] font-mono px-1.5 py-0.5 rounded-full bg-blue-100 text-blue-800 font-semibold uppercase">
+              AI Assist
+            </span>
+          </button>
+        </div>
+
+        <div className="text-xs font-mono text-slate-500">
+          {viewMode === 'ussd' ? (
+            <span>Dialer &amp; GSM Protocol · Deterministic Quorum</span>
+          ) : (
+            <span>Multilingual Voice Intake · Assistive Intelligence</span>
+          )}
+        </div>
+      </div>
+
+      {viewMode === 'voice' ? (
+        <div className="space-y-6">
+          <div className="bg-white border border-slate-200/80 rounded-2xl p-6 sm:p-8 shadow-sm">
+            <div className="max-w-4xl mx-auto space-y-6">
+              <div className="border-b border-slate-100 pb-4">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-xs font-mono font-bold uppercase tracking-wider text-blue-600">
+                    Proof-Line Intake // Voice AI Evidence
+                  </span>
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200">
+                    Human-in-the-loop Invariant
+                  </span>
+                </div>
+                <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900">
+                  Citizen Voice Inspection Recorder
+                </h2>
+                <p className="text-xs sm:text-sm text-slate-600 mt-1">
+                  Field monitors and community residents can record spoken observations in Kiswahili, Amharic, Oromo, or English. Assistive intelligence extracts structured answers for human verification before ledger commit.
+                </p>
+              </div>
+
+              <VoiceEvidenceRecorder taskId="00000000-0000-4000-a000-000000000300" />
+            </div>
+          </div>
+        </div>
+      ) : (
+        <>
+          {/* ─── Compact Stepper (Reference 2 §14) ─── */}
+          <div className="bg-white border border-slate-200/80 rounded-2xl p-5 sm:p-6 shadow-sm">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 flex-1">
             {/* Step 1: Amina */}
@@ -1188,6 +1260,8 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
           )}
         </section>
       </div>
+      </>
+      )}
 
       {/* ─── Bottom Banner: Why This Matters (Reference 2 §12) ─── */}
       <div className="bg-gradient-to-r from-blue-50/70 via-slate-50 to-indigo-50/70 border border-blue-100 rounded-2xl p-5 sm:p-6 shadow-sm">

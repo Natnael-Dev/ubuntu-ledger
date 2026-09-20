@@ -47,20 +47,6 @@ export default function SimulatorPage() {
         role: 'duplicate',
       },
       {
-        id: DEMO_PERSONAS.ORIGINAL_REPORTER_1.id,
-        label: DEMO_PERSONAS.ORIGINAL_REPORTER_1.label,
-        msisdn: DEMO_PERSONAS.ORIGINAL_REPORTER_1.msisdn,
-        clusterKey: DEMO_PERSONAS.ORIGINAL_REPORTER_1.clusterKey,
-        role: 'witness',
-      },
-      {
-        id: DEMO_PERSONAS.ORIGINAL_REPORTER_2.id,
-        label: DEMO_PERSONAS.ORIGINAL_REPORTER_2.label,
-        msisdn: DEMO_PERSONAS.ORIGINAL_REPORTER_2.msisdn,
-        clusterKey: DEMO_PERSONAS.ORIGINAL_REPORTER_2.clusterKey,
-        role: 'witness',
-      },
-      {
         id: 'kalinda',
         label: 'Kalinda (Resident - Fee Verification)',
         msisdn: '+251999000015',
@@ -108,56 +94,56 @@ export default function SimulatorPage() {
             </div>
           </div>
 
-          {/* Top Right Scenario Briefing Card (Agent 3) */}
-          <div className="lg:w-96 bg-white border-2 border-slate-200/90 rounded-2xl p-5 sm:p-6 shadow-sm shrink-0 flex flex-col justify-between">
+          {/* Top Right Scenario Briefing Card (Agent 3 - High Visibility) */}
+          <div className="lg:w-[420px] bg-white border-2 border-slate-200/90 rounded-2xl p-6 shadow-sm shrink-0 flex flex-col justify-between">
             <div>
-              <div className="flex items-center justify-between gap-2 mb-3 pb-2.5 border-b border-slate-100">
+              <div className="flex items-center justify-between gap-2 mb-3.5 pb-3 border-b border-slate-100">
                 <div className="flex items-center gap-2">
-                  <span className="text-blue-600 font-bold text-base">📋</span>
-                  <h3 className="font-extrabold text-sm uppercase tracking-wide text-slate-900">
+                  <span className="text-blue-600 font-bold text-lg">📋</span>
+                  <h3 className="font-black text-base uppercase tracking-wide text-slate-900">
                     Key Demo Scenario
                   </h3>
                 </div>
-                <span className="text-[10px] font-bold uppercase tracking-wider bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full border border-blue-200">
+                <span className="text-xs font-extrabold uppercase tracking-wider bg-blue-50 text-blue-700 px-3 py-1 rounded-full border border-blue-200">
                   Triangulation
                 </span>
               </div>
 
-              <p className="text-xs text-slate-600 leading-relaxed mb-3.5 font-medium">
+              <p className="text-sm text-slate-700 leading-relaxed mb-4 font-semibold">
                 Simulating 3 community members in Kebele 08 &amp; 09 to test geographic fraud prevention:
               </p>
 
               {/* 3-Step Scenario Roadmap */}
-              <div className="space-y-2 mb-4 text-xs">
-                <div className="flex items-start gap-2.5 p-2 rounded-lg bg-blue-50/70 border border-blue-200/80">
-                  <span className="w-5 h-5 rounded-full bg-blue-600 text-white font-bold text-[11px] flex items-center justify-center shrink-0 shadow-2xs">1</span>
+              <div className="space-y-2.5 mb-5 text-sm">
+                <div className="flex items-start gap-3 p-3 rounded-xl bg-blue-50/80 border border-blue-200/90 shadow-2xs">
+                  <span className="w-6 h-6 rounded-full bg-blue-600 text-white font-black text-xs flex items-center justify-center shrink-0 shadow-xs">1</span>
                   <div>
-                    <strong className="text-blue-950 font-bold block">Amina submits repair check</strong>
-                    <span className="text-slate-600 text-[11px]">Counts toward 3/3 community quorum</span>
+                    <strong className="text-blue-950 font-bold block text-sm">Amina submits repair check</strong>
+                    <span className="text-slate-600 text-xs font-medium">Counts toward 3/3 community quorum</span>
                   </div>
                 </div>
 
-                <div className="flex items-start gap-2.5 p-2 rounded-lg bg-amber-50/70 border border-amber-200/80">
-                  <span className="w-5 h-5 rounded-full bg-amber-500 text-white font-bold text-[11px] flex items-center justify-center shrink-0 shadow-2xs">2</span>
+                <div className="flex items-start gap-3 p-3 rounded-xl bg-amber-50/80 border border-amber-200/90 shadow-2xs">
+                  <span className="w-6 h-6 rounded-full bg-amber-500 text-white font-black text-xs flex items-center justify-center shrink-0 shadow-xs">2</span>
                   <div>
-                    <strong className="text-amber-950 font-bold block">Girma is suppressed</strong>
-                    <span className="text-slate-600 text-[11px]">Same cell tower detected as duplicate cluster</span>
+                    <strong className="text-amber-950 font-bold block text-sm">Girma is suppressed</strong>
+                    <span className="text-slate-600 text-xs font-medium">Same cell tower detected as duplicate cluster</span>
                   </div>
                 </div>
 
-                <div className="flex items-start gap-2.5 p-2 rounded-lg bg-emerald-50/70 border border-emerald-200/80">
-                  <span className="w-5 h-5 rounded-full bg-emerald-600 text-white font-bold text-[11px] flex items-center justify-center shrink-0 shadow-2xs">3</span>
+                <div className="flex items-start gap-3 p-3 rounded-xl bg-emerald-50/80 border border-emerald-200/90 shadow-2xs">
+                  <span className="w-6 h-6 rounded-full bg-emerald-600 text-white font-black text-xs flex items-center justify-center shrink-0 shadow-xs">3</span>
                   <div>
-                    <strong className="text-emerald-950 font-bold block">Kalinda confirms quorum</strong>
-                    <span className="text-slate-600 text-[11px]">Independent location satisfies civic proof</span>
+                    <strong className="text-emerald-950 font-bold block text-sm">Kalinda confirms quorum</strong>
+                    <span className="text-slate-600 text-xs font-medium">Independent location satisfies civic proof</span>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
-              <span className="font-semibold text-slate-700">👉 How to run:</span>
-              <span className="text-blue-600 font-semibold">Select persona &amp; dial *890#</span>
+            <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-sm">
+              <span className="font-bold text-slate-700">👉 How to run:</span>
+              <span className="text-blue-600 font-extrabold">Select persona &amp; dial *890#</span>
             </div>
 
             {/* Test Contract preservation hook */}

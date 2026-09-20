@@ -21,6 +21,7 @@ import {
 import { DEMO_WARDS } from '@/fixtures/demo-scenario';
 import { ReceiptAudioButton } from './ReceiptAudioButton';
 import { ReceiptPrintButton } from '@/components/ReceiptPrintButton';
+import { Eli5SummaryPanel } from '@/components/ai/Eli5SummaryPanel';
 
 interface PageProps {
   params: Promise<{ code: string }>;
@@ -375,6 +376,41 @@ export default async function ReceiptPage(props: PageProps) {
                 <span className="text-[10px]">↗</span>
               </a>
             </div>
+          </section>
+
+          {/* Plain Language Summary (AI) Accordion */}
+          <section className="pt-4 pb-1 print:hidden">
+            <details className="group border border-slate-200/90 rounded-xl bg-slate-50/70 overflow-hidden transition-all">
+              <summary className="flex items-center justify-between p-3.5 cursor-pointer select-none hover:bg-slate-100/80 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-xl">
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse" />
+                  <span className="text-xs font-bold text-slate-900 font-sans">
+                    Plain Language Summary (AI)
+                  </span>
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 font-medium">
+                    Assistive
+                  </span>
+                </div>
+                <div className="flex items-center gap-1.5 text-xs text-slate-500 font-mono">
+                  <span className="group-open:hidden">Expand</span>
+                  <span className="hidden group-open:inline">Collapse</span>
+                  <svg className="w-4 h-4 transform transition-transform duration-200 group-open:rotate-180" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                  </svg>
+                </div>
+              </summary>
+              <div className="p-4 pt-2 border-t border-slate-200/80 bg-white">
+                <Eli5SummaryPanel
+                  entityType="project"
+                  entityId={receipt.projectCode}
+                  title={receipt.title}
+                  amount={receipt.amountMinor}
+                  currency={receipt.currency}
+                  contractor={receipt.contractor}
+                  status={receipt.narrative.state}
+                />
+              </div>
+            </details>
           </section>
 
           {/* Bottom perforation edge */}

@@ -99,7 +99,7 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
   const [loading, setLoading] = useState(false);
   const [lastRawResponse, setLastRawResponse] = useState<string>('');
   const [invalidInputNotice, setInvalidInputNotice] = useState<string | null>(null);
-  const [activeRightTab, setActiveRightTab] = useState<'live' | 'walkthrough'>('live');
+  const [activeRightTab, setActiveRightTab] = useState<'live' | 'walkthrough'>('walkthrough');
   const [showTechnicalDetails, setShowTechnicalDetails] = useState(false);
   const [scenarioExpanded, setScenarioExpanded] = useState(false);
   const sessionActive = Boolean(session?.isAlive);

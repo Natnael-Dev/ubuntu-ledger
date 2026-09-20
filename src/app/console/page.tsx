@@ -72,7 +72,7 @@ export default function ConsolePage() {
 
             <div className="flex flex-wrap items-center gap-3 text-xs font-mono">
               <div className="flex items-center gap-2 border border-slate-700 px-3 py-1.5 bg-[#131924] rounded-xl text-slate-200">
-                <span className="font-bold text-amber-400">Role: ADMIN</span>
+                <span className="font-bold text-amber-400">PUBLIC VIEWER · Demo Mode</span>
               </div>
               <div className="flex items-center gap-2 border border-emerald-900/60 px-3 py-1.5 bg-emerald-950/40 text-emerald-300 rounded-xl font-medium">
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />

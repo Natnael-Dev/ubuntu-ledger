@@ -15,7 +15,9 @@
     "test:e2e": "playwright test",
     "dev:full": "next dev",
     "seed:demo": "tsx scripts/seed-demo.ts",
-    "seed": "npm run seed:demo"
+    "seed": "npm run seed:demo",
+    "deck:build": "tsx scripts/render-deck.ts",
+    "deck:preview": "tsx scripts/preview-deck.ts"
   },
   "dependencies": {
     "clsx": "^2.1.1",

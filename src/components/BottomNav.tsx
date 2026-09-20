@@ -48,7 +48,7 @@ const MOBILE_NAV_ITEMS: NavItem[] = [
     ),
   },
   {
-    href: '/services/ET-ID-REPLACE',
+    href: '/services/ET-CIVIL-ID',
     label: 'Services',
     icon: (
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.75}>

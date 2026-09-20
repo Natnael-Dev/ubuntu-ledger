@@ -188,7 +188,7 @@ export default async function ReceiptPage(props: PageProps) {
               Step 3: Receipt
             </span>
             <Link
-              href="/services/ET-ID-REPLACE"
+              href="/services/ET-CIVIL-ID"
               className="px-3.5 py-2 rounded-xl bg-blue-50 border border-blue-200 text-blue-700 font-bold hover:bg-blue-100 flex items-center gap-1 transition-all active:scale-98"
             >
               <span>Step 4: Divergence</span>

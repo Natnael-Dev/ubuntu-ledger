@@ -134,8 +134,8 @@ export default function SimulatorPage() {
                 <div className="flex items-start gap-3 p-3 rounded-xl bg-emerald-50/80 border border-emerald-200/90 shadow-2xs">
                   <span className="w-6 h-6 rounded-full bg-emerald-600 text-white font-black text-xs flex items-center justify-center shrink-0 shadow-xs">3</span>
                   <div>
-                    <strong className="text-emerald-950 font-bold block text-sm">Kalinda confirms quorum</strong>
-                    <span className="text-slate-600 text-xs font-medium">Independent location satisfies civic proof</span>
+                    <strong className="text-emerald-950 font-bold block text-sm">Kalinda verifies fee compliance</strong>
+                    <span className="text-slate-600 text-xs font-medium">Dual-ledger check: statutory gazette vs. citizen-reported fee</span>
                   </div>
                 </div>
               </div>

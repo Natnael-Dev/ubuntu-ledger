@@ -39,7 +39,7 @@ export function SiteFooter() {
               <Link href="/receipt/4412" className="text-xs text-slate-600 hover:text-blue-600 transition-colors">
                 Receipt
               </Link>
-              <Link href="/services/ET-ID-REPLACE" className="text-xs text-slate-600 hover:text-blue-600 transition-colors">
+              <Link href="/services/ET-CIVIL-ID" className="text-xs text-slate-600 hover:text-blue-600 transition-colors">
                 Services
               </Link>
               <Link href="/pwa" className="text-xs text-slate-600 hover:text-blue-600 transition-colors">

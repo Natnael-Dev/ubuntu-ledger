@@ -42,8 +42,8 @@ const PROOFS = [
     claim: 'Official gazette mandates and citizen field observations are never merged or averaged.',
     mechanism:
       'Official statutory rules (with archived gazette citation and SHA-256 provenance) are kept in a separate cryptographic ledger from anonymous citizen observations. Divergence is made transparently visible.',
-    href: '/services/ET-ID-REPLACE',
-    action: 'Explore Fee Divergence Card',
+    href: '/services/ET-CIVIL-ID',
+    action: 'Explore Fee Divergence — ID Card Replacement',
     accent: 'emerald',
   },
 ] as const;
@@ -74,7 +74,7 @@ const PORTALS = [
     tag: 'Public Artifact',
   },
   {
-    href: '/services/ET-ID-REPLACE',
+    href: '/services/ET-CIVIL-ID',
     title: 'Service Fee Divergence',
     category: 'Dual-Ledger Accountability',
     description:

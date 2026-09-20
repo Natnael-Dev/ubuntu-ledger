@@ -10,7 +10,7 @@ const NAV_LINKS = [
   { href: '/simulator',             label: 'Simulator' },
   { href: '/console',               label: 'Console' },
   { href: '/receipt/4412',          label: 'Receipts' },
-  { href: '/services/ET-ID-REPLACE',label: 'Divergence' },
+  { href: '/services/ET-CIVIL-ID',    label: 'Divergence' },
   { href: '/pwa',                   label: 'Field' },
 ] as const;
 

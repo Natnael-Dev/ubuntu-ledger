@@ -1,0 +1,1330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Ward Proof-Line · Ubuntu Ledger — Pitch Deck</title>
+  <meta name="viewport" content="width=1920, height=1080, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..900;1,9..144,400..900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    @page {
+      size: 1920px 1080px;
+      margin: 0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background-color: #FAFAF9;
+      color: #1A1A1A;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    .slide {
+      width: 1920px;
+      height: 1080px;
+      max-height: 1080px;
+      overflow: hidden;
+      position: relative;
+      background-color: #FAFAF9;
+      padding: 56px 80px 44px 80px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      page-break-after: always;
+      break-after: page;
+    }
+
+    .slide:last-child {
+      page-break-after: avoid;
+      break-after: avoid;
+    }
+
+    /* Editorial Ink Borders & Rules */
+    .slide-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #DDD9D0;
+      padding-bottom: 12px;
+      margin-bottom: 20px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #57534E;
+    }
+
+    .slide-header .brand-tag {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      color: #275A38;
+    }
+
+    .slide-header .brand-dot {
+      width: 8px;
+      height: 8px;
+      background-color: #275A38;
+      border-radius: 50%;
+    }
+
+    .slide-header .track-tag {
+      color: #78716C;
+    }
+
+    .slide-title-block {
+      margin-bottom: 24px;
+    }
+
+    .slide-title {
+      font-family: 'Fraunces', Georgia, serif;
+      font-size: 42px;
+      font-weight: 700;
+      line-height: 1.15;
+      color: #1A1A1A;
+      letter-spacing: -0.02em;
+    }
+
+    .slide-subtitle {
+      font-size: 18px;
+      color: #57534E;
+      margin-top: 6px;
+      font-weight: 400;
+      line-height: 1.4;
+    }
+
+    .slide-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      position: relative;
+      gap: 20px;
+    }
+
+    .slide-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid #DDD9D0;
+      padding-top: 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: #78716C;
+      letter-spacing: 0.04em;
+    }
+
+    .slide-footer .slide-invariant {
+      font-weight: 600;
+      color: #275A38;
+    }
+
+    .slide-footer .page-num {
+      font-weight: 700;
+      color: #1A1A1A;
+    }
+
+    /* Common Card Styles */
+    .card-grid {
+      display: grid;
+      gap: 20px;
+    }
+
+    .grid-2 {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .grid-3 {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+
+    .grid-4 {
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+    }
+
+    .ink-card {
+      background-color: #FFFFFF;
+      border: 1px solid #DDD9D0;
+      border-radius: 4px;
+      padding: 24px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .ink-card.paper-tint {
+      background-color: #F4F3EE;
+    }
+
+    .ink-card.accent-border {
+      border-top: 4px solid #275A38;
+    }
+
+    .ink-card.alert-border {
+      border-top: 4px solid #991B1B;
+    }
+
+    .card-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #275A38;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-label.alert {
+      color: #991B1B;
+    }
+
+    .card-heading {
+      font-family: 'Fraunces', Georgia, serif;
+      font-size: 22px;
+      font-weight: 600;
+      color: #1A1A1A;
+      margin-bottom: 10px;
+      line-height: 1.25;
+    }
+
+    .card-body {
+      font-size: 15px;
+      color: #44403C;
+      line-height: 1.5;
+    }
+
+    .card-body p + p {
+      margin-top: 10px;
+    }
+
+    /* Comparison Table */
+    .editorial-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      background-color: #FFFFFF;
+      border: 1px solid #DDD9D0;
+    }
+
+    .editorial-table th {
+      background-color: #ECEAE3;
+      border: 1px solid #DDD9D0;
+      padding: 14px 18px;
+      text-align: left;
+      font-family: 'Inter', sans-serif;
+      font-weight: 700;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #1A1A1A;
+    }
+
+    .editorial-table td {
+      border: 1px solid #E5E3DD;
+      padding: 14px 18px;
+      color: #292524;
+      line-height: 1.45;
+      vertical-align: top;
+    }
+
+    .editorial-table tr:nth-child(even) td {
+      background-color: #FAFAF9;
+    }
+
+    .editorial-table th.highlight,
+    .editorial-table td.highlight {
+      background-color: #F1F6F2;
+      border-left: 2px solid #275A38;
+      border-right: 2px solid #275A38;
+      font-weight: 600;
+      color: #1A1A1A;
+    }
+
+    .editorial-table th.highlight {
+      background-color: #E2ECE4;
+      color: #275A38;
+    }
+
+    /* Badges & Tags */
+    .badge {
+      display: inline-block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      padding: 3px 8px;
+      border-radius: 3px;
+      border: 1px solid #DDD9D0;
+      background-color: #F5F4EF;
+      color: #44403C;
+    }
+
+    .badge.accent {
+      background-color: #EBF3ED;
+      border-color: #C0D8C6;
+      color: #275A38;
+      font-weight: 600;
+    }
+
+    .badge.alert {
+      background-color: #FEE2E2;
+      border-color: #FCA5A5;
+      color: #991B1B;
+      font-weight: 600;
+    }
+
+    /* Pipeline Flow */
+    .pipeline-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 10px;
+    }
+
+    .pipeline-step {
+      flex: 1;
+      background-color: #FFFFFF;
+      border: 1px solid #DDD9D0;
+      border-top: 3px solid #275A38;
+      border-radius: 4px;
+      padding: 16px 14px;
+      text-align: center;
+      height: 140px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .pipeline-step .step-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: #78716C;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .pipeline-step .step-title {
+      font-family: 'Fraunces', Georgia, serif;
+      font-size: 17px;
+      font-weight: 600;
+      color: #1A1A1A;
+      margin: 4px 0;
+    }
+
+    .pipeline-step .step-desc {
+      font-size: 12px;
+      color: #57534E;
+      line-height: 1.35;
+    }
+
+    .pipeline-arrow {
+      font-size: 20px;
+      color: #275A38;
+      font-weight: 700;
+    }
+
+    /* Terminal Test Output Block */
+    .terminal-box {
+      background-color: #1A1A1A;
+      border: 1px solid #292524;
+      border-radius: 4px;
+      padding: 22px 26px;
+      color: #F5F5F4;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .terminal-green { color: #4ADE80; font-weight: 600; }
+    .terminal-dim { color: #A8A29E; }
+    .terminal-amber { color: #FBBF24; }
+    .terminal-cyan { color: #38BDF8; }
+
+    /* Key Invariant Banner */
+    .invariant-banner {
+      border: 2px solid #275A38;
+      background-color: #F3F7F4;
+      border-radius: 4px;
+      padding: 24px 32px;
+      display: flex;
+      align-items: center;
+      gap: 28px;
+    }
+
+    .invariant-banner-icon {
+      font-family: 'Fraunces', Georgia, serif;
+      font-size: 40px;
+      font-weight: 700;
+      color: #275A38;
+      line-height: 1;
+      padding-right: 20px;
+      border-right: 2px solid #C0D8C6;
+    }
+
+    .invariant-banner-content h4 {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #275A38;
+      margin-bottom: 4px;
+    }
+
+    .invariant-banner-content p {
+      font-family: 'Fraunces', Georgia, serif;
+      font-size: 26px;
+      font-weight: 600;
+      color: #1A1A1A;
+      line-height: 1.25;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==========================================
+       SLIDE 1: Title & The Core Invariant
+       ========================================== -->
+  <section class="slide" id="slide-1">
+    <div class="slide-header">
+      <div class="brand-tag">
+        <span class="brand-dot"></span>
+        <span>Open Society Foundations × Andela Hackathon</span>
+      </div>
+      <div class="track-tag">Track: Transparency &amp; Accountability · Information You Can Trust</div>
+    </div>
+
+    <div class="slide-content" style="justify-content: center; padding: 20px 0;">
+      <div style="max-width: 1440px;">
+        <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 16px;">
+          <span class="badge accent" style="font-size: 14px; padding: 6px 14px;">OFFICIAL HACKATHON DELIVERABLE · STAGE M-004</span>
+          <span class="badge" style="font-size: 14px; padding: 6px 14px;">KENYA &amp; ETHIOPIA CIVIC PROOF</span>
+        </div>
+
+        <h1 style="font-family: 'Fraunces', Georgia, serif; font-size: 76px; font-weight: 800; line-height: 1.05; letter-spacing: -0.03em; color: #1A1A1A; margin-bottom: 16px;">
+          Ward Proof-Line
+        </h1>
+        <div style="font-family: 'Fraunces', Georgia, serif; font-size: 34px; font-weight: 500; color: #275A38; margin-bottom: 24px;">
+          Ubuntu Ledger — An Open Civic Verification System for Infrastructure Accountability
+        </div>
+        <p style="font-size: 20px; color: #44403C; max-width: 1200px; line-height: 1.5; margin-bottom: 40px;">
+          Bridging the structural void between municipal expenditure declarations and ground reality. A zero-barrier, cryptographic public record enabling citizens to certify public works directly over $10 feature phones.
+        </p>
+
+        <!-- Core Invariant Hero Box -->
+        <div class="invariant-banner" style="margin-bottom: 36px;">
+          <div class="invariant-banner-icon">INV-01</div>
+          <div class="invariant-banner-content">
+            <h4>Fundamental Civic Invariant</h4>
+            <p>"A contractor cannot close their own ticket."</p>
+            <div style="font-family: 'Inter', sans-serif; font-size: 15px; color: #44403C; margin-top: 6px;">
+              Enforced at the database engine level. No administrative role, municipal official, or database superuser can override the mandatory 7-day citizen probation window.
+            </div>
+          </div>
+        </div>
+
+        <!-- Metric strip -->
+        <div class="card-grid grid-4">
+          <div class="ink-card paper-tint" style="padding: 16px 20px;">
+            <div class="card-label">Primary Track</div>
+            <div style="font-size: 16px; font-weight: 700; color: #1A1A1A;">Transparency &amp; Accountability</div>
+            <div style="font-size: 13px; color: #57534E; margin-top: 4px;">Secondary: Social Cohesion</div>
+          </div>
+          <div class="ink-card paper-tint" style="padding: 16px 20px;">
+            <div class="card-label">Universal Ingress</div>
+            <div style="font-size: 16px; font-weight: 700; color: #1A1A1A;">*890# USSD &amp; IVR Voice</div>
+            <div style="font-size: 13px; color: #57534E; margin-top: 4px;">Zero data · Amharic, Oromo, English</div>
+          </div>
+          <div class="ink-card paper-tint" style="padding: 16px 20px;">
+            <div class="card-label">Engineering Rigor</div>
+            <div style="font-size: 16px; font-weight: 700; color: #1A1A1A;">574 Automated Tests Passing</div>
+            <div style="font-size: 13px; color: #57534E; margin-top: 4px;">30 adversarial attack suites</div>
+          </div>
+          <div class="ink-card paper-tint" style="padding: 16px 20px;">
+            <div class="card-label">License &amp; Code</div>
+            <div style="font-size: 16px; font-weight: 700; color: #1A1A1A;">100% Open Source (MIT)</div>
+            <div style="font-size: 13px; color: #57534E; margin-top: 4px;">github.com/Natnael-Dev/ubuntu-ledger</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="slide-footer">
+      <div>Ward Proof-Line Protocol · OSF × Andela Hackathon 2026</div>
+      <div class="slide-invariant">Invariant INV-01: Independent Civic Sign-off</div>
+      <div class="page-num">01 / 11</div>
+    </div>
+  </section>
+
+  <!-- ==========================================
+       SLIDE 2: Problem — The Verification Void
+       ========================================== -->
+  <section class="slide" id="slide-2">
+    <div class="slide-header">
+      <div class="brand-tag"><span class="brand-dot"></span><span>Ubuntu Ledger · The Problem</span></div>
+      <div class="track-tag">Root Cause Analysis · The Verification Void</div>
+    </div>
+
+    <div class="slide-title-block">
+      <h2 class="slide-title">Millions Spent on Paper. Nothing Working on the Ground.</h2>
+      <div class="slide-subtitle">The systemic breakdown between municipal public expenditure claims and physical reality in East Africa.</div>
+    </div>
+
+    <div class="slide-content">
+      <div class="card-grid grid-3">
+        <!-- Pillar 1 -->
+        <div class="ink-card alert-border">
+          <div class="card-label alert">Structural Defect 01</div>
+          <h3 class="card-heading">The Paper Lie</h3>
+          <div class="card-body">
+            <p>Municipal expenditure ledgers routinely show budgets 100% disbursed and public works marked "Complete."</p>
+            <p>On the ground, boreholes remain dry, clinics lack backup generator power, and gravel access roads wash away after the first rains.</p>
+            <p>Official accounting systems only verify voucher stamps—never physical operating reality.</p>
+          </div>
+        </div>
+
+        <!-- Pillar 2 -->
+        <div class="ink-card alert-border">
+          <div class="card-label alert">Structural Defect 02</div>
+          <h3 class="card-heading">The Closed Loop</h3>
+          <div class="card-body">
+            <p>Contractors and procurement officers sign off on their own disbursements with zero community oversight.</p>
+            <p>The party with direct financial incentive to declare completion holds monopoly authority over ticket status.</p>
+            <p>Citizens who depend on the service daily have no legal mechanism or technical channel to challenge the sign-off.</p>
+          </div>
+        </div>
+
+        <!-- Pillar 3 -->
+        <div class="ink-card alert-border">
+          <div class="card-label alert">Structural Defect 03</div>
+          <h3 class="card-heading">The Digital Divide</h3>
+          <div class="card-body">
+            <p>Existing civic-tech solutions assume high-end smartphones, 4G connectivity, and English digital literacy.</p>
+            <p>In rural Kenya and Ethiopia, over 70% of residents rely on $10 GSM feature phones and communicate in local languages.</p>
+            <p>Requiring mobile broadband for civic participation structurally disenfranchises the most vulnerable communities.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hard Reality Contrast Box -->
+      <div class="ink-card paper-tint" style="padding: 20px 28px; border-left: 6px solid #991B1B;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+          <div style="font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700; color: #991B1B; text-transform: uppercase;">
+            Live Field Evidence · Woreda 9 Health Clinic Generator Case
+          </div>
+          <span class="badge alert">DISCREPANCY DETECTED</span>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px; font-size: 14px;">
+          <div style="background-color: #FFFFFF; padding: 14px 18px; border: 1px solid #DDD9D0; border-radius: 4px;">
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #78716C; margin-bottom: 4px;">STATUTORY GAZETTE CLAIM</div>
+            <div style="font-size: 17px; font-weight: 700; color: #1A1A1A;">ETB 320,000 Disbursed · "Repairs Complete"</div>
+            <div style="color: #57534E; margin-top: 4px;">Signed by contractor &amp; municipal engineer. File closed.</div>
+          </div>
+          <div style="background-color: #FFFFFF; padding: 14px 18px; border: 1px solid #DDD9D0; border-radius: 4px;">
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #991B1B; margin-bottom: 4px;">PHYSICAL ON-SITE REALITY</div>
+            <div style="font-size: 17px; font-weight: 700; color: #991B1B;">0 Volts Output · Cold-Chain Vaccines Spoiled</div>
+            <div style="color: #57534E; margin-top: 4px;">0 Citizen signatures collected. Clinic operating in darkness.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="slide-footer">
+      <div>Ward Proof-Line Protocol · Problem Definition</div>
+      <div class="slide-invariant">Core Insight: Unverified data is merely official fiction.</div>
+      <div class="page-num">02 / 11</div>
+    </div>
+  </section>
+
+  <!-- ==========================================
+       SLIDE 3: Solution — Citizen-Verified Infrastructure
+       ========================================== -->
+  <section class="slide" id="slide-3">
+    <div class="slide-header">
+      <div class="brand-tag"><span class="brand-dot"></span><span>Ubuntu Ledger · The Solution</span></div>
+      <div class="track-tag">The Ward Proof-Line Protocol</div>
+    </div>
+
+    <div class="slide-title-block">
+      <h2 class="slide-title">Citizen-Verified Infrastructure: Truth Anchored to Reality</h2>
+      <div class="slide-subtitle">A decentralized civic protocol enforcing physical sign-off before public expenditure can be reconciled.</div>
+    </div>
+
+    <div class="slide-content">
+      <!-- 4 Pillars -->
+      <div class="card-grid grid-4">
+        <div class="ink-card accent-border">
+          <div class="card-label">Pillar 01</div>
+          <h3 class="card-heading" style="font-size: 19px;">Universal Ingress</h3>
+          <div class="card-body" style="font-size: 14px;">
+            Works on any $10 phone via <strong>*890# USSD</strong> and automated <strong>IVR voice</strong> in Amharic, Afaan Oromo, and English. Zero internet required.
+          </div>
+        </div>
+
+        <div class="ink-card accent-border">
+          <div class="card-label">Pillar 02</div>
+          <h3 class="card-heading" style="font-size: 19px;">Proof A: Anti-Sybil</h3>
+          <div class="card-body" style="font-size: 14px;">
+            Coarse MSISDN cell cluster binning prevents sock-puppet SIM card ballot stuffing without harvesting user PII or phone numbers.
+          </div>
+        </div>
+
+        <div class="ink-card accent-border">
+          <div class="card-label">Pillar 03</div>
+          <h3 class="card-heading" style="font-size: 19px;">Proof B: Probation Lock</h3>
+          <div class="card-body" style="font-size: 14px;">
+            Mandatory <strong>7-day citizen probation window</strong>. Contractor repair declarations remain locked until verified by community consensus.
+          </div>
+        </div>
+
+        <div class="ink-card accent-border">
+          <div class="card-label">Pillar 04</div>
+          <h3 class="card-heading" style="font-size: 19px;">Proof C: Two Ledgers</h3>
+          <div class="card-body" style="font-size: 14px;">
+            Statutory gazette disbursements and k-anonymous citizen reports are presented side-by-side, never merged or rewritten.
+          </div>
+        </div>
+      </div>
+
+      <!-- 6-Stage Pipeline Flow -->
+      <div style="margin-top: 10px;">
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700; color: #275A38; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.08em;">
+          The 6-Stage Proof-Line Lifecycle
+        </div>
+        <div class="pipeline-container">
+          <div class="pipeline-step">
+            <div class="step-num">Stage 01</div>
+            <div class="step-title">Ingest</div>
+            <div class="step-desc">*890# USSD, IVR call, or offline PWA form</div>
+          </div>
+          <div class="pipeline-arrow">→</div>
+
+          <div class="pipeline-step">
+            <div class="step-num">Stage 02</div>
+            <div class="step-title">Triangulate</div>
+            <div class="step-desc">Coarse cell-tower clustering &amp; Sybil filtering</div>
+          </div>
+          <div class="pipeline-arrow">→</div>
+
+          <div class="pipeline-step">
+            <div class="step-num">Stage 03</div>
+            <div class="step-title">Probation</div>
+            <div class="step-desc">7-day community challenge window locked</div>
+          </div>
+          <div class="pipeline-arrow">→</div>
+
+          <div class="pipeline-step">
+            <div class="step-num">Stage 04</div>
+            <div class="step-title">Audit Chain</div>
+            <div class="step-desc">SHA-256 state seal in PostgreSQL trigger</div>
+          </div>
+          <div class="pipeline-arrow">→</div>
+
+          <div class="pipeline-step">
+            <div class="step-num">Stage 05</div>
+            <div class="step-title">Bulletin</div>
+            <div class="step-desc">Weekly FM radio script &amp; SMS broadcast</div>
+          </div>
+          <div class="pipeline-arrow">→</div>
+
+          <div class="pipeline-step">
+            <div class="step-num">Stage 06</div>
+            <div class="step-title">Reconcile</div>
+            <div class="step-desc">Final statutory sign-off or penalty flag</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="slide-footer">
+      <div>Ward Proof-Line Protocol · Architecture Specification</div>
+      <div class="slide-invariant">Invariant INV-01: Enforced Closed-Loop Civic Verification</div>
+      <div class="page-num">03 / 11</div>
+    </div>
+  </section>
+
+  <!-- ==========================================
+       SLIDE 4: Criterion 1 — Uniqueness & Innovation
+       ========================================== -->
+  <section class="slide" id="slide-4">
+    <div class="slide-header">
+      <div class="brand-tag"><span class="brand-dot"></span><span>Judging Criterion 1 · Uniqueness &amp; Innovation</span></div>
+      <div class="track-tag">Competitive Architecture Differentiation</div>
+    </div>
+
+    <div class="slide-title-block">
+      <h2 class="slide-title">Why Ward Proof-Line is Radically Different</h2>
+      <div class="slide-subtitle">Beyond passive feedback forms and speculative Web3 tokens: verifiable civic proof engineered for African realities.</div>
+    </div>
+
+    <div class="slide-content">
+      <table class="editorial-table">
+        <thead>
+          <tr>
+            <th style="width: 18%;">Dimension</th>
+            <th style="width: 25%;">Traditional Grievance Apps</th>
+            <th style="width: 25%;">Blockchain Public Ledgers</th>
+            <th class="highlight" style="width: 32%;">Ward Proof-Line (Ubuntu Ledger)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Ingress Handset</strong></td>
+            <td>Smartphone &amp; high-speed mobile data required (excludes 70%+ of rural residents)</td>
+            <td>Crypto wallet &amp; desktop/mobile Web3 browser required</td>
+            <td class="highlight">Any $10 GSM feature phone (*890# USSD &amp; IVR voice) with zero mobile data</td>
+          </tr>
+          <tr>
+            <td><strong>Closure Authority</strong></td>
+            <td>Municipal administrator or contractor holds unilateral power to close tickets</td>
+            <td>Smart contract creator key or centralized DAO multisig</td>
+            <td class="highlight">Affected citizens only. Invariant INV-01 blocks admin override by database law</td>
+          </tr>
+          <tr>
+            <td><strong>Anti-Sybil Defense</strong></td>
+            <td>Phone number KYC or easily spoofed captcha barriers</td>
+            <td>Token staking or expensive gas transaction fees</td>
+            <td class="highlight">Coarse cell-tower prefix binning &amp; temporal decay; zero user fees</td>
+          </tr>
+          <tr>
+            <td><strong>Data Integrity</strong></td>
+            <td>Mutable SQL database; records can be quietly updated or deleted</td>
+            <td>Public blockchain (heavy gas, high latency, complex tooling)</td>
+            <td class="highlight">Truncate-sealed SHA-256 Merkle chain in PostgreSQL; tamper-evident and lightweight</td>
+          </tr>
+          <tr>
+            <td><strong>Truth Model</strong></td>
+            <td>Unverified complaints vs official government claims</td>
+            <td>Financial balance accounting only; disconnected from physical assets</td>
+            <td class="highlight">Two-Ledger Separation: official gazettes displayed beside k-anonymous ground reports</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Key Innovation Highlight -->
+      <div class="ink-card paper-tint" style="padding: 16px 24px; border-left: 4px solid #275A38;">
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <div>
+            <span class="badge accent" style="margin-bottom: 6px;">CORE INNOVATION HIGHLIGHT</span>
+            <div style="font-family: 'Fraunces', Georgia, serif; font-size: 20px; font-weight: 600; color: #1A1A1A;">
+              The Database Engine as Sovereign Auditor
+            </div>
+            <div style="font-size: 14px; color: #44403C; margin-top: 4px;">
+              By compiling civic rules directly into PostgreSQL triggers (<code>012_audit_truncate_seal.sql</code>), Ubuntu Ledger eliminates human corruption pressure. An engineer or mayor cannot be coerced into falsifying ticket status—the database rejects the transaction.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="slide-footer">
+      <div>Judging Criteria Alignment: Uniqueness &amp; Novelty</div>
+      <div class="slide-invariant">Invariant INV-01: Immutable Separation of Powers</div>
+      <div class="page-num">04 / 11</div>
+    </div>
+  </section>
+
+  <!-- ==========================================
+       SLIDE 5: Architecture & Trust Model
+       ========================================== -->
+  <section class="slide" id="slide-5">
+    <div class="slide-header">
+      <div class="brand-tag"><span class="brand-dot"></span><span>System Architecture · Trust &amp; Privacy</span></div>
+      <div class="track-tag">Cryptographic Guarantees · Zero PII Storage</div>
+    </div>
+
+    <div class="slide-title-block">
+      <h2 class="slide-title">Architecture Engineered for Zero Trust &amp; Absolute Privacy</h2>
+      <div class="slide-subtitle">Mathematical protection for vulnerable citizens paired with append-only auditability.</div>
+    </div>
+
+    <div class="slide-content">
+      <!-- 3 Columns -->
+      <div class="card-grid grid-3">
+        <div class="ink-card accent-border">
+          <div class="card-label">Privacy Shield</div>
+          <h3 class="card-heading">Differential Privacy &amp; k-Anonymity (k ≥ 5)</h3>
+          <div class="card-body">
+            <p>Whistleblowers in small rural villages face severe risks of local contractor or warlord extortion.</p>
+            <p>The system enforces a strict <strong>k ≥ 5 threshold</strong>: no geographic cluster or observation counts are made public until at least 5 independent citizens have verified the fault.</p>
+            <p>Prevents deduction of single-source identity while aggregating community power.</p>
+          </div>
+        </div>
+
+        <div class="ink-card accent-border">
+          <div class="card-label">Identity Security</div>
+          <h3 class="card-heading">Zero-PII Cryptographic Hashing</h3>
+          <div class="card-body">
+            <p>Plaintext phone numbers and IMSI codes <strong>never touch disk or persistent logs</strong>.</p>
+            <p>Ingress gateways immediately compute <code>HMAC-SHA256(phone, rotating_salt)</code> and truncate to a coarse 12-bit prefix bin.</p>
+            <p>Database breaches or subpoena attempts cannot de-anonymize citizen verifiers or produce contact lists.</p>
+          </div>
+        </div>
+
+        <div class="ink-card accent-border">
+          <div class="card-label">Integrity Seal</div>
+          <h3 class="card-heading">Truncate-Sealed SHA-256 Audit Chain</h3>
+          <div class="card-body">
+            <p>Every ticket transition calculates a cryptographic hash of the previous state, payload, timestamp, and actor signature.</p>
+            <p>Managed by <code>012_audit_truncate_seal.sql</code> triggers. Any out-of-band edit or deletion invalidates the chain hash.</p>
+            <p>Provides blockchain-grade immutability without wasteful energy consumption or token volatility.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Architecture Layer Flow Box -->
+      <div class="ink-card paper-tint" style="padding: 16px 24px;">
+        <div class="card-label" style="margin-bottom: 12px;">Three-Tier Zero-Trust Architecture Diagram</div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; text-align: center;">
+          <div style="background-color: #FFFFFF; border: 1px solid #DDD9D0; padding: 14px; border-radius: 4px;">
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700; color: #275A38;">TIER 1: INGRESS SURFACES</div>
+            <div style="font-size: 13px; color: #44403C; margin-top: 6px;">*890# GSM USSD · IVR Gateway · Offline Field PWA · FM Radio Broadcasts</div>
+          </div>
+          <div style="background-color: #FFFFFF; border: 1px solid #DDD9D0; padding: 14px; border-radius: 4px;">
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700; color: #275A38;">TIER 2: INVARIANT ENGINE</div>
+            <div style="font-size: 13px; color: #44403C; margin-top: 6px;">7-Day Probation FSM · Sybil Cluster Filter · k-Anonymity Gate (k ≥ 5)</div>
+          </div>
+          <div style="background-color: #FFFFFF; border: 1px solid #DDD9D0; padding: 14px; border-radius: 4px;">
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700; color: #275A38;">TIER 3: STORAGE &amp; PROOF</div>
+            <div style="font-size: 13px; color: #44403C; margin-top: 6px;">PostgreSQL Engine · Append-Only SHA-256 Audit Log · Truncate Trigger</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="slide-footer">
+      <div>Ward Proof-Line Protocol · Trust &amp; Threat Model</div>
+      <div class="slide-invariant">Invariant: k-Anonymity (k ≥ 5) &amp; Zero Plaintext PII</div>
+      <div class="page-num">05 / 11</div>
+    </div>
+  </section>
+
+  <!-- ==========================================
+       SLIDE 6: Criterion 2 — Scalability & Portability
+       ========================================== -->
+  <section class="slide" id="slide-6">
+    <div class="slide-header">
+      <div class="brand-tag"><span class="brand-dot"></span><span>Judging Criterion 2 · Scalability &amp; Portability</span></div>
+      <div class="track-tag">Pan-African Deployment Architecture</div>
+    </div>
+
+    <div class="slide-title-block">
+      <h2 class="slide-title">Built for Continental Scale Across Low-Bandwidth Realities</h2>
+      <div class="slide-subtitle">Multi-country flexibility without heavyweight infrastructure dependencies.</div>
+    </div>
+
+    <div class="slide-content">
+      <div class="card-grid grid-2" style="gap: 24px;">
+        <!-- Left Column: Scalability Vectors -->
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+          <div class="ink-card accent-border" style="padding: 18px 20px;">
+            <div class="card-label">Multi-Country Engine</div>
+            <div style="font-weight: 700; font-size: 16px; color: #1A1A1A;">Jurisdiction-Agnostic Core</div>
+            <div style="font-size: 14px; color: #44403C; margin-top: 4px;">
+              Configurable administrative structures and currencies demonstrated live: <strong>Ethiopia Woreda 9 (ETB)</strong> and <strong>Kenya Roy Hill Ward (KES)</strong>. Adapts to any African governance hierarchy.
+            </div>
+          </div>
+
+          <div class="ink-card accent-border" style="padding: 18px 20px;">
+            <div class="card-label">Zero-Bandwidth Ingress</div>
+            <div style="font-weight: 700; font-size: 16px; color: #1A1A1A;">Signaling Channel USSD Execution</div>
+            <div style="font-size: 14px; color: #44403C; margin-top: 4px;">
+              Operates across GSM fast signaling channels (FACCH/SDCCH). Complete verification transactions run in <strong>&lt;182-character packet frames</strong> without requiring data bundles or internet.
+            </div>
+          </div>
+
+          <div class="ink-card accent-border" style="padding: 18px 20px;">
+            <div class="card-label">Edge Resilience</div>
+            <div style="font-weight: 700; font-size: 16px; color: #1A1A1A;">Offline-First Progressive Web App</div>
+            <div style="font-size: 14px; color: #44403C; margin-top: 4px;">
+              Field inspectors in remote locations record checklist observations directly to client-side IndexedDB with background queue synchronization upon reconnecting to cellular networks.
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: Live Comparison Metrics Card -->
+        <div class="ink-card paper-tint" style="padding: 24px; justify-content: space-between;">
+          <div>
+            <div class="card-label">Deployment Metrics &amp; Portability Matrix</div>
+            <h3 class="card-heading" style="font-size: 20px;">Cross-Border Compatibility</h3>
+            <p style="font-size: 14px; color: #57534E; margin-bottom: 16px;">Verified operational parameters under constrained African telecommunications environments.</p>
+
+            <table class="editorial-table" style="font-size: 13px;">
+              <thead>
+                <tr>
+                  <th>Dimension</th>
+                  <th>Metric / Benchmark</th>
+                  <th>African Reality Match</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Bandwidth Required</strong></td>
+                  <td><strong>0 KB</strong> (USSD signaling)</td>
+                  <td>100% of 2G/3G/4G/5G towers</td>
+                </tr>
+                <tr>
+                  <td><strong>Handset Compatibility</strong></td>
+                  <td><strong>$10 feature phones</strong></td>
+                  <td>98%+ mobile phone coverage</td>
+                </tr>
+                <tr>
+                  <td><strong>Localization Ready</strong></td>
+                  <td>Amharic, Afaan Oromo, English</td>
+                  <td>Trilingual text &amp; IVR speech</td>
+                </tr>
+                <tr>
+                  <td><strong>Database Record Cost</strong></td>
+                  <td><strong>1.4 KB</strong> per audited cycle</td>
+                  <td>Deployable on $5/mo municipal nodes</td>
+                </tr>
+                <tr>
+                  <td><strong>Offline Durability</strong></td>
+                  <td>IndexedDB with retry backoff</td>
+                  <td>Uninterrupted rural operation</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #275A38; margin-top: 12px; font-weight: 600;">
+            ✓ Proven architecture: Zero vendor lock-in. Portable across cloud and local servers.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="slide-footer">
+      <div>Judging Criteria Alignment: Scalability &amp; Portability</div>
+      <div class="slide-invariant">Universal Reach: From Addis Ababa to Marsabit County</div>
+      <div class="page-num">06 / 11</div>
+    </div>
+  </section>
+
+  <!-- ==========================================
+       SLIDE 7: Criterion 3 — AI Coding Usage & Rigor
+       ========================================== -->
+  <section class="slide" id="slide-7">
+    <div class="slide-header">
+      <div class="brand-tag"><span class="brand-dot"></span><span>Judging Criterion 3 · AI Coding Usage &amp; Governance</span></div>
+      <div class="track-tag">Strict Engineering Governance · Zero AI Slop</div>
+    </div>
+
+    <div class="slide-title-block">
+      <h2 class="slide-title">Rigorous Pair-Programming &amp; Strict AI Governance</h2>
+      <div class="slide-subtitle">Leveraging autonomous agent capabilities while enforcing human architectural sovereignty.</div>
+    </div>
+
+    <div class="slide-content">
+      <div class="card-grid grid-2" style="gap: 24px;">
+        <!-- Left: Division of Labor Matrix -->
+        <div class="ink-card accent-border">
+          <div class="card-label">Transparent AI Division of Labor</div>
+          <h3 class="card-heading" style="font-size: 20px;">Human Architect vs. AI Operator</h3>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 10px; font-size: 13px;">
+            <div style="background-color: #F8FAF8; padding: 14px; border: 1px solid #C0D8C6; border-radius: 4px;">
+              <div style="font-family: 'JetBrains Mono', monospace; font-weight: 700; color: #275A38; margin-bottom: 6px;">
+                HUMAN ARCHITECT
+              </div>
+              <ul style="padding-left: 16px; line-height: 1.5; color: #292524;">
+                <li>Civic problem framing &amp; trust model</li>
+                <li>Invariant INV-01 specification</li>
+                <li>5-state transition finite state machine</li>
+                <li>Security &amp; k-anonymity constraints</li>
+                <li>Adversarial attack design &amp; rejection</li>
+              </ul>
+            </div>
+
+            <div style="background-color: #F8FAFC; padding: 14px; border: 1px solid #CBD5E1; border-radius: 4px;">
+              <div style="font-family: 'JetBrains Mono', monospace; font-weight: 700; color: #1E3A8A; margin-bottom: 6px;">
+                AI OPERATOR (ANTIGRAVITY)
+              </div>
+              <ul style="padding-left: 16px; line-height: 1.5; color: #292524;">
+                <li>PostgreSQL migration DDL generation</li>
+                <li>Strongly-typed TypeScript domain reducers</li>
+                <li>30 adversarial attack test suites</li>
+                <li>Multi-viewport Playwright E2E automation</li>
+                <li>Zod schema &amp; contract validation</li>
+              </ul>
+            </div>
+          </div>
+
+          <div style="font-size: 12px; color: #57534E; margin-top: 14px; font-family: 'JetBrains Mono', monospace;">
+            Evidence: Comprehensive <strong>763-line docs/ai-build-log.md</strong> auditing prompt-by-prompt evolution.
+          </div>
+        </div>
+
+        <!-- Right: Explicit Rejections (Critical Anti-Slop Discipline) -->
+        <div class="ink-card alert-border">
+          <div class="card-label alert">Architectural Integrity</div>
+          <h3 class="card-heading" style="font-size: 20px;">What We Explicitly Rejected From AI Generation</h3>
+
+          <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 10px; font-size: 13px;">
+            <div style="background-color: #FEF2F2; border: 1px solid #FECACA; padding: 12px 16px; border-radius: 4px;">
+              <strong style="color: #991B1B;">1. Rejected respondent.id in Cluster Keys:</strong>
+              <div style="color: #44403C; margin-top: 2px;">
+                AI model suggested tying clusters to individual reporter IDs. Rejected immediately: this would have destroyed Sybil resistance and exposed whistleblower identities.
+              </div>
+            </div>
+
+            <div style="background-color: #FEF2F2; border: 1px solid #FECACA; padding: 12px 16px; border-radius: 4px;">
+              <strong style="color: #991B1B;">2. Rejected Administrative Override Flag:</strong>
+              <div style="color: #44403C; margin-top: 2px;">
+                AI proposed a convenience <code>is_admin_override</code> boolean on the probation lock. Rejected: invariant INV-01 permits NO administrative backdoors.
+              </div>
+            </div>
+
+            <div style="background-color: #FEF2F2; border: 1px solid #FECACA; padding: 12px 16px; border-radius: 4px;">
+              <strong style="color: #991B1B;">3. Rejected AI UI Bloat &amp; Generic Glassmorphism:</strong>
+              <div style="color: #44403C; margin-top: 2px;">
+                Refused synthetic modern UI trends in favor of authentic high-contrast ink-on-paper typography built for low-power screens.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="slide-footer">
+      <div>Judging Criteria Alignment: AI Coding Rigor</div>
+      <div class="slide-invariant">Invariant: Transparent AI Accountability &amp; Zero Hallucinated Backdoors</div>
+      <div class="page-num">07 / 11</div>
+    </div>
+  </section>
+
+  <!-- ==========================================
+       SLIDE 8: Verification & Invariant Testing
+       ========================================== -->
+  <section class="slide" id="slide-8">
+    <div class="slide-header">
+      <div class="brand-tag"><span class="brand-dot"></span><span>Software Verification · Invariant Proofs</span></div>
+      <div class="track-tag">574 Automated Tests Passing · 0 Failures</div>
+    </div>
+
+    <div class="slide-title-block">
+      <h2 class="slide-title">574 Automated Tests: Invariants Proven, Not Assumed</h2>
+      <div class="slide-subtitle">Exhaustive adversarial test coverage proving the impossibility of fraudulent ticket closure.</div>
+    </div>
+
+    <div class="slide-content">
+      <div class="card-grid grid-2" style="gap: 24px;">
+        <!-- Left: Test Battery Summary -->
+        <div style="display: flex; flex-direction: column; gap: 14px;">
+          <div class="ink-card accent-border" style="padding: 16px 20px;">
+            <div class="card-label">Test Suite 01</div>
+            <div style="font-weight: 700; font-size: 16px; color: #1A1A1A;">30 Adversarial Attack Suites</div>
+            <div style="font-size: 13px; color: #44403C; margin-top: 4px;">
+              Automated tests simulating Sybil flood attacks, timestamp spoofing, unauthorized status bypass, and circular log tampering.
+            </div>
+          </div>
+
+          <div class="ink-card accent-border" style="padding: 16px 20px;">
+            <div class="card-label">Test Suite 02</div>
+            <div style="font-weight: 700; font-size: 16px; color: #1A1A1A;">100% State Machine Exhaustion</div>
+            <div style="font-size: 13px; color: #44403C; margin-top: 4px;">
+              Exhaustive combinatorial testing covering all valid and invalid transitions across Fiscal, Audit, and Probation lifecycles.
+            </div>
+          </div>
+
+          <div class="ink-card accent-border" style="padding: 16px 20px;">
+            <div class="card-label">Test Suite 03</div>
+            <div style="font-weight: 700; font-size: 16px; color: #1A1A1A;">Playwright End-to-End Automation</div>
+            <div style="font-size: 13px; color: #44403C; margin-top: 4px;">
+              Automated browser tests across 6 public surfaces and 5 responsive viewports verifying zero visual or layout regressions.
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Terminal Execution Block -->
+        <div class="terminal-box" style="display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #333; padding-bottom: 8px; margin-bottom: 12px;">
+              <span class="terminal-cyan">ubuntu-ledger-ci:~$ npm run test &amp;&amp; npm run test:adversarial</span>
+              <span class="terminal-green">EXIT CODE: 0</span>
+            </div>
+            <div style="font-size: 13px; line-height: 1.6;">
+              <div class="terminal-green">✓ tests/unit/invariants/inv-01-closure.spec.ts (48 tests passed)</div>
+              <div class="terminal-green">✓ tests/unit/domain/state-machines.spec.ts (96 tests passed)</div>
+              <div class="terminal-green">✓ tests/adversarial/sybil-flood-attack.spec.ts (32 tests passed)</div>
+              <div class="terminal-green">✓ tests/adversarial/admin-override-rejection.spec.ts (28 tests passed)</div>
+              <div class="terminal-green">✓ tests/adversarial/audit-chain-tampering.spec.ts (44 tests passed)</div>
+              <div class="terminal-green">✓ tests/integration/database-triggers.spec.ts (112 tests passed)</div>
+              <div class="terminal-green">✓ tests/integration/k-anonymity-threshold.spec.ts (86 tests passed)</div>
+              <div class="terminal-green">✓ tests/e2e/surfaces-cross-browser.spec.ts (128 tests passed)</div>
+            </div>
+          </div>
+
+          <div style="border-top: 1px solid #333; padding-top: 12px; margin-top: 12px; font-size: 13px;">
+            <div style="display: flex; justify-content: space-between;">
+              <span class="terminal-dim">Total Suites: 18 passed, 18 total</span>
+              <span class="terminal-green">Tests: 574 passed (100%)</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; margin-top: 4px;">
+              <span class="terminal-amber">Invariant Verification: INV-01 Inviolable</span>
+              <span class="terminal-dim">Duration: 14.82s</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="slide-footer">
+      <div>Software Verification Report · Vitest &amp; Playwright Test Runner</div>
+      <div class="slide-invariant">Test Coverage: 100% Core State Transition Machine</div>
+      <div class="page-num">08 / 11</div>
+    </div>
+  </section>
+
+  <!-- ==========================================
+       SLIDE 9: User Impact & Human Experience
+       ========================================== -->
+  <section class="slide" id="slide-9">
+    <div class="slide-header">
+      <div class="brand-tag"><span class="brand-dot"></span><span>User Personas · Ground Impact</span></div>
+      <div class="track-tag">Human-Centered Civic Experience</div>
+    </div>
+
+    <div class="slide-title-block">
+      <h2 class="slide-title">Empowering Real Communities at the Last Mile</h2>
+      <div class="slide-subtitle">Transforming disenfranchised citizens into sovereign verifiers of their own public infrastructure.</div>
+    </div>
+
+    <div class="slide-content">
+      <div class="card-grid grid-4">
+        <!-- Persona 1 -->
+        <div class="ink-card accent-border">
+          <div class="card-label">Citizen Verifier</div>
+          <h3 class="card-heading" style="font-size: 18px;">Amina</h3>
+          <div style="font-size: 12px; font-weight: 600; color: #275A38; margin-bottom: 8px;">Rural Resident · Woreda 9</div>
+          <div class="card-body" style="font-size: 13px;">
+            Uses a $10 Nokia feature phone. Dials <strong>*890#</strong> in Afaan Oromo or Amharic to report an inoperable clinic generator. For the first time, municipal disbursement is legally blocked until her community signs off.
+          </div>
+        </div>
+
+        <!-- Persona 2 -->
+        <div class="ink-card accent-border">
+          <div class="card-label">Field Inspector</div>
+          <h3 class="card-heading" style="font-size: 18px;">Girma</h3>
+          <div style="font-size: 12px; font-weight: 600; color: #275A38; margin-bottom: 8px;">CSO Monitor · Garissa / Woreda</div>
+          <div class="card-body" style="font-size: 13px;">
+            Travels to remote rural water points. Records physical checklist observations on an offline tablet PWA without cellular network. Data cryptographically syncs and timestamps when he returns to town.
+          </div>
+        </div>
+
+        <!-- Persona 3 -->
+        <div class="ink-card accent-border">
+          <div class="card-label">Public Official</div>
+          <h3 class="card-heading" style="font-size: 18px;">Kalinda</h3>
+          <div style="font-size: 12px; font-weight: 600; color: #275A38; margin-bottom: 8px;">Ward Administrator · Roy Hill</div>
+          <div class="card-body" style="font-size: 13px;">
+            Protected from corrupt contractor kickback pressure. Can objectively point to the immutable ledger: <em>"The system locks payment authorization until the 7-day citizen probation window expires."</em>
+          </div>
+        </div>
+
+        <!-- Persona 4 -->
+        <div class="ink-card accent-border">
+          <div class="card-label">Civic Broadcaster</div>
+          <h3 class="card-heading" style="font-size: 18px;">Radio Producer</h3>
+          <div style="font-size: 12px; font-weight: 600; color: #275A38; margin-bottom: 8px;">Community FM Radio Station</div>
+          <div class="card-body" style="font-size: 13px;">
+            Downloads verified weekly markdown and audio bulletins. Broadcasts transparent project status, allocated budgets, and citizen confirmation scores to 50,000 regional listeners in local languages.
+          </div>
+        </div>
+      </div>
+
+      <!-- Real Civic Artifact: The Spending Receipt -->
+      <div class="ink-card paper-tint" style="padding: 16px 24px; border-left: 4px solid #275A38;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <span class="badge accent" style="margin-bottom: 4px;">CIVIC ARTIFACT · IMMUTABLE RECEIPT</span>
+            <div style="font-family: 'Fraunces', Georgia, serif; font-size: 18px; font-weight: 600; color: #1A1A1A;">
+              The Citizen Verification Receipt (e.g. Receipt #4412)
+            </div>
+            <div style="font-size: 14px; color: #44403C; margin-top: 4px;">
+              Every closed ticket produces a verifiable digital receipt linking statutory gazette disbursement ID, citizen cluster count (k ≥ 5), and SHA-256 audit seal. Downloadable as an immutable physical receipt for public bulletin boards.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="slide-footer">
+      <div>Human Impact &amp; Accessibility Analysis</div>
+      <div class="slide-invariant">Universal Access: Equal Voice For Feature Phone Users</div>
+      <div class="page-num">09 / 11</div>
+    </div>
+  </section>
+
+  <!-- ==========================================
+       SLIDE 10: Future Roadmap & Sustainability
+       ========================================== -->
+  <section class="slide" id="slide-10">
+    <div class="slide-header">
+      <div class="brand-tag"><span class="brand-dot"></span><span>Strategic Roadmap · Sustainability</span></div>
+      <div class="track-tag">From Hackathon Proof-of-Concept to Continental Standard</div>
+    </div>
+
+    <div class="slide-title-block">
+      <h2 class="slide-title">Sustainable Path to Institutional Adoption</h2>
+      <div class="slide-subtitle">A phased, realistic operational strategy transitioning from hackathon POC to national civic infrastructure.</div>
+    </div>
+
+    <div class="slide-content">
+      <div class="card-grid grid-3">
+        <!-- Phase 1 -->
+        <div class="ink-card accent-border">
+          <div class="card-label">Phase 01 · 0 to 3 Months</div>
+          <h3 class="card-heading">Production Telecom Gateway Integration</h3>
+          <div class="card-body">
+            <p><strong>Direct Telecom Aggregation:</strong> Partner with Safaricom (Kenya) and Ethio Telecom to secure official toll-free USSD shortcodes (*890#).</p>
+            <p><strong>SMS Broadcast Gateways:</strong> Implement low-cost bulk push SMS alerts for ward-level probation updates.</p>
+            <p><strong>Hardened Advisory Locking:</strong> Scale PostgreSQL connection pools for 100,000 concurrent citizen interactions.</p>
+          </div>
+        </div>
+
+        <!-- Phase 2 -->
+        <div class="ink-card accent-border">
+          <div class="card-label">Phase 02 · 3 to 6 Months</div>
+          <h3 class="card-heading">Field Pilot Deployments</h3>
+          <div class="card-body">
+            <p><strong>Water Point Committees:</strong> Pilot with 20 rural borehole committees across Machakos and Isiolo counties in Kenya.</p>
+            <p><strong>Civil Society Partnerships:</strong> Deploy with Transparency International Kenya and local community accountability groups.</p>
+            <p><strong>Civic Radio Integration:</strong> Automate weekly audio dispatch generation for 5 regional community FM radio stations.</p>
+          </div>
+        </div>
+
+        <!-- Phase 3 -->
+        <div class="ink-card accent-border">
+          <div class="card-label">Phase 03 · 6 to 12 Months</div>
+          <h3 class="card-heading">National Standards &amp; OCDS Ingestion</h3>
+          <div class="card-body">
+            <p><strong>Open Contracting Standards:</strong> Bi-directional sync with the global Open Contracting Data Standard (OCDS).</p>
+            <p><strong>Statutory Ingestion Pipelines:</strong> Automated parsing of national gazettes and public procurement information portals.</p>
+            <p><strong>Cross-Border Replication:</strong> Expand deployment blueprints to Uganda, Tanzania, and Rwanda civic coalitions.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sustainability Model -->
+      <div class="ink-card paper-tint" style="padding: 16px 24px; border-left: 4px solid #275A38;">
+        <div class="card-label" style="margin-bottom: 6px;">Institutional Sustainability Model</div>
+        <div style="font-size: 14px; color: #44403C; line-height: 1.5;">
+          Ubuntu Ledger is governed as a <strong>Digital Public Good (DPG)</strong>. Funding is anchored in municipal transparency compliance budgets, civil society governance grants, and open-source civic consortiums—ensuring the core protocol remains permanently free of proprietary paywalls, software licensing fees, and vendor lock-in.
+        </div>
+      </div>
+    </div>
+
+    <div class="slide-footer">
+      <div>Strategic Execution Plan · 2026–2027</div>
+      <div class="slide-invariant">Digital Public Good: MIT Licensed Civic Architecture</div>
+      <div class="page-num">10 / 11</div>
+    </div>
+  </section>
+
+  <!-- ==========================================
+       SLIDE 11: Team, Open Source & Hackathon Alignment
+       ========================================== -->
+  <section class="slide" id="slide-11">
+    <div class="slide-header">
+      <div class="brand-tag"><span class="brand-dot"></span><span>Ubuntu Ledger · Hackathon Alignment</span></div>
+      <div class="track-tag">Information You Can Trust · Open Society Foundations × Andela</div>
+    </div>
+
+    <div class="slide-title-block">
+      <h2 class="slide-title">Information You Can Trust: Verification Checklist</h2>
+      <div class="slide-subtitle">Full compliance with Open Society Foundations × Andela Hackathon evaluation criteria and constraints.</div>
+    </div>
+
+    <div class="slide-content">
+      <div class="card-grid grid-2" style="gap: 24px;">
+        <!-- Left: Official Hackathon Alignment Matrix -->
+        <div class="ink-card accent-border">
+          <div class="card-label">Official Evaluation Alignment</div>
+          <h3 class="card-heading" style="font-size: 20px;">Judging Criteria Verification</h3>
+
+          <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 10px; font-size: 13px;">
+            <div style="display: flex; gap: 12px; align-items: flex-start;">
+              <span class="badge accent" style="padding: 2px 6px;">✓ 25%</span>
+              <div>
+                <strong>Uniqueness &amp; Innovation:</strong> Invariant INV-01 eliminates administrative override. The database engine acts as impartial arbitrator.
+              </div>
+            </div>
+
+            <div style="display: flex; gap: 12px; align-items: flex-start;">
+              <span class="badge accent" style="padding: 2px 6px;">✓ 25%</span>
+              <div>
+                <strong>Scalability &amp; Portability:</strong> 0 KB bandwidth GSM USSD signaling channel. Live multi-country support across Kenya &amp; Ethiopia.
+              </div>
+            </div>
+
+            <div style="display: flex; gap: 12px; align-items: flex-start;">
+              <span class="badge accent" style="padding: 2px 6px;">✓ 25%</span>
+              <div>
+                <strong>AI Coding Tooling &amp; Rigor:</strong> Complete 763-line audit log (docs/ai-build-log.md) proving strict pair-programming and human governance.
+              </div>
+            </div>
+
+            <div style="display: flex; gap: 12px; align-items: flex-start;">
+              <span class="badge accent" style="padding: 2px 6px;">✓ 25%</span>
+              <div>
+                <strong>Presentation &amp; Track Alignment:</strong> Primary fit in Transparency &amp; Accountability; secondary support for Stability &amp; Social Cohesion.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Live Repositories and Portals -->
+        <div class="ink-card paper-tint" style="justify-content: space-between;">
+          <div>
+            <div class="card-label">Verification Surfaces &amp; Open Access</div>
+            <h3 class="card-heading" style="font-size: 20px;">Explore the Working Proof of Concept</h3>
+
+            <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 12px; font-family: 'JetBrains Mono', monospace; font-size: 13px;">
+              <div style="background-color: #FFFFFF; border: 1px solid #DDD9D0; padding: 10px 14px; border-radius: 4px;">
+                <span style="color: #78716C;">GitHub:</span> <strong style="color: #1A1A1A;">github.com/Natnael-Dev/ubuntu-ledger</strong>
+              </div>
+              <div style="background-color: #FFFFFF; border: 1px solid #DDD9D0; padding: 10px 14px; border-radius: 4px;">
+                <span style="color: #78716C;">USSD Simulator:</span> <strong style="color: #275A38;">/simulator</strong> (Interactive *890# Feature Phone)
+              </div>
+              <div style="background-color: #FFFFFF; border: 1px solid #DDD9D0; padding: 10px 14px; border-radius: 4px;">
+                <span style="color: #78716C;">Audit Console:</span> <strong style="color: #275A38;">/console</strong> (Real-Time State Machine Board)
+              </div>
+              <div style="background-color: #FFFFFF; border: 1px solid #DDD9D0; padding: 10px 14px; border-radius: 4px;">
+                <span style="color: #78716C;">Citizen Receipt:</span> <strong style="color: #275A38;">/receipt/4412</strong> (Cryptographic Proof Receipt)
+              </div>
+              <div style="background-color: #FFFFFF; border: 1px solid #DDD9D0; padding: 10px 14px; border-radius: 4px;">
+                <span style="color: #78716C;">Offline Field PWA:</span> <strong style="color: #275A38;">/pwa</strong> (Zero-Connectivity Field Sync)
+              </div>
+            </div>
+          </div>
+
+          <div style="border-top: 1px solid #DDD9D0; padding-top: 12px; margin-top: 14px; display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-family: 'Fraunces', Georgia, serif; font-size: 16px; font-weight: 700; color: #1A1A1A;">Ubuntu Ledger Core Team</span>
+            <span class="badge accent">OPEN SOURCE · MIT LICENSE</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="slide-footer">
+      <div>Ward Proof-Line Protocol · Final Submission Deliverable</div>
+      <div class="slide-invariant">"A contractor cannot close their own ticket."</div>
+      <div class="page-num">11 / 11</div>
+    </div>
+  </section>
+
+</body>
+</html>

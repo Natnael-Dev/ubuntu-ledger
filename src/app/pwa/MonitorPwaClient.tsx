@@ -403,61 +403,9 @@ export function MonitorPwaClient() {
                 data-testid="btn-force-sync-error"
                 onClick={handleForceSyncError}
                 className="px-3 py-2 text-xs font-mono border border-red-300 text-red-800 bg-white hover:bg-red-50 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-red-800"
-                title="Inject a simulated sync failure to test error recovery (Audit #103)"
+                title="Demo tool: injects a synthetic network failure to demonstrate how the offline outbox handles sync errors and recovers"
               >
-                ⚠ Simulate Sync Error (Audit #103)
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* ─── Demo Credentials Card ─── */}
-        <div
-          className="border-2 border-amber-400 bg-amber-50 rounded-2xl p-5 sm:p-6 shadow-sm"
-          role="note"
-          aria-label="Demo credentials for testing"
-        >
-          <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
-            <div className="space-y-3 flex-1 min-w-0">
-              <div className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-amber-500 flex-shrink-0" aria-hidden="true" />
-                <p className="font-mono text-[10px] uppercase tracking-widest text-amber-800 font-bold">
-                  Demo Mode · Pre-loaded Test Credentials
-                </p>
-              </div>
-              <p className="text-xs text-amber-900 font-sans leading-relaxed">
-                Use the values below to test this form. The fields are pre-filled — just click{' '}
-                <strong>Submit Field Observation</strong> to see the offline queue in action.
-              </p>
-              <div className="space-y-2">
-                <div className="bg-white border border-amber-200 rounded-xl px-3.5 py-2.5">
-                  <div className="text-[10px] font-mono uppercase tracking-wider text-amber-700 font-bold mb-0.5">
-                    Inspection Task ID (Task #4412)
-                  </div>
-                  <code className="text-xs font-mono text-slate-800 break-all select-all">
-                    00000000-0000-4000-a000-000000000300
-                  </code>
-                </div>
-                <div className="bg-white border border-amber-200 rounded-xl px-3.5 py-2.5">
-                  <div className="text-[10px] font-mono uppercase tracking-wider text-amber-700 font-bold mb-0.5">
-                    Monitor Phone Hash (Amina · SHA-256 · zero raw PII)
-                  </div>
-                  <code className="text-xs font-mono text-slate-800 break-all select-all leading-relaxed">
-                    435eef566c8beff9f57f26e9072010466319187fa2f673b636e44084e913ef65
-                  </code>
-                </div>
-              </div>
-            </div>
-            <div className="flex-shrink-0">
-              <button
-                type="button"
-                onClick={() => {
-                  setTaskId(DEFAULT_TASK_ID);
-                  setPhoneHash(DEFAULT_PHONE_HASH);
-                }}
-                className="px-4 py-2.5 min-h-[44px] text-xs font-mono font-bold bg-amber-500 text-white hover:bg-amber-600 active:scale-[0.98] rounded-xl transition-all shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-amber-700 whitespace-nowrap"
-              >
-                ↺ Use Demo Values
+                ⚠ Test: Simulate Sync Failure
               </button>
             </div>
           </div>
@@ -576,6 +524,44 @@ export function MonitorPwaClient() {
             </p>
           </div>
 
+          {/* ─── Demo Credentials (inside form — first thing user sees) ─── */}
+          <div
+            className="border-2 border-amber-400 bg-amber-50 rounded-2xl p-4 sm:p-5 shadow-sm"
+            role="note"
+            aria-label="Demo credentials for testing"
+          >
+            <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+              <div className="space-y-2.5 flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-amber-500 flex-shrink-0" aria-hidden="true" />
+                  <p className="font-mono text-[10px] uppercase tracking-widest text-amber-800 font-bold">
+                    Demo Mode · Pre-loaded Test Credentials
+                  </p>
+                </div>
+                <p className="text-xs text-amber-900 font-sans leading-relaxed">
+                  Both fields are pre-filled. Click <strong>Submit Field Observation</strong> to test the offline queue, or use the reset button if you cleared them.
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <div className="bg-white border border-amber-200 rounded-xl px-3 py-2">
+                    <div className="text-[10px] font-mono uppercase tracking-wider text-amber-700 font-bold mb-0.5">Task ID (Task #4412)</div>
+                    <code className="text-[11px] font-mono text-slate-800 break-all select-all">00000000-0000-4000-a000-000000000300</code>
+                  </div>
+                  <div className="bg-white border border-amber-200 rounded-xl px-3 py-2">
+                    <div className="text-[10px] font-mono uppercase tracking-wider text-amber-700 font-bold mb-0.5">Monitor Hash (Amina · SHA-256)</div>
+                    <code className="text-[11px] font-mono text-slate-800 break-all select-all leading-relaxed">435eef566c8beff9f57f26e9072010466319187fa2f673b636e44084e913ef65</code>
+                  </div>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => { setTaskId(DEFAULT_TASK_ID); setPhoneHash(DEFAULT_PHONE_HASH); }}
+                className="flex-shrink-0 px-4 py-2.5 min-h-[44px] text-xs font-mono font-bold bg-amber-500 text-white hover:bg-amber-600 active:scale-[0.98] rounded-xl transition-all shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-amber-700 whitespace-nowrap"
+              >
+                ↺ Reset to Demo Values
+              </button>
+            </div>
+          </div>
+
           {/* Audit #104: Thickened 5-Step Form Progress Bar for Outdoor Visibility */}
           <div
             aria-labelledby="progress-bar-heading"
@@ -660,14 +646,15 @@ export function MonitorPwaClient() {
                 />
                 <p id="task-id-hint" className={`text-[10px] mt-1 font-mono ${taskId.length > 0 && !isTaskIdValid ? 'text-red-600' : 'text-slate-500'}`}>
                   {taskId.length > 0 && !isTaskIdValid
-                    ? '✗ Must be a valid UUID v4 (e.g. 00000000-0000-4000-a000-...)'
-                    : 'UUID v4 task identifier from the inspection ledger'}
+                    ? '✗ Must be a valid UUID v4 — e.g. 00000000-0000-4000-a000-000000000300 (Task #4412)'
+                    : 'UUID v4 task identifier — demo value: 00000000-0000-4000-a000-000000000300'}
                 </p>
               </div>
 
               <div>
                 <label htmlFor="phone-hash-input" className="block text-[11px] font-mono text-slate-600 uppercase tracking-wider mb-1 font-semibold">
                   Monitor Phone Hash
+                  <span className="ml-1.5 text-[9px] normal-case font-normal text-slate-400">(auto-generated in live system)</span>
                 </label>
                 <input
                   id="phone-hash-input"
@@ -688,7 +675,7 @@ export function MonitorPwaClient() {
                     ? '✗ ZERO-PII: Raw phone numbers are strictly rejected. Use SHA-256 hash.'
                     : phoneHash.length > 0 && !isPhoneHashValid
                     ? '✗ Must be exactly 64 hexadecimal characters (SHA-256 hex digest)'
-                    : '64-character SHA-256 hex hash of the monitor MSISDN (zero raw phone numbers)'}
+                    : 'In the live system your app generates this automatically. For this demo, the value is pre-filled above.'}
                 </p>
               </div>
             </div>

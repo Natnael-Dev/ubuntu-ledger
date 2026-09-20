@@ -1,4 +1,4 @@
-﻿import React from "react";
+import React from "react";
 import Link from "next/link";
 import { EmptyState } from "@/components/ui/EmptyState";
 
@@ -31,11 +31,11 @@ export default function NotFound() {
               <span className="text-[10px] text-[var(--ink-soft)]">Health Post Overhaul</span>
             </Link>
             <Link
-              href="/services/ET-ID-REPLACE"
+              href="/services/ET-CIVIL-ID"
               className="p-2 border border-[var(--rule)] hover:border-[var(--ink)] bg-[var(--paper-warm)] text-[var(--ink)] flex items-center justify-between"
             >
-              <span>Gazette ET-ID-REPLACE</span>
-              <span className="text-[10px] text-[var(--ink-soft)]">ID Card Replacement</span>
+              <span>ID Card Replacement</span>
+              <span className="text-[10px] text-[var(--ink-soft)]">Fee Divergence Card</span>
             </Link>
             <Link
               href="/console"

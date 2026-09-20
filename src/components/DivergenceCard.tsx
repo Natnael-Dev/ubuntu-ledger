@@ -22,6 +22,12 @@ const SERVICE_NAMES: Record<string, { name: string; amharic?: string; office: st
     amharic: 'የቀበሌ ነዋሪነት መታወቂያ ካርድ እድሳት',
     office: 'Woreda 09 Civil Registry',
   },
+  // Public URL alias — resolves to the same service
+  'ET-CIVIL-ID': {
+    name: 'Kebele Resident ID Card Replacement',
+    amharic: 'የቀበሌ ነዋሪነት መታወቂያ ካርድ እድሳት',
+    office: 'Woreda 09 Civil Registry',
+  },
 };
 
 const DOC_LABELS: Record<string, string> = {

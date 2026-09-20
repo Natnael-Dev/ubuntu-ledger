@@ -118,10 +118,20 @@ export class FixtureStatutoryRepository implements StatutoryRepository {
     reportedAt: vo.reportedAt,
   }));
 
+  // URL-friendly aliases for public-facing codes that look like template placeholders.
+  // Maps <public URL code> → <internal fixture code>. Keeps domain/tests unchanged.
+  private static readonly CODE_ALIASES: Record<string, string> = {
+    'ET-CIVIL-ID': 'ET-ID-REPLACE',
+  };
+
   async getServiceByCode(code: string): Promise<ServiceDomain | null> {
     const normalized = code.trim().toUpperCase();
+    // Resolve any public URL alias to the internal fixture code
+    const resolved =
+      FixtureStatutoryRepository.CODE_ALIASES[normalized] ??
+      normalized;
     const svc = this.services.find(
-      (s) => s.code.toUpperCase() === normalized
+      (s) => s.code.toUpperCase() === resolved
     );
     return svc || null;
   }

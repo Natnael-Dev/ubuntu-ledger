@@ -95,7 +95,7 @@ export default function HomePage() {
   return (
     <div className="bg-[#F8FAFC] min-h-screen text-slate-900 font-sans">
       {/* ─── Hero Section ──────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden border-b border-slate-200/80 bg-white pt-14 pb-18 md:pt-22 md:pb-26">
+      <section className="relative overflow-hidden border-b border-slate-200/80 bg-white pt-16 pb-24 md:pt-24 md:pb-32">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
             {/* Tracked Uppercase Eyebrow with Canonical Brand Icon */}
@@ -129,17 +129,17 @@ export default function HomePage() {
               </p>
             </div>
 
-            {/* Large, Tactile Action Buttons */}
-            <div className="flex flex-wrap items-center gap-4">
+            {/* Large, Tactile Action Buttons with Generous Spacing */}
+            <div className="flex flex-wrap items-center gap-4 pt-2">
               <Link
                 href="/receipt/4412"
-                className="inline-flex items-center justify-center px-8 py-4 rounded-xl text-base font-semibold bg-blue-600 text-white hover:bg-blue-700 active:scale-98 shadow-sm shadow-blue-500/25 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
+                className="inline-flex items-center justify-center px-8 py-4 rounded-xl text-base font-bold bg-blue-600 text-white hover:bg-blue-700 active:scale-98 shadow-md shadow-blue-500/20 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
               >
                 View Verified Receipt
               </Link>
               <Link
                 href="/simulator"
-                className="inline-flex items-center justify-center px-8 py-4 rounded-xl text-base font-semibold bg-white text-slate-800 hover:bg-slate-50 hover:text-slate-950 border border-slate-300 hover:border-slate-400 active:scale-98 transition-all shadow-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
+                className="inline-flex items-center justify-center px-8 py-4 rounded-xl text-base font-bold bg-white text-slate-800 hover:bg-slate-50 hover:text-slate-950 border-2 border-slate-300 hover:border-slate-400 active:scale-98 transition-all shadow-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
               >
                 Feature Phone Simulator
               </Link>

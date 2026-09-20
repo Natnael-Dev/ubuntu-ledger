@@ -50,7 +50,7 @@ const KEYPAD_KEYS: Array<{ key: string; letters: string; ariaLabel: string }> = 
   { key: '8', letters: 'TUV', ariaLabel: 'Digit 8' },
   { key: '9', letters: 'WXYZ', ariaLabel: 'Digit 9' },
   { key: '*', letters: '+ 🔒', ariaLabel: 'Asterisk – Send' },
-  { key: '0', letters: '—', ariaLabel: 'Digit 0' },
+  { key: '0', letters: '🌐', ariaLabel: 'Digit 0' },
   { key: '#', letters: '⇧ 🔔', ariaLabel: 'Hash – End' },
 ];
 
@@ -169,25 +169,34 @@ export function AlcatelHandset({
         </div>
       </div>
 
-      {/* ─── Outer Physical Chassis (Alcatel 1066 Handset Styling) ─── */}
+      {/* ─── Outer Physical Chassis (Realistic Mass-Market Feature Phone Reference) ─── */}
       <div
         data-testid="feature-phone"
-        className="w-full bg-[#1C282E] rounded-[42px] p-4 pt-3.5 pb-6 shadow-2xl shadow-slate-950/50 border-2 border-[#26373F] relative flex flex-col items-center transition-all"
+        className="w-full bg-[#182024] rounded-[46px] p-4 pt-4 pb-6 shadow-2xl shadow-slate-950/60 border-2 border-[#2C3840] relative flex flex-col items-center transition-all"
         style={{
           boxShadow:
-            '0 25px 50px -12px rgba(0, 0, 0, 0.45), inset 0 1px 1px rgba(255, 255, 255, 0.15), inset 0 -2px 4px rgba(0, 0, 0, 0.6)',
+            '0 25px 50px -12px rgba(0, 0, 0, 0.55), inset 0 1px 2px rgba(255, 255, 255, 0.15), inset 0 -3px 6px rgba(0, 0, 0, 0.7)',
         }}
       >
-        {/* Chamfered highlight on top edge */}
-        <div className="w-28 h-1 bg-white/10 rounded-full mb-2 pointer-events-none" />
+        {/* Top Edge Chamfer Highlight */}
+        <div className="w-32 h-1 bg-white/12 rounded-full mb-2 pointer-events-none" />
 
-        {/* Earpiece Speaker Slit */}
-        <div className="w-14 h-2 rounded-full bg-[#0D1417] mb-3 border-b border-white/10 flex items-center justify-center shadow-inner">
-          <div className="w-8 h-0.5 rounded-full bg-[#1F2E35]" />
+        {/* Earpiece Speaker Slit & Front Sensor */}
+        <div className="w-full px-8 flex items-center justify-between mb-3">
+          {/* Ambient Sensor Dot */}
+          <div className="w-2.5 h-2.5 rounded-full bg-[#0D1418] border border-white/10 shadow-inner" />
+
+          {/* Centered Earpiece Slit */}
+          <div className="w-16 h-2 rounded-full bg-[#0A0F12] border-b border-white/15 flex items-center justify-center shadow-inner">
+            <div className="w-10 h-0.5 rounded-full bg-[#202C33]" />
+          </div>
+
+          {/* Front Camera / Dot */}
+          <div className="w-2.5 h-2.5 rounded-full bg-[#0D1418] border border-white/10 shadow-inner" />
         </div>
 
         {/* ─── Screen Bezel & LCD Display Frame ─── */}
-        <div className="w-full bg-[#0A1013] rounded-2xl p-3 border border-[#182328] shadow-inner mb-3">
+        <div className="w-full bg-[#0B0F13] rounded-2xl p-3 border border-[#1A252C] shadow-inner mb-3">
           {/* Inset Retro Olive LCD Screen */}
           <div
             data-testid="lcd-display"
@@ -253,10 +262,10 @@ export function AlcatelHandset({
             </div>
           </div>
 
-          {/* Alcatel Logo Chin (White, signature lowercase wordmark) */}
-          <div className="text-center mt-2">
-            <span className="font-sans font-extrabold text-[11px] tracking-[0.28em] text-slate-100 lowercase">
-              alcatel
+          {/* Feature Phone Brand Chin (Ubuntu Ledger Civic Simulator Branding) */}
+          <div className="text-center mt-2.5">
+            <span className="font-sans font-extrabold text-[10px] tracking-[0.24em] text-slate-300 uppercase">
+              UBUNTU LEDGER
             </span>
           </div>
         </div>
@@ -277,14 +286,14 @@ export function AlcatelHandset({
               —
             </button>
 
-            {/* 5-Way Circular D-Pad */}
-            <div className="w-18 h-16 mx-auto relative bg-[#131D21] rounded-full border border-slate-600/60 shadow-lg flex items-center justify-center p-1">
+            {/* 5-Way Squircle D-Pad (Matching Hardware Reference) */}
+            <div className="w-20 h-16 mx-auto relative bg-[#10161A] rounded-[22px] border-2 border-slate-600/70 shadow-lg flex items-center justify-center p-1">
               {/* Up arrow */}
               <button
                 type="button"
                 aria-label="D-Pad Up"
                 onClick={() => {}}
-                className="absolute top-1 left-1/2 -translate-x-1/2 text-slate-400 text-[9px] hover:text-white"
+                className="absolute top-1 left-1/2 -translate-x-1/2 text-slate-400 text-[10px] hover:text-white"
               >
                 ▲
               </button>
@@ -293,7 +302,7 @@ export function AlcatelHandset({
                 type="button"
                 aria-label="D-Pad Down"
                 onClick={() => {}}
-                className="absolute bottom-1 left-1/2 -translate-x-1/2 text-slate-400 text-[9px] hover:text-white"
+                className="absolute bottom-1 left-1/2 -translate-x-1/2 text-slate-400 text-[10px] hover:text-white"
               >
                 ▼
               </button>
@@ -302,7 +311,7 @@ export function AlcatelHandset({
                 type="button"
                 aria-label="D-Pad Left"
                 onClick={() => {}}
-                className="absolute left-1.5 top-1/2 -translate-y-1/2 text-slate-400 text-[9px] hover:text-white"
+                className="absolute left-1.5 top-1/2 -translate-y-1/2 text-slate-400 text-[10px] hover:text-white"
               >
                 ◀
               </button>
@@ -311,32 +320,32 @@ export function AlcatelHandset({
                 type="button"
                 aria-label="D-Pad Right"
                 onClick={() => {}}
-                className="absolute right-1.5 top-1/2 -translate-y-1/2 text-slate-400 text-[9px] hover:text-white"
+                className="absolute right-1.5 top-1/2 -translate-y-1/2 text-slate-400 text-[10px] hover:text-white"
               >
                 ▶
               </button>
-              {/* Center OK Button */}
+              {/* Center Squircle OK Button */}
               <button
                 type="button"
                 aria-label="D-Pad Center OK"
                 onClick={() => {
                   if (!sessionActive) onDial();
                 }}
-                className="w-8 h-8 bg-[#2B3E46] hover:bg-[#364C56] active:bg-[#182327] active:scale-95 rounded-full border border-slate-400/30 flex items-center justify-center text-[10px] font-bold text-white shadow-inner"
+                className="w-9 h-8 bg-[#27363D] hover:bg-[#34464F] active:bg-[#1A252A] active:scale-95 rounded-[12px] border border-slate-400/40 flex items-center justify-center text-[10px] font-extrabold text-white shadow-inner"
               >
                 OK
               </button>
             </div>
 
-            {/* Right Softkey (Back) */}
+            {/* Right Softkey (Back / Message) */}
             <button
               type="button"
               data-testid="btn-back"
               aria-label="Back button"
               onClick={onBack}
-              className="h-8 bg-[#23333B] hover:bg-[#2C3F48] active:bg-[#182328] active:translate-y-0.5 text-slate-200 text-sm font-bold rounded-xl border-t border-white/15 shadow-sm flex items-center justify-center transition-all cursor-pointer"
+              className="h-8 bg-[#23333B] hover:bg-[#2C3F48] active:bg-[#182328] active:translate-y-0.5 text-slate-200 text-xs font-bold rounded-xl border-t border-white/15 shadow-sm flex items-center justify-center transition-all cursor-pointer"
             >
-              —
+              — / 💬
             </button>
           </div>
 
@@ -381,28 +390,39 @@ export function AlcatelHandset({
           aria-label="Phone keypad"
           className="w-full grid grid-cols-3 gap-2 px-0.5 mb-2.5"
         >
-          {KEYPAD_KEYS.map(({ key, letters, ariaLabel }) => (
-            <button
-              key={key}
-              type="button"
-              data-testid={`key-${key}`}
-              aria-label={ariaLabel}
-              onClick={() => {
-                if (sessionActive) onKeypadPress(key);
-              }}
-              disabled={!sessionActive || loading}
-              className={`h-11 rounded-xl flex flex-col items-center justify-center transition-all border-t border-white/15 shadow-sm ${
-                sessionActive && !loading
-                  ? 'bg-[#2A3C44] hover:bg-[#354C57] active:bg-[#1A252A] active:translate-y-0.5 text-white cursor-pointer'
-                  : 'bg-[#1D292F] text-slate-500 cursor-not-allowed border-transparent'
-              }`}
-            >
-              <span className="text-sm font-bold leading-none">{key}</span>
-              <span className="text-[8px] text-slate-300 font-semibold leading-none mt-1 tracking-wider">
-                {letters}
-              </span>
-            </button>
-          ))}
+          {KEYPAD_KEYS.map(({ key, letters, ariaLabel }) => {
+            const isKey5 = key === '5';
+
+            return (
+              <button
+                key={key}
+                type="button"
+                data-testid={`key-${key}`}
+                aria-label={ariaLabel}
+                onClick={() => {
+                  if (sessionActive) onKeypadPress(key);
+                }}
+                disabled={!sessionActive || loading}
+                className={`h-11 rounded-xl flex flex-col items-center justify-center relative transition-all border-t border-white/15 shadow-sm ${
+                  sessionActive && !loading
+                    ? 'bg-[#2A3C44] hover:bg-[#354C57] active:bg-[#1A252A] active:translate-y-0.5 text-white cursor-pointer'
+                    : 'bg-[#1D292F] text-slate-500 cursor-not-allowed border-transparent'
+                }`}
+              >
+                {/* Physical Tactile Home Nib Bars on Key 5 */}
+                {isKey5 && (
+                  <>
+                    <span className="absolute left-1.5 top-1/2 -translate-y-1/2 w-0.5 h-3 bg-slate-400/40 rounded-full" />
+                    <span className="absolute right-1.5 top-1/2 -translate-y-1/2 w-0.5 h-3 bg-slate-400/40 rounded-full" />
+                  </>
+                )}
+                <span className="text-sm font-bold leading-none">{key}</span>
+                <span className="text-[8px] text-slate-300 font-semibold leading-none mt-1 tracking-wider">
+                  {letters}
+                </span>
+              </button>
+            );
+          })}
         </div>
 
         {/* ─── Direct Text Input Row ─── */}

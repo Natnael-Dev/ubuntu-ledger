@@ -441,16 +441,23 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
                   : 'bg-slate-50/60 text-slate-700 border-slate-200 hover:border-slate-300'
               }`}
             >
-              <div
-                className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 shadow-2xs ${
-                  currentStep === 1
-                    ? 'bg-blue-600 text-white animate-pulse'
-                    : currentStep > 1
-                    ? 'bg-emerald-600 text-white'
-                    : 'bg-slate-200 text-slate-600'
-                }`}
-              >
-                {currentStep > 1 ? '✓' : '1'}
+              <div className="relative shrink-0">
+                <img
+                  src="/personas/amina.jpg"
+                  alt="Amina"
+                  className="w-9 h-9 rounded-full object-cover border border-slate-300 shadow-2xs"
+                />
+                <div
+                  className={`absolute -bottom-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shadow-2xs ${
+                    currentStep === 1
+                      ? 'bg-blue-600 text-white animate-pulse'
+                      : currentStep > 1
+                      ? 'bg-emerald-600 text-white'
+                      : 'bg-slate-200 text-slate-600'
+                  }`}
+                >
+                  {currentStep > 1 ? '✓' : '1'}
+                </div>
               </div>
               <div className="min-w-0">
                 <div className="flex items-center gap-1.5">
@@ -486,16 +493,23 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
                   : 'bg-slate-50/60 text-slate-700 border-slate-200 hover:border-slate-300'
               }`}
             >
-              <div
-                className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 shadow-2xs ${
-                  currentStep === 2
-                    ? 'bg-amber-500 text-white animate-pulse'
-                    : currentStep > 2
-                    ? 'bg-emerald-600 text-white'
-                    : 'bg-slate-200 text-slate-600'
-                }`}
-              >
-                {currentStep > 2 ? '✓' : '2'}
+              <div className="relative shrink-0">
+                <img
+                  src="/personas/girma.jpg"
+                  alt="Girma"
+                  className="w-9 h-9 rounded-full object-cover border border-slate-300 shadow-2xs"
+                />
+                <div
+                  className={`absolute -bottom-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shadow-2xs ${
+                    currentStep === 2
+                      ? 'bg-amber-500 text-white animate-pulse'
+                      : currentStep > 2
+                      ? 'bg-emerald-600 text-white'
+                      : 'bg-slate-200 text-slate-600'
+                  }`}
+                >
+                  {currentStep > 2 ? '✓' : '2'}
+                </div>
               </div>
               <div className="min-w-0">
                 <div className="flex items-center gap-1.5">
@@ -529,14 +543,21 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
                   : 'bg-slate-50/60 text-slate-700 border-slate-200 hover:border-slate-300'
               }`}
             >
-              <div
-                className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 shadow-2xs ${
-                  currentStep === 3
-                    ? 'bg-emerald-600 text-white animate-pulse'
-                    : 'bg-slate-200 text-slate-600'
-                }`}
-              >
-                3
+              <div className="relative shrink-0">
+                <img
+                  src="/personas/kalinda.jpg"
+                  alt="Kalinda"
+                  className="w-9 h-9 rounded-full object-cover border border-slate-300 shadow-2xs"
+                />
+                <div
+                  className={`absolute -bottom-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold shadow-2xs ${
+                    currentStep === 3
+                      ? 'bg-emerald-600 text-white animate-pulse'
+                      : 'bg-slate-200 text-slate-600'
+                  }`}
+                >
+                  3
+                </div>
               </div>
               <div className="min-w-0">
                 <div className="flex items-center gap-1.5">
@@ -614,17 +635,37 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
                   >
                     <div className="flex items-start justify-between w-full">
                       <div className="flex items-center gap-4">
-                        {/* High-Contrast Civic Identity Avatar Badge */}
+                        {/* High-Resolution Circular Persona Photo Avatar */}
                         <div
-                          className={`w-14 h-14 rounded-2xl overflow-hidden shrink-0 border-2 flex items-center justify-center font-extrabold text-base shadow-xs ${
+                          className={`w-14 h-14 rounded-full overflow-hidden shrink-0 border-2 shadow-xs relative flex items-center justify-center font-extrabold text-base ${
+                            isSelected
+                              ? 'border-blue-600 ring-2 ring-blue-400'
+                              : 'border-slate-300'
+                          } ${
                             isAmina
-                              ? 'bg-[#E07A5F] text-white border-amber-200'
+                              ? 'bg-[#E07A5F] text-white'
                               : isGirma
-                              ? 'bg-[#3D405B] text-white border-slate-300'
-                              : 'bg-[#2A4365] text-white border-blue-200'
+                              ? 'bg-[#3D405B] text-white'
+                              : 'bg-[#2A4365] text-white'
                           }`}
                         >
-                          <span>{isAmina ? 'AM' : isGirma ? 'GI' : 'KA'}</span>
+                          <img
+                            src={
+                              isAmina
+                                ? '/personas/amina.jpg'
+                                : isGirma
+                                ? '/personas/girma.jpg'
+                                : '/personas/kalinda.jpg'
+                            }
+                            alt={isAmina ? 'Amina' : isGirma ? 'Girma' : 'Kalinda'}
+                            className="w-full h-full object-cover object-center"
+                            onError={(e) => {
+                              e.currentTarget.style.display = 'none';
+                            }}
+                          />
+                          <span className="absolute -z-10 font-bold text-sm">
+                            {isAmina ? 'AM' : isGirma ? 'GI' : 'KA'}
+                          </span>
                         </div>
 
                         <div>
@@ -816,11 +857,27 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
 
           {/* 1. Human Summary Card */}
           <div className="bg-white border border-slate-200/80 rounded-2xl p-5 sm:p-6 shadow-sm">
-            <div className="flex items-center gap-2 mb-3.5">
-              <span className="text-blue-600 text-lg">👥</span>
-              <h4 className="font-bold text-base text-slate-900">Human Summary</h4>
+            <div className="flex items-center justify-between gap-2 mb-3.5 pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-2">
+                <span className="text-blue-600 text-lg">👥</span>
+                <h4 className="font-bold text-base text-slate-900">Human Summary</h4>
+              </div>
+              <div className="flex items-center gap-2.5">
+                <img
+                  src={
+                    selectedPersona.role === 'primary'
+                      ? '/personas/amina.jpg'
+                      : selectedPersona.role === 'duplicate'
+                      ? '/personas/girma.jpg'
+                      : '/personas/kalinda.jpg'
+                  }
+                  alt={selectedPersona.label}
+                  className="w-8 h-8 rounded-full object-cover border border-slate-300 shadow-2xs"
+                />
+                <span className="text-xs font-bold text-slate-900">{selectedPersona.label.split(' ')[0]}</span>
+              </div>
             </div>
-            <div className="grid grid-cols-2 gap-y-3 gap-x-4 text-xs border-t border-slate-100 pt-3.5">
+            <div className="grid grid-cols-2 gap-y-3 gap-x-4 text-xs pt-1">
               <div>
                 <span className="text-slate-500 block text-xs font-medium">Who</span>
                 <span className="font-bold text-sm text-slate-900">{selectedPersona.label}</span>

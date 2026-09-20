@@ -171,26 +171,26 @@ export default async function ReceiptPage(props: PageProps) {
         }}
       />
       <div className="min-h-screen bg-[var(--paper)] text-[var(--ink)] py-8 px-4 flex flex-col items-center justify-start print:bg-white print:text-black print:p-0">
-        {/* Print trigger bar for demo */}
+        {/* Navigation & Print trigger bar (Agent 7) */}
         <nav
           aria-label="Proof-Line steps"
-          className="print-hide w-full max-w-[560px] mb-4 flex justify-between items-center text-xs text-[var(--ink-soft)] font-mono"
+          className="print-hide w-full max-w-[560px] mb-5 flex justify-between items-center text-xs font-mono"
         >
           <Link
             href="/"
-            className="hover:text-[var(--ink)] hover:underline flex items-center gap-1.5 focus:outline-none focus:ring-1 focus:ring-[var(--ink)] text-xs font-semibold"
+            className="px-3.5 py-2 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-800 font-bold flex items-center gap-1.5 shadow-2xs transition-all active:scale-98"
           >
             ← Overview
           </Link>
-          <div className="flex items-center gap-4">
-            <span aria-current="step" className="font-bold text-[var(--ink)] text-xs">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <span aria-current="step" className="font-bold text-slate-900 text-xs bg-slate-200/70 px-2.5 py-1.5 rounded-xl">
               Step 3: Receipt
             </span>
             <Link
               href="/services/ET-ID-REPLACE"
-              className="inline-flex items-center gap-1 font-mono text-xs text-blue-700 font-semibold hover:underline transition-colors focus:outline-none focus:ring-1 focus:ring-[var(--ink)]"
+              className="px-3.5 py-2 rounded-xl bg-blue-50 border border-blue-200 text-blue-700 font-bold hover:bg-blue-100 flex items-center gap-1 transition-all active:scale-98"
             >
-              Step 4: Divergence
+              <span>Step 4: Divergence</span>
               <span aria-hidden="true">›</span>
             </Link>
             <ReceiptPrintButton />
@@ -358,21 +358,21 @@ export default async function ReceiptPage(props: PageProps) {
             </div>
           </section>
 
-          {/* Prove it Section */}
-          <section className="pt-4 pb-1 print:hidden">
-            <div className="flex items-center gap-2">
+          {/* Prove it Section — Prominent Source Verification Action (Agent 7) */}
+          <section className="pt-5 pb-1 print:hidden">
+            <div className="flex items-center justify-between gap-3 p-3.5 rounded-xl bg-slate-50 border border-slate-200/90 shadow-2xs">
+              <div>
+                <span className="text-xs font-bold text-slate-900 block">Cryptographic Genesis Record</span>
+                <span className="text-[11px] font-mono text-slate-500">view source record · SHA-256</span>
+              </div>
               <a
                 href={`/api/projects/${encodeURIComponent(receipt.projectCode)}`}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-1.5 text-xs font-mono text-[var(--ink)] hover:underline focus:outline-none focus:ring-2 focus:ring-[var(--ink)]"
+                className="inline-flex items-center gap-1.5 text-xs font-bold font-mono text-white bg-slate-900 hover:bg-slate-800 px-3.5 py-2 rounded-lg shadow-xs transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 active:scale-98"
               >
-                <span className="border border-[var(--ink-soft)] px-1.5 py-0.5 rounded text-[11px]">
-                  prove it
-                </span>
-                <span className="text-[var(--ink-soft)]">
-                  view source record
-                </span>
+                <span>prove it</span>
+                <span className="text-[10px]">↗</span>
               </a>
             </div>
           </section>

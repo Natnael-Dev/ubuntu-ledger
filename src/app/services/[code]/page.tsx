@@ -75,10 +75,10 @@ export default async function ServiceCardPage(props: PageProps) {
         }}
       />
       <div className="min-h-screen bg-slate-50 text-slate-900 py-10 px-4 sm:px-6 lg:px-8 print:bg-white print:text-black print:p-0">
-        <nav aria-label="Return navigation" className="max-w-5xl mx-auto mb-5 print-hide">
+        <nav aria-label="Return navigation" className="max-w-5xl mx-auto mb-6 print-hide">
           <Link
             href="/"
-            className="font-mono text-xs text-slate-600 hover:text-blue-600 inline-flex items-center gap-1.5 focus:outline-none focus:ring-2 focus:ring-blue-600 font-semibold transition-colors"
+            className="font-mono text-xs text-slate-800 hover:text-slate-950 px-3.5 py-2 rounded-xl bg-white border border-slate-300 hover:bg-slate-100 inline-flex items-center gap-1.5 shadow-2xs font-bold transition-all active:scale-98"
           >
             ← Return to Proof-Line Overview
           </Link>
@@ -87,23 +87,23 @@ export default async function ServiceCardPage(props: PageProps) {
         <h1 className="sr-only">Public Service Fee Divergence Card for {card.serviceCode}</h1>
         <DivergenceCard card={card} />
 
-        {/* Journey navigation */}
+        {/* Journey navigation (Agent 7) */}
         <nav
           aria-label="Proof-Line steps"
-          className="max-w-5xl mx-auto mt-10 pt-5 border-t border-slate-200 flex justify-between items-center font-mono text-xs text-slate-600 print-hide"
+          className="max-w-5xl mx-auto mt-12 pt-6 border-t border-slate-200 flex justify-between items-center font-mono text-xs print-hide"
         >
           <Link
             href="/receipt/4412"
-            className="hover:text-blue-600 transition-colors focus:outline-none focus:ring-1 focus:ring-blue-600"
+            className="px-3.5 py-2 rounded-xl bg-white border border-slate-300 hover:bg-slate-50 text-slate-800 font-bold transition-all shadow-2xs active:scale-98"
           >
             ‹ Step 3: Receipt
           </Link>
-          <span aria-current="step" className="font-bold text-slate-900">
+          <span aria-current="step" className="font-bold text-slate-900 bg-slate-200/80 px-3.5 py-2 rounded-xl">
             Step 4: Divergence
           </span>
           <Link
             href="/pwa"
-            className="hover:text-blue-600 transition-colors focus:outline-none focus:ring-1 focus:ring-blue-600"
+            className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold transition-all shadow-sm shadow-blue-500/20 active:scale-98"
           >
             Step 5: Offline PWA ›
           </Link>

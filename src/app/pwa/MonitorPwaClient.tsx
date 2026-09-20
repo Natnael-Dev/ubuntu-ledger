@@ -302,18 +302,29 @@ export function MonitorPwaClient() {
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 font-sans antialiased pb-16">
       {/* Header */}
-      <header className="border-b border-slate-200 bg-white px-4 sm:px-6 lg:px-8 py-4 shadow-sm">
-        <div className="max-w-5xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div>
-            <div className="text-[10px] font-mono uppercase tracking-widest text-slate-500 font-bold">
-              Ward Proof-Line // Field Monitor Interface
+      <header className="border-b border-slate-800 bg-[#0B0F17] px-4 sm:px-6 lg:px-8 py-5 shadow-lg text-white">
+        <div className="max-w-5xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-3.5">
+            <div className="relative w-12 h-12 rounded-full overflow-hidden border-2 border-amber-400 shadow-md flex-shrink-0 bg-slate-800">
+              <img
+                src="/personas/field-monitor.jpg"
+                alt="Field Monitor Volunteer"
+                className="w-full h-full object-cover"
+              />
             </div>
-            <h1 className="text-lg sm:text-xl font-bold font-sans tracking-tight text-slate-900 mt-0.5">
-              Monitor Field Observation (PWA)
-            </h1>
-            <p className="text-xs text-slate-500 mt-0.5">
-              Offline observation outbox with client-side IndexedDB and idempotent background sync.
-            </p>
+            <div>
+              <div className="text-[10px] font-mono uppercase tracking-widest text-emerald-400 font-bold flex items-center gap-2">
+                <span>Ward Proof-Line</span>
+                <span className="text-slate-600">•</span>
+                <span className="text-slate-400">Field Monitor PWA</span>
+              </div>
+              <h1 className="text-lg sm:text-xl font-bold font-sans tracking-tight text-white mt-0.5">
+                Monitor Field Observation (PWA)
+              </h1>
+              <p className="text-xs text-slate-400 mt-0.5">
+                Offline observation outbox with client-side IndexedDB and idempotent background sync.
+              </p>
+            </div>
           </div>
 
           <div className="flex flex-wrap items-center gap-3 self-start sm:self-auto">
@@ -324,7 +335,7 @@ export function MonitorPwaClient() {
               <label
                 htmlFor="airplane-mode-toggle"
                 id="connectivity-label"
-                className="text-[11px] font-mono uppercase tracking-wider text-slate-500 sr-only sm:not-sr-only font-bold"
+                className="text-[11px] font-mono uppercase tracking-wider text-slate-400 sr-only sm:not-sr-only font-bold"
               >
                 Simulation:
               </label>
@@ -341,10 +352,10 @@ export function MonitorPwaClient() {
                 }
                 data-testid="airplane-mode-toggle"
                 onClick={handleToggleAirplane}
-                className={`px-3 py-2.5 min-h-[44px] text-xs font-mono rounded-xl border transition-all shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-blue-600 ${
+                className={`px-3 py-2.5 min-h-[44px] text-xs font-mono rounded-xl border transition-all shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-blue-400 ${
                   isAirplaneMode
-                    ? 'bg-amber-600 text-white border-amber-700 font-bold shadow-amber-500/20'
-                    : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50 hover:text-slate-900'
+                    ? 'bg-amber-500 text-slate-950 font-bold border-amber-400 shadow-amber-500/20'
+                    : 'bg-slate-800 text-slate-200 border-slate-700 hover:bg-slate-700 hover:text-white'
                 }`}
               >
                 {isAirplaneMode ? '✈ Airplane Mode: ON (Buffered)' : '✈ Airplane Mode: OFF (Live)'}

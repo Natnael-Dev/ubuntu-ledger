@@ -449,12 +449,12 @@ export function ProjectBoard({
             type="button"
             data-testid="demo-reset-btn"
             onClick={resetProject4412ToBroken}
-            className="px-4 py-2 text-xs font-bold font-sans rounded-xl border border-amber-300 bg-amber-50 hover:bg-amber-100 text-amber-900 transition-all flex items-center gap-2 shadow-xs cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
+            className="px-5 py-2.5 text-sm font-bold font-sans rounded-xl border-2 border-amber-400 bg-amber-100/90 hover:bg-amber-200 text-amber-950 transition-all flex items-center gap-2.5 shadow-sm hover:shadow active:scale-98 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-600"
             title="Reset Project 4412 to REPORTED_BROKEN to demonstrate the claim and 7-day probation lock"
           >
-            <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
-            <span>Demo: Simulate Breakage on #4412</span>
-            <span className="text-amber-700 font-mono text-[11px]">›</span>
+            <span className="w-2.5 h-2.5 rounded-full bg-amber-600 animate-pulse" />
+            <span className="tracking-tight">Demo: Simulate Breakage on #4412</span>
+            <span className="text-amber-800 font-mono text-sm font-bold">›</span>
           </button>
           
           {/* Journey nav - shown after demo */}
@@ -780,37 +780,37 @@ export function ProjectBoard({
                   }`}
                 >
                   {/* Code */}
-                  <td className="py-2.5 px-3 font-bold font-mono">
+                  <td className="py-3 px-3 font-bold font-mono">
                     <Link
                       href={`/receipt/${p.projectCode}`}
-                      className="text-blue-700 hover:underline inline-flex items-center gap-1 focus-visible:ring-1 focus-visible:ring-[var(--ink)] focus-visible:outline-none"
+                      className="text-blue-700 hover:text-blue-900 bg-blue-50/80 hover:bg-blue-100 border border-blue-200 px-2 py-1 rounded-md inline-flex items-center gap-1 focus-visible:ring-1 focus-visible:ring-[var(--ink)] focus-visible:outline-none transition-colors"
                       title="View public spending receipt"
                     >
-                      <span>{p.projectCode}</span>
+                      <span className="font-bold text-xs">{p.projectCode}</span>
                       <span className="text-[10px] opacity-70">↗</span>
                     </Link>
                   </td>
 
                   {/* Title & Contractor */}
-                  <td className="py-2.5 px-3 font-sans max-w-xs">
-                    <div className="font-semibold text-[var(--ink)] truncate">{p.title}</div>
-                    <div className="text-[11px] font-mono text-[var(--ink-soft)] truncate">
+                  <td className="py-3 px-3 font-sans max-w-xs">
+                    <div className="font-bold text-sm text-slate-900 leading-snug truncate">{p.title}</div>
+                    <div className="text-xs font-mono text-slate-500 truncate mt-0.5">
                       {p.contractorName}
                     </div>
                   </td>
 
                   {/* Amount */}
-                  <td className="py-2.5 px-3 text-right font-mono tabular-nums whitespace-nowrap">
+                  <td className="py-3 px-3 text-right font-mono tabular-nums whitespace-nowrap text-xs font-semibold">
                     {formatCurrency(p.amountMinor, p.currency)}
                   </td>
 
                   {/* Fiscal State */}
-                  <td className="py-2.5 px-3 whitespace-nowrap">
+                  <td className="py-3 px-3 whitespace-nowrap">
                     <NarrativeState kind="fiscal" state={p.fiscal} />
                     {p.fiscal === 'COMMITTED' && (
                       <div className="mt-0.5">
                         <span
-                          className="inline-block text-[9px] font-mono text-amber-900 bg-amber-50 border border-amber-300 px-1 py-0.2 cursor-help"
+                          className="inline-block text-[9px] font-mono text-amber-900 bg-amber-50 border border-amber-300 px-1 py-0.2 cursor-help rounded-xs"
                           title="Locked: funds committed / held in escrow / non-disbursable pending community verification"
                         >
                           Locked: Escrow ⓘ
@@ -820,12 +820,12 @@ export function ProjectBoard({
                   </td>
 
                   {/* Audit State */}
-                  <td className="py-2.5 px-3 whitespace-nowrap">
+                  <td className="py-3 px-3 whitespace-nowrap">
                     <NarrativeState kind="audit" state={p.audit} />
                   </td>
 
                   {/* Witnesses n of target */}
-                  <td className="py-2.5 px-3 text-center whitespace-nowrap">
+                  <td className="py-3 px-3 text-center whitespace-nowrap">
                     <WitnessCounter 
                       count={p.witnessCount} 
                       target={p.witnessTarget} 
@@ -834,7 +834,7 @@ export function ProjectBoard({
                   </td>
 
                   {/* Probation Status / Countdown */}
-                  <td className="py-2.5 px-3 whitespace-nowrap">
+                  <td className="py-3 px-3 whitespace-nowrap">
                     <div className="flex flex-col gap-1 items-start">
                       {p.probationState && (
                         <NarrativeState kind="probation" state={p.probationState} />
@@ -849,7 +849,7 @@ export function ProjectBoard({
                   </td>
 
                   {/* Actions */}
-                  <td className="py-2.5 px-3 text-right whitespace-nowrap">
+                  <td className="py-3 px-3 text-right whitespace-nowrap">
                     {p.ticketId && isBroken && (
                       <button
                         type="button"
@@ -859,7 +859,7 @@ export function ProjectBoard({
                           setClaimModalProject(p);
                           setClaimedByInput(p.contractorName || 'AfroTech Infra');
                         }}
-                        className="px-3 py-1.5 text-xs font-bold font-sans rounded-lg border border-amber-600 bg-amber-600 text-white hover:bg-amber-700 transition-all shadow-xs cursor-pointer focus-visible:ring-2 focus-visible:ring-amber-500"
+                        className="px-3.5 py-1.5 text-xs font-bold font-sans rounded-xl border border-amber-600 bg-amber-600 text-white hover:bg-amber-700 transition-all shadow-xs cursor-pointer focus-visible:ring-2 focus-visible:ring-amber-500 active:scale-98"
                       >
                         Record Claim
                       </button>
@@ -875,13 +875,13 @@ export function ProjectBoard({
                             refusalTriggerRef.current = e.currentTarget;
                             attemptEarlyClose(p.ticketId!, p.projectCode);
                           }}
-                          className="px-2.5 py-1.5 text-xs font-semibold font-sans rounded-lg border border-slate-300 bg-white hover:bg-red-50 text-slate-700 hover:text-red-700 hover:border-red-300 transition-all disabled:opacity-50 cursor-pointer focus-visible:ring-2 focus-visible:ring-red-500 shadow-2xs"
+                          className="px-3 py-1.5 text-xs font-bold font-sans rounded-xl border-2 border-slate-300 bg-white hover:bg-red-50 text-slate-800 hover:text-red-700 hover:border-red-300 transition-all disabled:opacity-50 cursor-pointer focus-visible:ring-2 focus-visible:ring-red-500 shadow-2xs active:scale-98"
                           title="Attempt to close probation early (will demonstrate 409 lock)"
                         >
                           {isAttemptingClose === p.ticketId ? 'Checking...' : 'Attempt Close'}
                         </button>
                         <span
-                          className="text-[11px] font-mono font-bold text-amber-800 border border-amber-300 px-2 py-0.5 bg-amber-50 rounded-md"
+                          className="text-[11px] font-mono font-bold text-amber-800 border border-amber-300 px-2.5 py-1 bg-amber-50 rounded-lg"
                           title="Repair claim recorded; waiting for time + community confirmation"
                         >
                           Claimed
@@ -890,7 +890,7 @@ export function ProjectBoard({
                     )}
 
                     {isSustained && (
-                      <span className="text-[11px] font-mono text-[var(--state-open)] font-medium">
+                      <span className="text-xs font-mono text-[var(--state-open)] font-bold">
                         ✓ Sustained
                       </span>
                     )}

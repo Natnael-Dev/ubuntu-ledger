@@ -104,6 +104,67 @@ code, kbd, samp, .font-mono {
   animation: routeFadeIn 180ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
+/* ─── Civic Action & Button Primitives (Agent 1) ────────── */
+.btn-civic-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.9375rem;
+  padding: 0.75rem 1.375rem;
+  border-radius: 0.75rem;
+  background-color: var(--civic-blue);
+  color: #ffffff;
+  transition: all 150ms ease;
+  cursor: pointer;
+  box-shadow: 0 1px 2px 0 rgba(37, 99, 235, 0.2);
+}
+.btn-civic-primary:hover {
+  background-color: var(--civic-blue-hover);
+  box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.3);
+}
+.btn-civic-primary:active {
+  transform: translateY(1px);
+}
+
+.btn-civic-dark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.9375rem;
+  padding: 0.75rem 1.375rem;
+  border-radius: 0.75rem;
+  background-color: #0F172A;
+  color: #ffffff;
+  border: 1px solid #1E293B;
+  transition: all 150ms ease;
+  cursor: pointer;
+}
+.btn-civic-dark:hover {
+  background-color: #1E293B;
+  border-color: #334155;
+}
+
+.btn-civic-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.9375rem;
+  padding: 0.75rem 1.375rem;
+  border-radius: 0.75rem;
+  background-color: #ffffff;
+  color: #1E293B;
+  border: 2px solid #CBD5E1;
+  transition: all 150ms ease;
+  cursor: pointer;
+}
+.btn-civic-outline:hover {
+  border-color: #94A3B8;
+  background-color: #F8FAFC;
+}
+
 /* ─── Reduced Motion ─────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   *,

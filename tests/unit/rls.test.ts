@@ -55,8 +55,8 @@ describe("T-06: RLS Security Invariant Verification", () => {
   const fullSql = migrations.map((m) => m.content).join("\n");
 
   describe("Level 1: RLS Enablement Coverage", () => {
-    it("has migrations 001 through 012 present", () => {
-      expect(migrations.length).toBe(12);
+    it("has migrations 001 through 013 present", () => {
+      expect(migrations.length).toBe(13);
       const prefixes = migrations.map((m) => m.filename.slice(0, 3));
       expect(prefixes).toEqual([
         "001",
@@ -71,6 +71,7 @@ describe("T-06: RLS Security Invariant Verification", () => {
         "010",
         "011",
         "012",
+        "013",
       ]);
     });
 

@@ -1,44 +1,63 @@
-// API Route: Voice-to-Evidence AI Assistive Processing (T-AI-010 / T-AI-011)
+// API Route: Voice-to-Evidence AI Assistive Processing (T-AI-010 / T-AI-021)
 // Contract: All AI endpoints must live under /api/ai/* or /api/insights/*,
 // enforce PII redaction, 2000ms timeout, and return typed results with deterministic fallbacks.
+// Rule: Strictly assistive. The core deterministic ledger (INV-01) does not rely on this endpoint for state transitions.
 
-import { callAiWithFallback } from '@/lib/ai/client';
-import { redactPiiPayload } from '@/lib/ai/redact';
-import {
-  VoiceToEvidenceResultSchema,
-  type VoiceToEvidenceResult,
-} from '@/lib/ai/types';
+import { processVoiceEvidence } from '@/app-services/ai/voice-evidence.service';
 import fallbackFixture from '@/content/fixtures/ai/voice-to-evidence.json';
+import type { VoiceToEvidenceResult } from '@/lib/ai/types';
+import { logger } from '@/lib/logger';
+
+interface VoiceToEvidenceRequestBody {
+  audioBase64?: string;
+  textTranscript?: string;
+  taskId?: string;
+}
 
 export async function POST(request: Request): Promise<Response> {
-  let body: Record<string, unknown> = {};
+  let body: VoiceToEvidenceRequestBody = {};
   try {
-    body = (await request.json()) as Record<string, unknown>;
+    const raw = await request.json();
+    if (raw && typeof raw === 'object') {
+      body = raw as VoiceToEvidenceRequestBody;
+    }
   } catch {
-    // Body is optional for initial fallback probing
+    // Body is optional for initial fallback probing or malformed JSON
     body = {};
   }
 
-  // Enforce zero-PII boundary before model invocation
-  const safePayload = redactPiiPayload(body);
+  const requestedTaskId = typeof body.taskId === 'string' ? body.taskId.trim() : undefined;
 
-  const prompt = `You are an assistive civic observer analyzing a citizen voice report.
-Extract structured observation answers (q1, q2, q3 as booleans), urgency, and summary.
-Input: ${JSON.stringify(safePayload)}`;
+  try {
+    const result = await processVoiceEvidence({
+      audioBase64: typeof body.audioBase64 === 'string' ? body.audioBase64 : undefined,
+      textTranscript: typeof body.textTranscript === 'string' ? body.textTranscript : undefined,
+      taskId: requestedTaskId,
+    });
 
-  const typedFallback = fallbackFixture as VoiceToEvidenceResult;
+    return Response.json(result, {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+        'X-AI-Assistive-Only': 'true',
+      },
+    });
+  } catch (error) {
+    logger.warn('AI: Error processing voice evidence route; returning fallback fixture', {
+      error: error instanceof Error ? error.message : String(error),
+    });
 
-  const result = await callAiWithFallback(
-    prompt,
-    VoiceToEvidenceResultSchema,
-    typedFallback
-  );
+    const fallback: VoiceToEvidenceResult = {
+      ...(fallbackFixture as VoiceToEvidenceResult),
+      ...(requestedTaskId ? { taskId: requestedTaskId } : {}),
+    };
 
-  return Response.json(result, {
-    status: 200,
-    headers: {
-      'Content-Type': 'application/json',
-      'X-AI-Assistive-Only': 'true',
-    },
-  });
+    return Response.json(fallback, {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+        'X-AI-Assistive-Only': 'true',
+      },
+    });
+  }
 }

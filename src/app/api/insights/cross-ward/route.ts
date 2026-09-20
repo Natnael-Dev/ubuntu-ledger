@@ -1,14 +1,13 @@
-// API Route: Cross-Ward Contractor Pattern Detection (T-AI-010 / T-AI-011)
-// Contract: Assistive intelligence detecting contractor over-concentration or multi-ward failure trends.
-// Enforces zero-PII boundary, 2000ms timeout, and deterministic fallback.
+// API Route: Cross-Ward Contractor Pattern Detection (T-AI-023)
+// Assistive intelligence endpoint detecting contractor over-concentration or multi-ward failure trends.
+// Enforces zero-PII boundary, 2000ms timeout, and deterministic fallback via cross-ward service.
 
-import { callAiWithFallback } from '@/lib/ai/client';
-import { redactPiiPayload } from '@/lib/ai/redact';
 import {
-  CrossWardPatternResultSchema,
-  type CrossWardPatternResult,
-} from '@/lib/ai/types';
-import fallbackFixture from '@/content/fixtures/ai/cross-ward-patterns.json';
+  analyzeCrossWardPatterns,
+  type CrossWardProjectInput,
+} from '@/app-services/ai/cross-ward.service';
+
+const DEFAULT_CONTRACTOR = 'Apex Rift Engineering Ltd';
 
 export async function POST(request: Request): Promise<Response> {
   let body: Record<string, unknown> = {};
@@ -18,20 +17,54 @@ export async function POST(request: Request): Promise<Response> {
     body = {};
   }
 
-  // Strip phone numbers, exact GPS, and actor identities
-  const safePayload = redactPiiPayload(body);
+  const contractorName =
+    typeof body.contractorName === 'string' && body.contractorName.trim().length > 0
+      ? body.contractorName.trim()
+      : DEFAULT_CONTRACTOR;
 
-  const prompt = `You are a public procurement transparency analyst.
-Analyze contractor allocation across ward boundaries, detecting project over-concentration and probation risks.
-Input: ${JSON.stringify(safePayload)}`;
+  const wardIds = Array.isArray(body.wardIds)
+    ? (body.wardIds.filter((id) => typeof id === 'string') as string[])
+    : undefined;
 
-  const typedFallback = fallbackFixture as CrossWardPatternResult;
+  const projects = Array.isArray(body.projects)
+    ? (body.projects as CrossWardProjectInput[])
+    : undefined;
 
-  const result = await callAiWithFallback(
-    prompt,
-    CrossWardPatternResultSchema,
-    typedFallback
-  );
+  const result = await analyzeCrossWardPatterns({
+    contractorName,
+    wardIds,
+    projects,
+  });
+
+  return Response.json(result, {
+    status: 200,
+    headers: {
+      'Content-Type': 'application/json',
+      'X-AI-Assistive-Only': 'true',
+    },
+  });
+}
+
+export async function GET(request: Request): Promise<Response> {
+  const { searchParams } = new URL(request.url);
+  const contractorParam = searchParams.get('contractorName');
+  const contractorName =
+    contractorParam && contractorParam.trim().length > 0
+      ? contractorParam.trim()
+      : DEFAULT_CONTRACTOR;
+
+  const wardParam = searchParams.get('wardIds');
+  const wardIds = wardParam
+    ? wardParam
+        .split(',')
+        .map((w) => w.trim())
+        .filter(Boolean)
+    : undefined;
+
+  const result = await analyzeCrossWardPatterns({
+    contractorName,
+    wardIds,
+  });
 
   return Response.json(result, {
     status: 200,

@@ -411,6 +411,58 @@ export function MonitorPwaClient() {
           </div>
         </div>
 
+        {/* ─── Demo Credentials Card ─── */}
+        <div
+          className="border-2 border-amber-400 bg-amber-50 rounded-2xl p-5 sm:p-6 shadow-sm"
+          role="note"
+          aria-label="Demo credentials for testing"
+        >
+          <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+            <div className="space-y-3 flex-1 min-w-0">
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-amber-500 flex-shrink-0" aria-hidden="true" />
+                <p className="font-mono text-[10px] uppercase tracking-widest text-amber-800 font-bold">
+                  Demo Mode · Pre-loaded Test Credentials
+                </p>
+              </div>
+              <p className="text-xs text-amber-900 font-sans leading-relaxed">
+                Use the values below to test this form. The fields are pre-filled — just click{' '}
+                <strong>Submit Field Observation</strong> to see the offline queue in action.
+              </p>
+              <div className="space-y-2">
+                <div className="bg-white border border-amber-200 rounded-xl px-3.5 py-2.5">
+                  <div className="text-[10px] font-mono uppercase tracking-wider text-amber-700 font-bold mb-0.5">
+                    Inspection Task ID (Task #4412)
+                  </div>
+                  <code className="text-xs font-mono text-slate-800 break-all select-all">
+                    00000000-0000-4000-a000-000000000300
+                  </code>
+                </div>
+                <div className="bg-white border border-amber-200 rounded-xl px-3.5 py-2.5">
+                  <div className="text-[10px] font-mono uppercase tracking-wider text-amber-700 font-bold mb-0.5">
+                    Monitor Phone Hash (Amina · SHA-256 · zero raw PII)
+                  </div>
+                  <code className="text-xs font-mono text-slate-800 break-all select-all leading-relaxed">
+                    435eef566c8beff9f57f26e9072010466319187fa2f673b636e44084e913ef65
+                  </code>
+                </div>
+              </div>
+            </div>
+            <div className="flex-shrink-0">
+              <button
+                type="button"
+                onClick={() => {
+                  setTaskId(DEFAULT_TASK_ID);
+                  setPhoneHash(DEFAULT_PHONE_HASH);
+                }}
+                className="px-4 py-2.5 min-h-[44px] text-xs font-mono font-bold bg-amber-500 text-white hover:bg-amber-600 active:scale-[0.98] rounded-xl transition-all shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-amber-700 whitespace-nowrap"
+              >
+                ↺ Use Demo Values
+              </button>
+            </div>
+          </div>
+        </div>
+
         {/* Notice Banner */}
         {lastSubmissionNotice && (
           <div

@@ -7,7 +7,7 @@
 
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import type { SimulatorConfig, PersonaOption } from './page';
-import { AlcatelHandset } from '@/components/AlcatelHandset';
+import { AlcatelHandset } from '@/components/simulator/AlcatelHandset';
 import { VoiceEvidenceRecorder } from '@/components/ai/VoiceEvidenceRecorder';
 
 interface TranscriptEntry {
@@ -99,7 +99,7 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
   const [loading, setLoading] = useState(false);
   const [lastRawResponse, setLastRawResponse] = useState<string>('');
   const [invalidInputNotice, setInvalidInputNotice] = useState<string | null>(null);
-  const [activeRightTab, setActiveRightTab] = useState<'live' | 'walkthrough'>('walkthrough');
+  const [activeRightTab, setActiveRightTab] = useState<'live' | 'walkthrough'>('live');
   const [showTechnicalDetails, setShowTechnicalDetails] = useState(false);
   const [scenarioExpanded, setScenarioExpanded] = useState(false);
   const sessionActive = Boolean(session?.isAlive);
@@ -749,10 +749,15 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
                           <p className="text-sm text-slate-600 font-semibold mt-1">
                             {isKalinda ? 'Woreda 09 · Kebele 09' : 'Woreda 09 · Kebele 08'}
                           </p>
-                          <p className="text-xs font-mono text-slate-800 font-bold mt-1.5 flex items-center gap-1.5 bg-slate-100 border border-slate-200 px-2.5 py-1 rounded-lg inline-flex">
-                            <span>📞</span>
-                            <span>{p.msisdn}</span>
-                          </p>
+                          <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+                            <span
+                              data-testid={`msisdn-chip-${p.id}`}
+                              className="text-xs font-mono font-bold text-slate-800 bg-slate-100 border border-slate-300 px-2.5 py-1 rounded-lg inline-flex items-center gap-1"
+                            >
+                              <span>MSISDN:</span>
+                              <span>{p.msisdn}</span>
+                            </span>
+                          </div>
                         </div>
                       </div>
 
@@ -804,6 +809,14 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
               })}
             </div>
 
+            {/* Authentication helper note (D-001 requirement) */}
+            <div
+              data-testid="persona-auth-helper"
+              className="mt-3.5 p-3.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 font-medium leading-relaxed"
+            >
+              No password needed — the handset authenticates by the selected persona&apos;s number. Dial *890# and follow the menu.
+            </div>
+
             {/* Persona Section Footer showing active cluster key */}
             <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-mono text-slate-600">
               <span>Cluster key: <strong className="text-slate-900 font-bold">{selectedPersona.clusterKey}</strong></span>
@@ -827,18 +840,66 @@ export function SimulatorShell({ config }: SimulatorShellProps) {
               </span>
             </button>
             {scenarioExpanded ? (
-              <div className="text-xs text-slate-600 mt-3 pt-3 border-t border-slate-100 space-y-2.5 leading-relaxed">
-                <p>
-                  <strong>1. Amina (Demo Witness):</strong> Submits inspection observation for Generator #4412.
-                  Independent confirmation recorded (quorum 1/3).
-                </p>
-                <p>
-                  <strong>2. Girma (Duplicate Cluster):</strong> Dials from the same telecom tower.
-                  Sybil protection recognizes the duplicate cluster key and suppresses inflation.
-                </p>
-                <p>
-                  <strong>3. Kalinda (Independent Witness):</strong> Dials from Kebele 09 to complete multi-witness quorum.
-                </p>
+              <div className="text-xs text-slate-600 mt-3 pt-3 border-t border-slate-100 space-y-4 leading-relaxed">
+                <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="font-black text-slate-900 text-xs uppercase">1. Amina (Demo Witness)</span>
+                    <span className="font-mono text-[10px] text-blue-700 font-bold bg-blue-50 px-2 py-0.5 rounded border border-blue-200">Replay Sequence</span>
+                  </div>
+                  <p className="text-xs text-slate-600">Submits genuine field inspection observation for Generator #4412.</p>
+                  <div className="font-mono text-[11px] font-bold text-slate-800 bg-white border border-slate-300 p-2.5 rounded-lg flex flex-wrap items-center gap-1.5">
+                    <span className="px-1.5 py-0.5 bg-emerald-100 text-emerald-900 rounded">Dial *890#</span>
+                    <span>→</span>
+                    <span className="px-1.5 py-0.5 bg-slate-100 rounded">1 (Observe)</span>
+                    <span>→</span>
+                    <span className="px-1.5 py-0.5 bg-slate-100 rounded">4412 (Code)</span>
+                    <span>→</span>
+                    <span className="px-1.5 py-0.5 bg-slate-100 rounded">1 (Yes)</span>
+                    <span>→</span>
+                    <span className="px-1.5 py-0.5 bg-slate-100 rounded">1 (Yes)</span>
+                    <span>→</span>
+                    <span className="px-1.5 py-0.5 bg-slate-100 rounded">2 (No)</span>
+                  </div>
+                  <p className="text-[11px] text-emerald-800 font-medium">Outcome: Witness quorum advances 2 → 3. Independent confirmation recorded.</p>
+                </div>
+
+                <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="font-black text-slate-900 text-xs uppercase">2. Girma (Duplicate Cluster)</span>
+                    <span className="font-mono text-[10px] text-amber-800 font-bold bg-amber-50 px-2 py-0.5 rounded border border-amber-200">Replay Sequence</span>
+                  </div>
+                  <p className="text-xs text-slate-600">Colliding neighbor on same telecom tower cell attempting duplicate observation.</p>
+                  <div className="font-mono text-[11px] font-bold text-slate-800 bg-white border border-slate-300 p-2.5 rounded-lg flex flex-wrap items-center gap-1.5">
+                    <span className="px-1.5 py-0.5 bg-amber-100 text-amber-900 rounded">Dial *890#</span>
+                    <span>→</span>
+                    <span className="px-1.5 py-0.5 bg-slate-100 rounded">1 (Observe)</span>
+                    <span>→</span>
+                    <span className="px-1.5 py-0.5 bg-slate-100 rounded">4412 (Code)</span>
+                    <span>→</span>
+                    <span className="px-1.5 py-0.5 bg-slate-100 rounded">1 (Yes)</span>
+                    <span>→</span>
+                    <span className="px-1.5 py-0.5 bg-slate-100 rounded">1 (Yes)</span>
+                    <span>→</span>
+                    <span className="px-1.5 py-0.5 bg-slate-100 rounded">2 (No)</span>
+                  </div>
+                  <p className="text-[11px] text-amber-800 font-medium">Outcome: DUPLICATE_CLUSTER_SUPPRESSED. Sybil weight = 0, quorum remains 3.</p>
+                </div>
+
+                <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="font-black text-slate-900 text-xs uppercase">3. Kalinda (Independent Witness)</span>
+                    <span className="font-mono text-[10px] text-blue-700 font-bold bg-blue-50 px-2 py-0.5 rounded border border-blue-200">Replay Sequence</span>
+                  </div>
+                  <p className="text-xs text-slate-600">Resident from distinct cell (Kebele 09) providing independent confirmation.</p>
+                  <div className="font-mono text-[11px] font-bold text-slate-800 bg-white border border-slate-300 p-2.5 rounded-lg flex flex-wrap items-center gap-1.5">
+                    <span className="px-1.5 py-0.5 bg-blue-100 text-blue-900 rounded">Dial *890#</span>
+                    <span>→</span>
+                    <span className="px-1.5 py-0.5 bg-slate-100 rounded">1 (View Fee)</span>
+                    <span>→</span>
+                    <span className="px-1.5 py-0.5 bg-slate-100 rounded">0 (Back)</span>
+                  </div>
+                  <p className="text-[11px] text-blue-800 font-medium">Outcome: Verified across independent cell clusters.</p>
+                </div>
               </div>
             ) : (
               <p className="text-xs text-slate-500 mt-2 line-clamp-2">

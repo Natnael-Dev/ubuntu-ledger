@@ -75,6 +75,14 @@ test.describe('simulator page loads and renders', () => {
     await page.goto('/simulator');
     await expect(page.getByText('DUPLICATE CLUSTER').first()).toBeVisible();
   });
+
+  test('credential chip (MSISDN) is visible on persona card and input buffer height >= 48px', async ({ page }) => {
+    await page.goto('/simulator');
+    await expect(page.getByText(/MSISDN:\s*\+251999000003/).first()).toBeVisible();
+    const box = await page.getByTestId('text-input').boundingBox();
+    expect(box).not.toBeNull();
+    expect(box!.height).toBeGreaterThanOrEqual(48);
+  });
 });
 
 // ─── API Integration — REAL backend ───────────────────────────────────────────
